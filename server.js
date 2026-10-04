@@ -230,27 +230,30 @@ app.get("/event-status", async (req, res) => {
     try {
         await connectDB();
 
-        const event = await Event.findOne({
+        let event = await Event.findOne({
             name: "TEDxAASTMT 2026"
         });
 
+        // Create the event automatically if it doesn't exist
         if (!event) {
-            return res.status(404).json({
-                message: "Event not found."
+            event = await Event.create({
+                name: "TEDxAASTMT 2026",
+                totalSeats: 100,
+                seatsRemaining: 100,
+                registrationOpen: true
             });
         }
 
         res.json({
             seatsRemaining: event.seatsRemaining,
             totalSeats: event.totalSeats,
-            registrationOpen: event.seatsRemaining > 0
+            registrationOpen: event.registrationOpen
         });
 
     } catch (error) {
-        console.error("EVENT STATUS ERROR:", error);
-
+        console.error("Event status error:", error);
         res.status(500).json({
-            message: "Server error."
+            message: "Failed to load event status."
         });
     }
 });
