@@ -501,7 +501,7 @@
     return fail(terms, 'Please accept the Terms and Privacy Policy to continue.');
 
   try {
-    const response = await fetch('http://localhost:5000/signup', {
+    const response = await fetch('/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
