@@ -10,8 +10,39 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve all HTML/CSS/JS files from the project folder
+// ==================== FRONTEND FILES ====================
+
 app.use(express.static(__dirname));
+
+// ==================== HTML PAGES ====================
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "frontend.html"));
+});
+
+app.get("/register.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "register.html"));
+});
+
+app.get("/signup.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "signup.html"));
+});
+
+app.get("/login.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "login.html"));
+});
+
+app.get("/privacy.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "privacy.html"));
+});
+
+app.get("/terms.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "terms.html"));
+});
+
+app.get("/rate.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "rate.html"));
+});
 
 // ==================== USER ====================
 
@@ -80,12 +111,6 @@ const Registration = mongoose.model(
     "Registration",
     registrationSchema
 );
-
-// ==================== HOME PAGE ====================
-
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "frontend.html"));
-});
 
 // ==================== SIGN UP ====================
 
@@ -343,12 +368,21 @@ mongoose.connect(process.env.MONGODB_URI)
         );
     });
 
-// ==================== START SERVER ====================
+// ==================== LOCAL SERVER ====================
 
-const PORT = process.env.PORT || 5000;
+// Only needed when running the project on your own computer.
+// Vercel handles the server itself.
 
-app.listen(PORT, () => {
-    console.log(
-        `TEDxAASTMT server running on port ${PORT}`
-    );
-});
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+        console.log(
+            `TEDxAASTMT server running on port ${PORT}`
+        );
+    });
+}
+
+// ==================== VERCEL ====================
+
+module.exports = app;
