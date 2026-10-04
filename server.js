@@ -10,6 +10,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ==================== MONGODB CONNECTION ====================
+
+let mongoPromise = null;
+
+async function connectDB() {
+    if (mongoose.connection.readyState === 1) {
+        return;
+    }
+
+    if (!process.env.MONGODB_URI) {
+        throw new Error("MONGODB_URI is not configured.");
+    }
+
+    if (!mongoPromise) {
+        mongoPromise = mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 10000
+        });
+    }
+
+    await mongoPromise;
+}
+
 // ==================== FRONTEND FILES ====================
 
 app.use(express.static(__dirname));
@@ -116,6 +138,8 @@ const Registration = mongoose.model(
 
 app.post("/signup", async (req, res) => {
     try {
+        await connectDB();
+
         const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
@@ -149,7 +173,7 @@ app.post("/signup", async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("SIGNUP ERROR:", error);
 
         res.status(500).json({
             message: "Server error."
@@ -161,6 +185,8 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
     try {
+        await connectDB();
+
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -190,7 +216,7 @@ app.post("/login", async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("LOGIN ERROR:", error);
 
         res.status(500).json({
             message: "Server error."
@@ -202,6 +228,8 @@ app.post("/login", async (req, res) => {
 
 app.get("/event-status", async (req, res) => {
     try {
+        await connectDB();
+
         const event = await Event.findOne({
             name: "TEDxAASTMT 2026"
         });
@@ -219,7 +247,7 @@ app.get("/event-status", async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("EVENT STATUS ERROR:", error);
 
         res.status(500).json({
             message: "Server error."
@@ -233,6 +261,8 @@ app.post("/register", async (req, res) => {
     const session = await mongoose.startSession();
 
     try {
+        await connectDB();
+
         const {
             name,
             registration_number,
@@ -310,7 +340,7 @@ app.post("/register", async (req, res) => {
 
     } catch (error) {
 
-        console.error(error);
+        console.error("REGISTRATION ERROR:", error);
 
         if (error.message === "EVENT_FULL") {
             return res.status(400).json({
@@ -334,53 +364,45 @@ app.post("/register", async (req, res) => {
     }
 });
 
-// ==================== MONGODB ====================
-
-mongoose.connect(process.env.MONGODB_URI)
-    .then(async () => {
-
-        console.log("MongoDB connected successfully!");
-
-        await Event.findOneAndUpdate(
-            {
-                name: "TEDxAASTMT 2026"
-            },
-            {
-                $setOnInsert: {
-                    name: "TEDxAASTMT 2026",
-                    totalSeats: 100,
-                    seatsRemaining: 100
-                }
-            },
-            {
-                upsert: true,
-                new: true
-            }
-        );
-
-        console.log("Event seat counter ready!");
-
-    })
-    .catch((error) => {
-        console.error(
-            "MongoDB connection error:",
-            error
-        );
-    });
-
 // ==================== LOCAL SERVER ====================
-
-// Only needed when running the project on your own computer.
-// Vercel handles the server itself.
 
 if (require.main === module) {
     const PORT = process.env.PORT || 5000;
 
-    app.listen(PORT, () => {
-        console.log(
-            `TEDxAASTMT server running on port ${PORT}`
-        );
-    });
+    connectDB()
+        .then(async () => {
+
+            console.log("MongoDB connected successfully!");
+
+            await Event.findOneAndUpdate(
+                {
+                    name: "TEDxAASTMT 2026"
+                },
+                {
+                    $setOnInsert: {
+                        name: "TEDxAASTMT 2026",
+                        totalSeats: 100,
+                        seatsRemaining: 100
+                    }
+                },
+                {
+                    upsert: true,
+                    new: true
+                }
+            );
+
+            console.log("Event seat counter ready!");
+
+            app.listen(PORT, () => {
+                console.log(
+                    `TEDxAASTMT server running on port ${PORT}`
+                );
+            });
+
+        })
+        .catch((error) => {
+            console.error("MongoDB startup error:", error);
+        });
 }
 
 // ==================== VERCEL ====================
