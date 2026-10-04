@@ -7,8 +7,10 @@
 
   <title>TEDxAASTMT | Ideas worth spreading</title>
 
-  <meta name="description"
-    content="TEDxAASTMT is an independent, student-run TEDx event. Join us for talks from speakers across campus and beyond.">
+  <meta
+    name="description"
+    content="TEDxAASTMT is an independent, student-run TEDx event. Join us for talks from speakers across campus and beyond."
+  >
 
   <link rel="stylesheet" href="style.css">
 
@@ -55,11 +57,16 @@
       background: var(--white);
       line-height: 1.65;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     a {
       color: inherit;
       text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
     }
 
     :focus-visible {
@@ -91,6 +98,7 @@
       font-size: 1.4rem;
       letter-spacing: -0.02em;
       font-weight: 800;
+      white-space: nowrap;
     }
 
     .logo .name {
@@ -115,7 +123,7 @@
 
       padding: 0.9rem clamp(1rem, 4vw, 3rem);
 
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(8px);
 
       border-bottom: 1px solid var(--line);
@@ -189,10 +197,8 @@
     .btn:hover {
       background: var(--red-dark);
       border-color: var(--red-dark);
-
-
-
       box-shadow: 0 8px 18px rgba(235, 0, 40, 0.28);
+      transform: translateY(-1px);
     }
 
     .btn.small {
@@ -228,7 +234,6 @@
       background: var(--red);
       color: var(--white);
       border-color: var(--red);
-
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
     }
 
@@ -415,9 +420,15 @@
       color: var(--red);
     }
 
+    /* Force About title onto two lines */
+    .about-title .red-text,
+    .about-title .grey-text {
+      display: block;
+    }
+
     .about-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
 
       gap: 2.5rem;
 
@@ -426,11 +437,20 @@
       font-size: 1.05rem;
     }
 
+
+    /* =========================================================
+       FACTS
+       ========================================================= */
+
     .facts {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: flex-start;
 
-      gap: 3.5rem;
+      width: 100%;
+
+      gap: 1rem;
 
       list-style: none;
 
@@ -441,13 +461,18 @@
     }
 
     .facts li {
+      flex: 1;
+      min-width: 0;
+
       color: var(--grey);
 
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
 
       font-size: 0.85rem;
       font-weight: 600;
+
+      text-align: center;
     }
 
     .facts strong {
@@ -460,6 +485,8 @@
 
       letter-spacing: -0.02em;
       text-transform: none;
+
+      white-space: nowrap;
     }
 
 
@@ -478,8 +505,6 @@
       transition: transform 0.3s;
     }
 
-
-
     .speaker h3 {
       margin-top: 1rem;
     }
@@ -491,79 +516,71 @@
 
 
     /* =========================================================
-       TICKETS BAND
+       TICKETS / LOGIN / SIGNUP
        ========================================================= */
 
-    /* =========================================================
-   LOGIN / SIGNUP BAND
-   ========================================================= */
+    .tickets {
+      max-width: none;
 
-/* =========================================================
-   LOGIN / SIGNUP BAND
-   ========================================================= */
+      background: var(--black);
+      color: var(--white);
 
-.tickets {
-  max-width: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-  background: var(--black);
-  color: var(--white);
+      gap: 3rem;
+      flex-wrap: wrap;
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+      border-top: 6px solid var(--red);
+    }
 
-  gap: 3rem;
-  flex-wrap: wrap;
+    .tickets > div:first-child {
+      max-width: 600px;
+    }
 
-  border-top: 6px solid var(--red);
-}
+    .tickets h2 {
+      margin-bottom: 1rem;
+      color: var(--white);
+    }
 
-.tickets > div:first-child {
-  max-width: 600px;
-}
+    .tickets p {
+      color: #d0d0d0;
+      font-size: 1.05rem;
+    }
 
-.tickets h2 {
-  margin-bottom: 1rem;
-  color: var(--white);
-}
+    .tickets-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
 
-.tickets p {
-  color: #d0d0d0;
-  font-size: 1.05rem;
-}
+      width: 100%;
+      max-width: 320px;
 
-/* Buttons stay together on the far right */
-.tickets-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  width: 250px;
-  margin-left: auto;
-}
+      margin-left: auto;
+    }
 
-/* Login and Signup */
-.tickets-actions .btn {
-  width: 100%;
-  min-width: 0;
+    .tickets-actions .btn {
+      width: 100%;
+      min-width: 0;
 
-  padding: 0.85rem 1.5rem;
+      padding: 0.85rem 1.5rem;
 
-  background: var(--white);
-  color: var(--black);
-  border: 2px solid var(--white);
+      background: var(--white);
+      color: var(--black);
+      border: 2px solid var(--white);
 
-  font-weight: 700;
-}
+      font-weight: 700;
+    }
 
-/* Hover: TEDx red */
-.tickets-actions .btn:hover {
-  background: var(--red);
-  color: var(--white);
-  border-color: var(--red);
+    .tickets-actions .btn:hover {
+      background: var(--red);
+      color: var(--white);
+      border-color: var(--red);
 
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(235, 0, 40, 0.28);
-}
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(235, 0, 40, 0.28);
+    }
 
 
     /* =========================================================
@@ -590,7 +607,6 @@
     }
 
 
-
     /* =========================================================
        TEAM
        ========================================================= */
@@ -605,9 +621,6 @@
       font-size: 1.05rem;
       margin-bottom: 3.5rem;
     }
-
-
-    /* President + Vice President */
 
     .executive-team {
       display: grid;
@@ -660,9 +673,6 @@
       letter-spacing: 0.08em;
     }
 
-
-    /* Department heads */
-
     .heads-title {
       font-size: 1.3rem;
       margin-bottom: 1.5rem;
@@ -674,6 +684,7 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 0;
+
       border-top: 1px solid var(--line);
     }
 
@@ -758,10 +769,14 @@
 
 
     /* =========================================================
-       MOBILE
+       TABLET
        ========================================================= */
 
     @media (max-width: 860px) {
+
+      .hero {
+        min-height: 72vh;
+      }
 
       .about-grid {
         grid-template-columns: 1fr;
@@ -787,8 +802,6 @@
         text-align: left;
       }
 
-      /* Team mobile */
-
       .executive-team {
         grid-template-columns: 1fr;
         gap: 3.5rem;
@@ -800,6 +813,259 @@
 
       .team-head .position {
         text-align: right;
+      }
+
+      .tickets {
+        align-items: flex-start;
+      }
+
+      .tickets-actions {
+        margin-left: 0;
+      }
+    }
+
+
+    /* =========================================================
+       PHONE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+      section {
+        padding: 3.5rem 1rem;
+      }
+
+      .nav {
+        padding: 0.8rem 1rem;
+      }
+
+      .logo {
+        font-size: 1.25rem;
+      }
+
+
+      /* HERO */
+
+      .hero {
+        min-height: 75vh;
+        align-items: center;
+      }
+
+      .hero::before {
+        width: 55px;
+        height: 6px;
+        top: 2.5rem;
+      }
+
+      .hero-text {
+        padding-top: 1.5rem;
+        width: 100%;
+      }
+
+      .hero h1 {
+        font-size: clamp(3.1rem, 18vw, 5rem);
+      }
+
+      .hero .theme {
+        font-size: 1.1rem;
+        margin-top: 1.5rem;
+      }
+
+      .hero .when {
+        font-size: 0.9rem;
+        margin-bottom: 1.75rem;
+      }
+
+      .actions {
+        width: 100%;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+
+
+      /* ABOUT */
+
+      .about-title {
+        font-size: 1.85rem;
+      }
+
+      .about-title .red-text,
+      .about-title .grey-text {
+        display: block;
+        white-space: nowrap;
+      }
+
+      .about-grid {
+        font-size: 0.98rem;
+      }
+
+
+      /* FACTS
+         KEEP ALL 3 ON ONE ROW */
+
+      .facts {
+        display: flex;
+        flex-wrap: nowrap;
+
+        gap: 0.2rem;
+
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+
+        width: 100%;
+      }
+
+      .facts li {
+        flex: 1;
+        width: 33.333%;
+        min-width: 0;
+
+        font-size: 0.58rem;
+        letter-spacing: 0.035em;
+
+        line-height: 1.35;
+      }
+
+      .facts strong {
+        font-size: clamp(1.65rem, 8vw, 2.1rem);
+        line-height: 1.05;
+
+        white-space: nowrap;
+      }
+
+
+      /* SPEAKERS */
+
+      .grid.four {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem 0.8rem;
+      }
+
+      .speaker h3 {
+        font-size: 0.95rem;
+        margin-top: 0.7rem;
+      }
+
+      .speaker p {
+        font-size: 0.78rem;
+        line-height: 1.4;
+      }
+
+
+      /* TICKETS */
+
+      .tickets {
+        gap: 2rem;
+      }
+
+      .tickets h2 {
+        font-size: 2rem;
+      }
+
+      .tickets p {
+        font-size: 0.95rem;
+      }
+
+      .tickets-actions {
+        width: 100%;
+        max-width: none;
+      }
+
+
+      /* GALLERY */
+
+      .masonry {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+      }
+
+      .masonry .photo.wide {
+        grid-column: span 2;
+      }
+
+
+      /* TEAM */
+
+      .executive-team {
+        margin-bottom: 3.5rem;
+      }
+
+      .executive-photo {
+        width: 180px;
+        height: 180px;
+      }
+
+      .heads-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .team-head {
+        padding: 1rem 0;
+      }
+
+      .team-head .name {
+        font-size: 0.9rem;
+      }
+
+      .team-head .position {
+        font-size: 0.75rem;
+      }
+
+
+      /* FOOTER */
+
+      .foot-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .footer-info {
+        text-align: left;
+        font-size: 0.85rem;
+      }
+
+      .legal {
+        font-size: 0.72rem;
+        line-height: 1.5;
+      }
+    }
+
+
+    /* =========================================================
+       VERY SMALL PHONES
+       ========================================================= */
+
+    @media (max-width: 380px) {
+
+      .logo {
+        font-size: 1.1rem;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+      }
+
+      .about-title {
+        font-size: 1.65rem;
+      }
+
+      .facts {
+        gap: 0.1rem;
+      }
+
+      .facts li {
+        font-size: 0.52rem;
+        letter-spacing: 0.02em;
+      }
+
+      .facts strong {
+        font-size: 1.5rem;
+      }
+
+      .grid.four {
+        gap: 1.5rem 0.6rem;
       }
     }
 
@@ -843,18 +1109,11 @@
       font-weight: 800 !important;
     }
 
-    .tickets-actions {
-  width: 100%;
-  max-width: 320px;
-  margin-left: 0;
-}
-
   </style>
 </head>
 
 
 <body>
-
 
   <!-- =======================================================
        HEADER
@@ -914,21 +1173,31 @@
 
     <section id="about" class="about">
 
-<h2>
-  <span class="red-text">Ideas worth sharing</span><br>
-  <span class="grey-text">from our campus</span>
-</h2>
+      <h2 class="about-title">
+
+        <span class="red-text">
+          Ideas worth sharing
+        </span>
+
+        <span class="grey-text">
+          from our campus
+        </span>
+
+      </h2>
+
 
       <div class="about-grid">
 
         <p>
-          TEDxAASTMT is a student-run event Founded in 2026 where ideas
+          TEDxAASTMT is a student-run event founded in 2026 where ideas
           meet people, conversations begin, and new perspectives
           have room to grow. Every talk is short, personal and open to everyone.
         </p>
 
       </div>
 
+
+      <!-- THREE FACTS — ALWAYS ONE ROW ON MOBILE -->
 
       <ul class="facts">
 
@@ -1157,25 +1426,26 @@
 
     <section id="tickets" class="tickets">
 
-  <div>
+      <div>
 
-    <h2>Join us</h2>
+        <h2>Join us</h2>
 
-    <p>
-      Signup or login to continue and stay connected with TEDxAASTMT.
-    </p>
+        <p>
+          Signup or login to continue and stay connected with TEDxAASTMT.
+        </p>
 
-  </div>
+      </div>
 
-  <div class="tickets-actions">
+      <div class="tickets-actions">
 
-    <a class="btn" href="signup.html">
-      Create an account
-    </a>
+        <a class="btn" href="signup.html">
+          Create an account
+        </a>
 
-  </div>
+      </div>
 
-</section>
+    </section>
+
 
     <!-- =====================================================
          GALLERY
@@ -1494,6 +1764,7 @@
 
 
       </div>
+
     </section>
 
   </main>
@@ -1521,6 +1792,7 @@
           Instagram &nbsp;|&nbsp;
           LinkedIn
         </p>
+
       </div>
 
     </div>
