@@ -234,7 +234,6 @@ app.get("/event-status", async (req, res) => {
             name: "TEDxAASTMT 2026"
         });
 
-        // Create the event automatically if it doesn't exist
         if (!event) {
             event = await Event.create({
                 name: "TEDxAASTMT 2026",
@@ -247,17 +246,17 @@ app.get("/event-status", async (req, res) => {
         res.json({
             seatsRemaining: event.seatsRemaining,
             totalSeats: event.totalSeats,
-            registrationOpen: event.registrationOpen
+            registrationOpen: true
         });
 
     } catch (error) {
         console.error("Event status error:", error);
+
         res.status(500).json({
             message: "Failed to load event status."
         });
     }
 });
-
 // ==================== REGISTER ====================
 
 app.post("/register", async (req, res) => {
