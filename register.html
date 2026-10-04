@@ -1124,10 +1124,7 @@ const STATUS_ENDPOINT =
 
         /* SEATS AVAILABLE */
 
-        if (
-          data.registrationOpen === true &&
-          data.seatsRemaining > 0
-        ) {
+        if (Number(data.seatsRemaining) > 0) {
 
           seatsElement.textContent =
             data.seatsRemaining +
@@ -1166,7 +1163,7 @@ const STATUS_ENDPOINT =
 
 
         connectionError.textContent =
-          "We couldn't connect to the registration server. Please make sure the Node.js server is running on port 5000.";
+          "We couldn't load the registration status. Please refresh the page and try again.";
 
       }
 
@@ -1426,7 +1423,7 @@ const STATUS_ENDPOINT =
 
 
           connectionError.textContent =
-            "The registration server could not be reached. Please make sure the Node.js server is running on port 5000.";
+            "The registration server could not be reached. Please refresh the page and try again.";
 
 
           alert(
