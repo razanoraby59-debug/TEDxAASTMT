@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login | TEDxAASTMT</title>
+  <meta name="description" content="Log in to your TEDxAASTMT account.">
+
+  <style>
+    :root {
+      --red: #EB0028;
+      --red-dark: #C60022;
+      --black: #000000;
+      --ink: #1A1A1A;
+      --grey: #555555;
+      --brand-grey: #8A8A8A;
+      --line: #E3E3E3;
+      --soft: #F6F6F6;
+      --white: #FFFFFF;
+      --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+    /* Wordmark */
+    .ted, .x, .aastmt { font-weight: 800; }
+    .ted, .x { color: var(--red); }
+    .aastmt { color: var(--brand-grey); }
+    .logo { font-size: 1.4rem; letter-spacing: -0.02em; font-weight: 800; }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem clamp(1rem, 4vw, 3rem);
+      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .nav .back {
+      font-size: 0.95rem;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .nav .back::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: -4px;
+      height: 2px; width: 0;
+      background: var(--red);
+      transition: width 0.25s;
+    }
+
+    .nav .back:hover { color: var(--red); }
+    .nav .back:hover::after { width: 100%; }
+
+    /* Layout */
+    .auth {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .auth-side {
+      background: var(--black);
+      color: var(--white);
+      border-top: 6px solid var(--red);
+      padding: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .auth-side::before {
+      content: "";
+      width: 80px; height: 8px;
+      background: var(--red);
+      margin-bottom: 2rem;
+    }
+
+    .auth-side h1 {
+      font-size: clamp(2.6rem, 6vw, 4.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .auth-side p {
+      margin-top: 1.5rem;
+      color: #d0d0d0;
+      font-size: 1.05rem;
+      max-width: 36ch;
+    }
+
+    .auth-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+    }
+
+    .card { width: 100%; max-width: 420px; }
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.2rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      position: relative;
+      padding-bottom: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h2::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 56px; height: 4px;
+      background: var(--red);
+    }
+
+    .sub { color: var(--grey); margin-bottom: 2rem; }
+
+    /* Form */
+    .field { margin-bottom: 1.25rem; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      font: inherit;
+      padding: 0.85rem 1rem;
+      border: 2px solid var(--line);
+      border-radius: 2px;
+      background: var(--white);
+      color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:hover { border-color: #c9c9c9; }
+
+    input:focus {
+      outline: none;
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(235, 0, 40, 0.15);
+    }
+
+    input.invalid { border-color: var(--red); }
+
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 4.5rem; }
+
+    .toggle {
+      position: absolute;
+      right: 0.5rem; top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: 0;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--grey);
+      cursor: pointer;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .toggle:hover { color: var(--red); }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+      font-size: 0.9rem;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--grey);
+    }
+
+    .check input { accent-color: var(--red); width: 1rem; height: 1rem; }
+
+    .link { color: var(--red); font-weight: 700; }
+    .link:hover { text-decoration: underline; }
+
+    .error {
+      display: none;
+      background: #fff0f2;
+      border-left: 4px solid var(--red);
+      color: var(--red-dark);
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .error.show { display: block; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: var(--white);
+      font: inherit;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-align: center;
+      padding: 1rem 1.8rem;
+      border: 2px solid var(--red);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(235, 0, 40, 0.28);
+    }
+
+    .switch {
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      color: var(--grey);
+      font-size: 0.95rem;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 1.5rem clamp(1rem, 4vw, 3rem);
+      border-top: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer .legal { font-size: 0.8rem; color: #aaa; }
+
+    @media (max-width: 860px) {
+      .auth { grid-template-columns: 1fr; }
+      .auth-side { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+      .auth-side p { display: none; }
+      .auth-side::before { margin-bottom: 1.25rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn, input, .nav .back::after { transition: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="nav">
+    <a class="logo" href="frontend.html" aria-label="TEDxAASTMT home">
+      <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
+    </a>
+    <a class="back" href="frontend.html">&larr; Back to home</a>
+  </header>
+
+  <main class="auth">
+
+    <aside class="auth-side">
+      <h1>
+        <span class="ted">TED</span><span class="x">x</span><br>
+        <span class="aastmt">AASTMT</span>
+      </h1>
+      <p>Welcome back. Log in to manage your tickets and stay connected with the event.</p>
+    </aside>
+
+    <section class="auth-main">
+      <div class="card">
+
+        <h2>Log in</h2>
+        <p class="sub">Enter your details to continue.</p>
+
+        <form id="loginForm" novalidate>
+
+          <div class="error" id="formError" role="alert"></div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Your password" required>
+              <button type="button" class="toggle" id="toggle" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <label class="check" style="text-transform:none;letter-spacing:0;font-weight:400;font-size:0.9rem;margin:0;">
+              <input type="checkbox" name="remember"> Remember me
+            </label>
+            <a class="link" href="forgot-password.html">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn">Log in</button>
+
+        </form>
+
+        <p class="switch">
+          New to TEDxAASTMT? <a class="link" href="signup.html">Create an account</a>
+        </p>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <a class="logo" href="frontend.html">
+      <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
+    </a>
+    <p class="legal">This independent TEDx event is operated under license from TED.</p>
+  </footer>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const err = document.getElementById('formError');
+    const toggle = document.getElementById('toggle');
+
+    toggle.addEventListener('click', () => {
+      const show = password.type === 'password';
+      password.type = show ? 'text' : 'password';
+      toggle.textContent = show ? 'Hide' : 'Show';
+      toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  [email, password].forEach(i => i.classList.remove('invalid'));
+  err.classList.remove('show');
+
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+
+  if (!emailOk) {
+    email.classList.add('invalid');
+    err.textContent = 'Please enter a valid email address.';
+    err.classList.add('show');
+    email.focus();
+    return;
+  }
+
+  if (!password.value) {
+    password.classList.add('invalid');
+    err.textContent = 'Please enter your password.';
+    err.classList.add('show');
+    password.focus();
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:5000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email.value.trim(),
+        password: password.value
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed.');
+    }
+
+    err.style.color = '#1E9E4A';
+    err.style.borderLeftColor = '#1E9E4A';
+    err.style.background = '#eefaf2';
+    err.textContent = data.message;
+    err.classList.add('show');
+
+    console.log('Logged in user:', data.user);
+
+  } catch (error) {
+    err.style.color = 'var(--red-dark)';
+    err.style.borderLeftColor = 'var(--red)';
+    err.style.background = '#fff0f2';
+    err.textContent = error.message;
+    err.classList.add('show');
+
+    console.error(error);
+  }
+    });
+  </script>
+
+</body>
+</html>

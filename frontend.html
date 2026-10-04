@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>TEDxAASTMT | Ideas worth spreading</title>
+
+  <meta name="description"
+    content="TEDxAASTMT is an independent, student-run TEDx event. Join us for talks from speakers across campus and beyond.">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+
+    /* =========================================================
+       TEDxAASTMT
+       ========================================================= */
+
+    :root {
+      --red: #EB0028;
+      --red-dark: #C60022;
+      --black: #000000;
+      --ink: #1A1A1A;
+      --grey: #555555;
+      --brand-grey: #8A8A8A;
+      --line: #E3E3E3;
+      --soft: #F6F6F6;
+      --white: #FFFFFF;
+
+      --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --max: 1120px;
+    }
+
+
+    /* =========================================================
+       RESET
+       ========================================================= */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 72px;
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 3px;
+    }
+
+
+    /* =========================================================
+       TEDxAASTMT WORDMARK
+       ========================================================= */
+
+    .ted,
+    .x,
+    .aastmt {
+      font-weight: 800 !important;
+    }
+
+    .ted,
+    .x {
+      color: var(--red);
+    }
+
+    .aastmt {
+      color: var(--brand-grey);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .logo .name {
+      color: var(--brand-grey);
+      font-weight: 800 !important;
+      margin-left: 0.1em;
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+       ========================================================= */
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 0.9rem clamp(1rem, 4vw, 3rem);
+
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .nav nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .nav nav a:not(.btn) {
+      position: relative;
+      font-weight: 600;
+    }
+
+    .nav nav a:not(.btn)::after {
+      content: "";
+
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+
+      height: 2px;
+      width: 0;
+
+      background: var(--red);
+      transition: width 0.25s;
+    }
+
+    .nav nav a:not(.btn):hover {
+      color: var(--red);
+    }
+
+    .nav nav a:not(.btn):hover::after {
+      width: 100%;
+    }
+
+    .nav nav .btn + .btn {
+      margin-left: -0.75rem;
+    }
+
+
+    /* =========================================================
+       BUTTONS
+       ========================================================= */
+
+    .btn {
+      display: inline-block;
+
+      background: var(--red);
+      color: var(--white);
+
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-align: center;
+
+      padding: 0.9rem 1.8rem;
+
+      border: 2px solid var(--red);
+      border-radius: 2px;
+
+      transition:
+        background 0.2s,
+        transform 0.2s,
+        box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+
+
+
+      box-shadow: 0 8px 18px rgba(235, 0, 40, 0.28);
+    }
+
+    .btn.small {
+      padding: 0.45rem 1.2rem;
+      font-size: 0.9rem;
+    }
+
+    .btn.wide {
+      min-width: min(100%, 320px);
+      padding: 1.05rem 3rem;
+      font-size: 1.1rem;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--black);
+      border-color: var(--black);
+    }
+
+    .btn.ghost:hover {
+      background: var(--black);
+      color: var(--white);
+      box-shadow: none;
+    }
+
+    .btn.light {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    .btn.light:hover {
+      background: var(--red);
+      color: var(--white);
+      border-color: var(--red);
+
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    }
+
+
+    /* =========================================================
+       SECTIONS
+       ========================================================= */
+
+    section {
+      padding: clamp(3.5rem, 8vw, 6.5rem) clamp(1rem, 4vw, 3rem);
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+
+      margin-bottom: 2.5rem;
+      max-width: 20ch;
+
+      position: relative;
+      padding-bottom: 1rem;
+    }
+
+    h2::after {
+      content: "";
+
+      position: absolute;
+      left: 0;
+      bottom: 0;
+
+      width: 56px;
+      height: 4px;
+
+      background: var(--red);
+    }
+
+    h3 {
+      font-size: 1.1rem;
+    }
+
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .hero {
+      display: flex;
+      align-items: center;
+
+      min-height: 80vh;
+
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+
+      position: absolute;
+      left: clamp(1rem, 4vw, 3rem);
+      top: clamp(3rem, 8vw, 5rem);
+
+      width: 80px;
+      height: 8px;
+
+      background: var(--red);
+    }
+
+    .hero-text {
+      padding-top: 2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(3.2rem, 9vw, 6.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+
+      color: var(--grey);
+    }
+
+    .hero h1 .ted,
+    .hero h1 .x,
+    .hero h1 .aastmt {
+      font-weight: 800 !important;
+    }
+
+    .hero h1 .ted,
+    .hero h1 .x {
+      color: var(--red);
+    }
+
+    .hero h1 .aastmt {
+      color: var(--brand-grey);
+    }
+
+    .hero .theme {
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      margin: 1.75rem 0 0.5rem;
+      font-weight: 700;
+    }
+
+    .hero .when {
+      color: var(--grey);
+      margin-bottom: 2.25rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+
+    /* =========================================================
+       PHOTO PLACEHOLDERS
+       ========================================================= */
+
+    .photo {
+      position: relative;
+
+      background: var(--soft);
+      border: 2px dashed #cfcfcf;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      color: var(--grey);
+      overflow: hidden;
+
+      aspect-ratio: 4 / 3;
+
+      transition:
+        transform 0.3s,
+        box-shadow 0.3s;
+    }
+
+    .photo img {
+      position: absolute;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+
+      transition: transform 0.4s;
+    }
+
+    .photo small {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .photo.tall {
+      aspect-ratio: 4 / 5;
+    }
+
+    .photo.square {
+      aspect-ratio: 1;
+    }
+
+    .photo.round {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      max-width: 180px;
+    }
+
+
+    /* =========================================================
+       ABOUT
+       ========================================================= */
+
+    .grey-text {
+      color: var(--brand-grey);
+    }
+
+    .red-text {
+      color: var(--red);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      gap: 2.5rem;
+
+      max-width: 860px;
+
+      font-size: 1.05rem;
+    }
+
+    .facts {
+      display: flex;
+      flex-wrap: wrap;
+
+      gap: 3.5rem;
+
+      list-style: none;
+
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+
+      border-top: 4px solid var(--black);
+    }
+
+    .facts li {
+      color: var(--grey);
+
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .facts strong {
+      display: block;
+
+      font-size: 2.8rem;
+      line-height: 1.1;
+
+      color: var(--red);
+
+      letter-spacing: -0.02em;
+      text-transform: none;
+    }
+
+
+    /* =========================================================
+       SPEAKERS
+       ========================================================= */
+
+    .grid.four {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+
+      gap: 2rem 1.5rem;
+    }
+
+    .speaker {
+      transition: transform 0.3s;
+    }
+
+
+
+    .speaker h3 {
+      margin-top: 1rem;
+    }
+
+    .speaker p {
+      color: var(--grey);
+      font-size: 0.95rem;
+    }
+
+
+    /* =========================================================
+       TICKETS BAND
+       ========================================================= */
+
+    /* =========================================================
+   LOGIN / SIGNUP BAND
+   ========================================================= */
+
+/* =========================================================
+   LOGIN / SIGNUP BAND
+   ========================================================= */
+
+.tickets {
+  max-width: none;
+
+  background: var(--black);
+  color: var(--white);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 3rem;
+  flex-wrap: wrap;
+
+  border-top: 6px solid var(--red);
+}
+
+.tickets > div:first-child {
+  max-width: 600px;
+}
+
+.tickets h2 {
+  margin-bottom: 1rem;
+  color: var(--white);
+}
+
+.tickets p {
+  color: #d0d0d0;
+  font-size: 1.05rem;
+}
+
+/* Buttons stay together on the far right */
+.tickets-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 250px;
+  margin-left: auto;
+}
+
+/* Login and Signup */
+.tickets-actions .btn {
+  width: 100%;
+  min-width: 0;
+
+  padding: 0.85rem 1.5rem;
+
+  background: var(--white);
+  color: var(--black);
+  border: 2px solid var(--white);
+
+  font-weight: 700;
+}
+
+/* Hover: TEDx red */
+.tickets-actions .btn:hover {
+  background: var(--red);
+  color: var(--white);
+  border-color: var(--red);
+
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(235, 0, 40, 0.28);
+}
+
+
+    /* =========================================================
+       GALLERY
+       ========================================================= */
+
+    .masonry {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+
+      gap: 1rem;
+    }
+
+    .masonry .photo.wide {
+      grid-column: span 2;
+    }
+
+    .masonry .photo {
+      aspect-ratio: 4 / 3;
+    }
+
+    .masonry .photo.wide {
+      aspect-ratio: auto;
+    }
+
+
+
+    /* =========================================================
+       TEAM
+       ========================================================= */
+
+    .team {
+      background: var(--white);
+    }
+
+    .team-intro {
+      max-width: 680px;
+      color: var(--grey);
+      font-size: 1.05rem;
+      margin-bottom: 3.5rem;
+    }
+
+
+    /* President + Vice President */
+
+    .executive-team {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3rem;
+      max-width: 760px;
+      margin-bottom: 5rem;
+    }
+
+    .executive-member {
+      text-align: center;
+    }
+
+    .executive-photo {
+      width: 220px;
+      height: 220px;
+
+      margin: 0 auto 1.5rem;
+
+      border-radius: 50%;
+      overflow: hidden;
+
+      background: var(--soft);
+      border: 4px solid var(--black);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: var(--grey);
+      text-align: center;
+    }
+
+    .executive-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .executive-member h3 {
+      font-size: 1.35rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .executive-member .role {
+      color: var(--red);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+
+    /* Department heads */
+
+    .heads-title {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--black);
+    }
+
+    .heads-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .team-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 1.1rem 0.5rem;
+
+      border-bottom: 1px solid var(--line);
+
+      gap: 1rem;
+    }
+
+    .team-head .name {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .team-head .position {
+      color: var(--grey);
+      font-size: 0.85rem;
+      text-align: right;
+    }
+
+    .team-head:hover .name {
+      color: var(--red);
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    footer {
+      background: var(--black);
+      color: var(--white);
+
+      padding: 2.5rem clamp(1rem, 4vw, 3rem);
+
+      border-top: 1px solid #222;
+    }
+
+    footer .logo .ted,
+    footer .logo .x,
+    footer .logo .name {
+      font-weight: 800 !important;
+    }
+
+    footer .logo .ted,
+    footer .logo .x {
+      color: var(--red);
+    }
+
+    footer .logo .name {
+      color: var(--brand-grey);
+    }
+
+    .foot-top {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-info {
+      text-align: right;
+    }
+
+    .footer-info .president {
+      margin-top: 0.35rem;
+      color: var(--white);
+    }
+
+    .legal {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 860px) {
+
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .grid.four {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .masonry {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .nav nav a:not(.btn) {
+        display: none;
+      }
+
+      .btn.wide {
+        width: 100%;
+      }
+
+      .footer-info {
+        text-align: left;
+      }
+
+      /* Team mobile */
+
+      .executive-team {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+      }
+
+      .heads-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .team-head .position {
+        text-align: right;
+      }
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      html {
+        scroll-behavior: auto;
+      }
+
+      .btn,
+      .speaker,
+      .photo,
+      .photo img,
+      .nav nav a::after {
+        transition: none;
+      }
+    }
+
+
+    /* =========================================================
+       FINAL WORDMARK OVERRIDE
+       ========================================================= */
+
+    .ted,
+    .x,
+    .aastmt,
+    .logo .ted,
+    .logo .x,
+    .logo .name,
+    .hero h1 .ted,
+    .hero h1 .x,
+    .hero h1 .aastmt,
+    footer .logo .ted,
+    footer .logo .x,
+    footer .logo .name {
+      font-weight: 800 !important;
+    }
+
+    .tickets-actions {
+  width: 100%;
+  max-width: 320px;
+  margin-left: 0;
+}
+
+  </style>
+</head>
+
+
+<body>
+
+
+  <!-- =======================================================
+       HEADER
+       ======================================================= -->
+
+  <header class="nav">
+
+    <a class="logo" href="#top" aria-label="TEDxAASTMT home">
+
+      <span class="ted">TED</span><span class="x">x</span><span class="name aastmt">AASTMT</span>
+
+    </a>
+
+  </header>
+
+
+  <main id="top">
+
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section class="hero">
+
+      <div class="hero-text">
+
+        <h1>
+          <span class="ted">TED</span><span class="x">x</span><br>
+          <span class="aastmt">AASTMT</span>
+        </h1>
+
+        <p class="theme">
+          Theme of this year's event goes here
+        </p>
+
+        <p class="when">
+          Saturday 00 Month 2026 &nbsp;|&nbsp; Main Hall, AASTMT
+        </p>
+
+        <div class="actions">
+
+          <a class="btn wide" href="register.html">
+            Get tickets
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ABOUT
+         ===================================================== -->
+
+    <section id="about" class="about">
+
+      <h2>
+        <span class="red-text">Ideas worth sharing</span>
+        <span class="grey-text">from our campus</span>
+      </h2>
+
+      <div class="about-grid">
+
+        <p>
+          TEDxAASTMT is a student-run event where lecturers,
+          students and alumni share ideas that made them think
+          differently. Every talk is short, personal and open to everyone.
+        </p>
+
+        <p>
+          Founded in 2026, TEDxAASTMT is a platform where ideas
+          meet people, conversations begin, and new perspectives
+          have room to grow.
+        </p>
+
+      </div>
+
+
+      <ul class="facts">
+
+        <li>
+          <strong>8</strong>
+          speakers
+        </li>
+
+        <li>
+          <strong>100</strong>
+          seats
+        </li>
+
+        <li>
+          <strong>1 day</strong>
+          of talks
+        </li>
+
+      </ul>
+
+    </section>
+
+
+    <!-- =====================================================
+         SPEAKERS
+         ===================================================== -->
+
+    <section id="speakers" class="speakers">
+
+      <h2>Speakers</h2>
+
+      <div class="grid four">
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-1.jpg"
+              alt="Speaker 1"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-1.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-2.jpg"
+              alt="Speaker 2"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-2.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-3.jpg"
+              alt="Speaker 3"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-3.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-4.jpg"
+              alt="Speaker 4"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-4.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-5.jpg"
+              alt="Speaker 5"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-5.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-6.jpg"
+              alt="Speaker 6"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-6.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-7.jpg"
+              alt="Speaker 7"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-7.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+
+        <article class="speaker">
+
+          <div class="photo square">
+
+            <img
+              src="images/speaker-8.jpg"
+              alt="Speaker 8"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Speaker photo<br>
+              <small>speaker-8.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Speaker Name</h3>
+          <p>Talk title or short bio</p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TICKETS / REGISTRATION
+         ===================================================== -->
+
+    <section id="tickets" class="tickets">
+
+  <div>
+
+    <h2>Join us</h2>
+
+    <p>
+      Signup or login to continue and stay connected with TEDxAASTMT.
+    </p>
+
+  </div>
+
+  <div class="tickets-actions">
+
+    <a class="btn" href="signup.html">
+      Create an account
+    </a>
+
+  </div>
+
+</section>
+
+    <!-- =====================================================
+         GALLERY
+         ===================================================== -->
+
+    <section id="gallery" class="gallery">
+
+      <h2>From past events</h2>
+
+      <div class="masonry">
+
+
+        <div class="photo wide">
+
+          <img
+            src="images/gallery-1.jpg"
+            alt="Audience at last year's event"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-1.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-2.jpg"
+            alt="Team backstage"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-2.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-3.jpg"
+            alt="Speaker on stage"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-3.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-4.jpg"
+            alt="Networking break"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-4.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-5.jpg"
+            alt="Full hall"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-5.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo wide">
+
+          <img
+            src="images/gallery-6.jpg"
+            alt="Opening talk"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-6.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-7.jpg"
+            alt="Volunteers"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-7.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-8.jpg"
+            alt="Stage set-up"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-8.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-9.jpg"
+            alt="Speaker Q&A"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-9.jpg</small>
+          </span>
+
+        </div>
+
+
+        <div class="photo">
+
+          <img
+            src="images/gallery-10.jpg"
+            alt="Group photo"
+            onerror="this.remove()"
+          >
+
+          <span>
+            Gallery photo<br>
+            <small>gallery-10.jpg</small>
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TEAM
+         ===================================================== -->
+
+    <section id="team" class="team">
+
+      <h2>Our Team</h2>
+
+
+      <!-- PRESIDENT + VICE PRESIDENT -->
+
+      <div class="executive-team">
+
+
+        <!-- PRESIDENT -->
+
+        <article class="executive-member">
+
+          <div class="executive-photo">
+
+            <img
+              src="images/president.jpg"
+              alt="Razan AlOraby, President of TEDxAASTMT"
+              onerror="this.remove()"
+            >
+
+            <span>
+              President photo<br>
+              <small>president.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Razan AlOraby</h3>
+
+          <p class="role">
+            President
+          </p>
+
+        </article>
+
+
+        <!-- VICE PRESIDENT -->
+
+        <article class="executive-member">
+
+          <div class="executive-photo">
+
+            <img
+              src="images/vice-president.jpg"
+              alt="Vice President of TEDxAASTMT"
+              onerror="this.remove()"
+            >
+
+            <span>
+              Vice President photo<br>
+              <small>vice-president.jpg</small>
+            </span>
+
+          </div>
+
+          <h3>Vice President Name</h3>
+
+          <p class="role">
+            Vice President
+          </p>
+
+        </article>
+
+      </div>
+
+
+      <!-- DEPARTMENT HEADS -->
+
+      <h3 class="heads-title">
+        Department Heads
+      </h3>
+
+      <div class="heads-grid">
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Curator</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Head Of Human Resources</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Curator</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Head Of Public Relations</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Curator</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Head Of Event Direction</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Curator</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Head Of Production</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Curator</span>
+        </div>
+
+
+        <div class="team-head">
+          <span class="name">Head Name</span>
+          <span class="position">Head Of Creation</span>
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =======================================================
+       FOOTER
+       ======================================================= -->
+
+  <footer>
+
+    <div class="foot-top">
+
+      <a class="logo" href="#top">
+
+        <span class="ted">TED</span><span class="x">x</span><span class="name aastmt">AASTMT</span>
+
+      </a>
+
+
+      <div class="footer-info">
+
+        <p>
+          contact@yourclub.edu &nbsp;|&nbsp;
+          Instagram &nbsp;|&nbsp;
+          LinkedIn
+        </p>
+      </div>
+
+    </div>
+
+
+    <p class="legal">
+      This independent TEDx event is operated under license from TED.
+    </p>
+
+  </footer>
+
+
+</body>
+</html>

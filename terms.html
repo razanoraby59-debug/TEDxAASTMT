@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terms of Use | TEDxAASTMT</title>
+  <meta name="description" content="Terms of Use for TEDxAASTMT.">
+
+  <style>
+    :root {
+      --red: #EB0028;
+      --red-dark: #C60022;
+      --black: #000000;
+      --ink: #1A1A1A;
+      --grey: #555555;
+      --brand-grey: #8A8A8A;
+      --line: #E3E3E3;
+      --soft: #F6F6F6;
+      --white: #FFFFFF;
+      --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 3px;
+    }
+
+    /* Logo */
+
+    .ted,
+    .x,
+    .aastmt {
+      font-weight: 800;
+    }
+
+    .ted,
+    .x {
+      color: var(--red);
+    }
+
+    .aastmt {
+      color: var(--brand-grey);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    /* Navigation */
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem clamp(1rem, 4vw, 3rem);
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav .back {
+      font-size: 0.95rem;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .nav .back::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      height: 2px;
+      width: 0;
+      background: var(--red);
+      transition: width 0.25s;
+    }
+
+    .nav .back:hover {
+      color: var(--red);
+    }
+
+    .nav .back:hover::after {
+      width: 100%;
+    }
+
+    /* Main */
+
+    main {
+      flex: 1;
+    }
+
+    .hero {
+      background: var(--black);
+      color: var(--white);
+      border-top: 6px solid var(--red);
+      padding: clamp(3rem, 7vw, 5.5rem) clamp(1.5rem, 7vw, 7rem);
+    }
+
+    .hero::before {
+      content: "";
+      display: block;
+      width: 80px;
+      height: 8px;
+      background: var(--red);
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.7rem, 7vw, 5rem);
+      line-height: 0.95;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+      max-width: 900px;
+    }
+
+    .hero p {
+      margin-top: 1.4rem;
+      color: #d0d0d0;
+      font-size: 1rem;
+    }
+
+    /* Content */
+
+    .content {
+      width: min(900px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: clamp(3rem, 6vw, 5rem) 0;
+    }
+
+    .intro {
+      font-size: 1.1rem;
+      color: var(--grey);
+      margin-bottom: 3rem;
+      max-width: 75ch;
+    }
+
+    .section {
+      padding: 2rem 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-of-type {
+      border-top: 4px solid var(--red);
+    }
+
+    .section h2 {
+      font-size: 1.35rem;
+      line-height: 1.2;
+      margin-bottom: 0.9rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section p {
+      color: #444;
+      margin-bottom: 0.9rem;
+    }
+
+    .section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .section ul {
+      margin: 0.8rem 0 0.8rem 1.3rem;
+      color: #444;
+    }
+
+    .section li {
+      margin-bottom: 0.45rem;
+      padding-left: 0.25rem;
+    }
+
+    .contact-box {
+      margin-top: 3rem;
+      padding: 1.5rem;
+      background: var(--soft);
+      border-left: 5px solid var(--red);
+    }
+
+    .contact-box strong {
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Footer */
+
+
+    footer {
+      background: var(--black);
+      color: var(--white);
+
+      padding: 2.5rem clamp(1rem, 4vw, 3rem);
+
+      border-top: 1px solid #222;
+    }
+
+    footer .logo .ted,
+    footer .logo .x,
+    footer .logo .name {
+      font-weight: 800 !important;
+    }
+
+    footer .logo .ted,
+    footer .logo .x {
+      color: var(--red);
+    }
+
+    footer .logo .name {
+      color: var(--brand-grey);
+    }
+
+    .foot-top {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-info {
+      text-align: right;
+    }
+
+    .footer-info .president {
+      margin-top: 0.35rem;
+      color: var(--white);
+    }
+
+    .legal {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+
+    @media (max-width: 650px) {
+      .nav {
+        gap: 1rem;
+      }
+
+      .nav .back {
+        font-size: 0.85rem;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+      }
+
+      .content {
+        width: min(100% - 2rem, 900px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .nav .back::after {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="nav">
+    <a class="logo" href="frontend.html" aria-label="TEDxAASTMT home">
+      <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
+    </a>
+
+    <a class="back" href="signup.html">&larr; Back to sign up</a>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <h1>Terms of Use</h1>
+      <p>Last updated: October 2026</p>
+    </section>
+
+    <article class="content">
+
+      <p class="intro">
+        Welcome to the TEDxAASTMT website. By creating an account or using this
+        website, you agree to these Terms of Use. If you do not agree with
+        these terms, please do not use the website.
+      </p>
+
+      <section class="section">
+        <h2>1. About TEDxAASTMT</h2>
+        <p>
+          TEDxAASTMT is an independently organized TEDx event operated under
+          license from TED. TEDx events are independently organized by local
+          teams and are subject to TED's rules and guidelines.
+        </p>
+        <p>
+          This website is intended to provide information about TEDxAASTMT,
+          facilitate account registration, and support event-related activities
+          such as seat or ticket registration.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>2. Your Account</h2>
+        <p>
+          When you create an account, you agree to provide accurate and current
+          information, including your name and email address.
+        </p>
+        <p>
+          You are responsible for keeping your password confidential and for
+          activity carried out through your account.
+        </p>
+        <p>You must not:</p>
+        <ul>
+          <li>Create an account using someone else's identity.</li>
+          <li>Provide false or misleading information.</li>
+          <li>Attempt to access another person's account.</li>
+          <li>Use the website for unlawful or harmful purposes.</li>
+          <li>Attempt to interfere with the website, its server, or its security.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>3. Event Registration</h2>
+        <p>
+          Creating an account does not necessarily guarantee admission to a
+          TEDxAASTMT event.
+        </p>
+        <p>
+          Where an event requires registration or ticket confirmation,
+          attendance will be subject to availability, registration requirements,
+          and event policies communicated by the TEDxAASTMT team.
+        </p>
+        <p>
+          If tickets or seats are described as free, this does not guarantee
+          entry if the event reaches capacity or if additional event
+          requirements apply.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>4. Website Content</h2>
+        <p>
+          The content on this website, including text, graphics, logos,
+          photographs, and other materials, is provided for TEDxAASTMT-related
+          purposes.
+        </p>
+        <p>
+          You may not copy, reproduce, modify, distribute, or commercially
+          exploit website content without appropriate permission.
+        </p>
+        <p>
+          TED and TEDx names, logos, and related marks are subject to their
+          respective trademark and usage rules.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>5. Website Availability</h2>
+        <p>
+          We aim to keep the website available and functioning properly, but
+          we cannot guarantee that it will always be uninterrupted, secure,
+          or error-free.
+        </p>
+        <p>
+          We may temporarily modify, suspend, or discontinue parts of the
+          website when necessary for maintenance, security, updates, or other
+          operational reasons.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>6. Third-Party Links</h2>
+        <p>
+          Our website may contain links to third-party websites or services.
+          TEDxAASTMT is not responsible for the content, security, privacy
+          practices, or availability of third-party websites.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>7. Changes to These Terms</h2>
+        <p>
+          We may update these Terms of Use from time to time. When significant
+          changes are made, we may update the "Last updated" date on this page.
+        </p>
+        <p>
+          Your continued use of the website after changes are posted means
+          that you accept the updated terms.
+        </p>
+      </section>
+
+      <div class="contact-box">
+        <strong>Questions?</strong>
+        <p>
+          If you have questions about these Terms of Use, please contact the
+          TEDxAASTMT organizing team through the official contact information
+          provided on our website.
+        </p>
+      </div>
+
+    </article>
+
+  </main>
+
+<footer>
+
+    <div class="foot-top">
+
+      <a class="logo" href="#top">
+
+        <span class="ted">TED</span><span class="x">x</span><span class="name aastmt">AASTMT</span>
+
+      </a>
+
+
+      <div class="footer-info">
+
+        <p>
+          contact@yourclub.edu &nbsp;|&nbsp;
+          Instagram &nbsp;|&nbsp;
+          LinkedIn
+        </p>
+      </div>
+
+    </div>
+
+
+    <p class="legal">
+      This independent TEDx event is operated under license from TED.
+    </p>
+
+  </footer>
+
+</body>
+</html>

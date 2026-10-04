@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Register | TEDxAASTMT</title>
+
+  <meta
+    name="description"
+    content="Reserve your free seat at TEDxAASTMT."
+  >
+
+  <style>
+    :root {
+      --red: #EB0028;
+      --red-dark: #C60022;
+      --black: #000000;
+      --ink: #1A1A1A;
+      --grey: #555555;
+      --brand-grey: #8A8A8A;
+      --line: #E3E3E3;
+      --soft: #F6F6F6;
+      --white: #FFFFFF;
+
+      --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --max: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.6;
+      min-height: 100vh;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 3px;
+    }
+
+    /* =========================
+       TEDxAASTMT BRANDING
+    ========================= */
+
+    .ted,
+    .x {
+      color: var(--red);
+      font-weight: 800 !important;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      letter-spacing: -.02em;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .logo .name {
+      color: var(--brand-grey);
+      font-weight: 800 !important;
+      margin-left: .1em;
+    }
+
+    /* =========================
+       NAVIGATION
+    ========================= */
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: .9rem clamp(1rem, 4vw, 3rem);
+
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav .back {
+      font-size: .95rem;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .nav .back::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      height: 2px;
+      width: 0;
+      background: var(--red);
+      transition: width .25s;
+    }
+
+    .nav .back:hover {
+      color: var(--red);
+    }
+
+    .nav .back:hover::after {
+      width: 100%;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    .btn {
+      display: inline-block;
+
+      background: var(--red);
+      color: var(--white);
+
+      font: inherit;
+      font-weight: 700;
+
+      padding: .85rem 1.6rem;
+
+      border: 2px solid var(--red);
+
+      cursor: pointer;
+
+      transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+    }
+
+    .btn:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--black);
+      border-color: var(--black);
+    }
+
+    .btn.ghost:hover {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--black);
+    }
+
+    .btn[disabled] {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    main {
+      flex: 1;
+
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      max-width: var(--max);
+      margin: 0 auto;
+
+      width: 100%;
+
+      padding:
+        clamp(2rem, 6vw, 5rem)
+        clamp(1rem, 4vw, 3rem);
+
+      gap: clamp(2rem, 5vw, 4rem);
+
+      align-items: start;
+    }
+
+    /* =========================
+       INTRO
+    ========================= */
+
+    .intro h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      line-height: 1;
+      letter-spacing: -.04em;
+      font-weight: 800;
+
+      margin-bottom: 1.5rem;
+    }
+
+    .intro p {
+      max-width: 34ch;
+      margin-bottom: 2rem;
+    }
+
+    .details {
+      list-style: none;
+
+      border-top: 4px solid var(--red);
+
+      padding-top: 1.5rem;
+
+      display: grid;
+      gap: 1rem;
+    }
+
+    .details li {
+      display: flex;
+      flex-direction: column;
+
+      font-size: .95rem;
+    }
+
+    .details strong {
+      font-size: 1.5rem;
+      line-height: 1.1;
+
+      color: var(--red);
+
+      font-weight: 800;
+    }
+
+    /* =========================
+       FORM CARD
+    ========================= */
+
+    .card {
+      background: var(--soft);
+
+      border-top: 6px solid var(--red);
+
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    .card h2 {
+      font-size: 1.6rem;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+
+      margin-bottom: .4rem;
+
+      font-weight: 800;
+    }
+
+    .card .sub {
+      color: var(--grey);
+      font-size: .95rem;
+
+      margin-bottom: 1.8rem;
+    }
+
+    .field {
+      margin-bottom: 1.3rem;
+    }
+
+    label {
+      display: block;
+
+      font-weight: 700;
+      font-size: .9rem;
+
+      margin-bottom: .4rem;
+    }
+
+    input {
+      width: 100%;
+
+      font: inherit;
+
+      padding: .8rem .9rem;
+
+      background: var(--white);
+      color: var(--ink);
+
+      border: 2px solid #C8C8C8;
+      border-radius: 0;
+
+      transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+    }
+
+    input:hover {
+      border-color: var(--grey);
+    }
+
+    input:focus {
+      border-color: var(--red);
+      outline: none;
+
+      box-shadow:
+        0 0 0 3px rgba(235, 0, 40, .2);
+    }
+
+    input[aria-invalid="true"] {
+      border-color: var(--red-dark);
+      background: #FFF6F7;
+    }
+
+    .hint {
+      font-size: .8rem;
+      color: var(--grey);
+
+      margin-top: .3rem;
+    }
+
+    .error {
+      font-size: .85rem;
+      color: var(--red-dark);
+      font-weight: 700;
+
+      margin-top: .3rem;
+
+      min-height: 1.2em;
+    }
+
+    .card .btn {
+      width: 100%;
+
+      font-size: 1.05rem;
+
+      margin-top: .4rem;
+    }
+
+    .fine {
+      font-size: .8rem;
+      color: var(--grey);
+
+      margin-top: 1rem;
+
+      text-align: center;
+    }
+
+    /* =========================
+       SUCCESS
+    ========================= */
+
+    .success {
+      display: none;
+      text-align: left;
+    }
+
+    .success.show {
+      display: block;
+    }
+
+    .tick {
+      width: 56px;
+      height: 56px;
+
+      border-radius: 50%;
+
+      background: var(--red);
+      color: var(--white);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 1.8rem;
+      font-weight: 800;
+
+      margin-bottom: 1.2rem;
+    }
+
+    .success h2 {
+      margin-bottom: .6rem;
+      font-weight: 800;
+    }
+
+    .success p {
+      margin-bottom: 1.5rem;
+    }
+
+    .summary {
+      background: var(--white);
+
+      padding: 1rem 1.2rem;
+
+      margin-bottom: 1.5rem;
+
+      font-size: .95rem;
+
+      border-left: 4px solid var(--red);
+
+      word-break: break-word;
+    }
+
+    .summary b {
+      display: inline-block;
+      min-width: 8.5rem;
+    }
+
+    .formbox.hide {
+      display: none;
+    }
+
+    /* =========================
+       CLOSED REGISTRATION
+    ========================= */
+
+    .closed {
+      padding: 1rem 0;
+    }
+
+    .closed h2 {
+      margin-bottom: .7rem;
+    }
+
+    .closed p {
+      color: var(--grey);
+    }
+
+    /* =========================
+       CONNECTION ERROR
+    ========================= */
+
+    .connection-error {
+      display: none;
+
+      background: #FFF6F7;
+
+      border-left: 4px solid var(--red);
+
+      padding: 1rem;
+
+      margin-bottom: 1.5rem;
+
+      font-size: .9rem;
+
+      color: var(--red-dark);
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+      background: var(--black);
+      color: var(--white);
+
+      padding: 2.5rem clamp(1rem, 4vw, 3rem);
+
+      border-top: 1px solid #222;
+    }
+
+    footer .logo .ted,
+    footer .logo .x,
+    footer .logo .name {
+      font-weight: 800 !important;
+    }
+
+    footer .logo .ted,
+    footer .logo .x {
+      color: var(--red);
+    }
+
+    footer .logo .name {
+      color: var(--brand-grey);
+    }
+
+    .foot-top {
+      display: flex;
+
+      justify-content: space-between;
+
+      flex-wrap: wrap;
+
+      gap: 1.5rem;
+
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-info {
+      text-align: right;
+    }
+
+    .legal {
+      font-size: .8rem;
+      color: #aaa;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 860px) {
+
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .intro p {
+        max-width: none;
+      }
+
+      .foot-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .footer-info {
+        text-align: left;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      html {
+        scroll-behavior: auto;
+      }
+
+      .btn,
+      input {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <!-- =========================
+       NAVIGATION
+  ========================= -->
+
+  <header class="nav">
+
+    <a
+      class="logo"
+      href="frontend.html"
+      aria-label="TEDxAASTMT home"
+    >
+      <span class="ted">TED</span><span class="x">x</span><span class="name">AASTMT</span>
+    </a>
+
+    <a
+      class="back"
+      href="frontend.html"
+    >
+      &larr; Back to home
+    </a>
+
+  </header>
+
+
+  <!-- =========================
+       MAIN
+  ========================= -->
+
+  <main>
+
+    <section
+      class="intro"
+      aria-labelledby="page-title"
+    >
+
+      <h1 id="page-title">
+        Save<br>
+        your seat
+      </h1>
+
+      <p>
+        Entry is completely free. Tell us who you are and we'll hold a seat for you.
+      </p>
+
+
+      <ul class="details">
+
+        <li>
+          <strong>Free</strong>
+          no payment, no catch
+        </li>
+
+        <li>
+          <strong id="seats">Loading...</strong>
+          first come, first served
+        </li>
+
+        <li>
+          <strong>Saturday 00 Month 2026</strong>
+          Main Hall, AASTMT
+        </li>
+
+      </ul>
+
+    </section>
+
+
+    <!-- =========================
+         REGISTRATION CARD
+    ========================= -->
+
+    <section
+      class="card"
+      aria-labelledby="form-title"
+    >
+
+      <div
+        class="formbox"
+        id="formbox"
+      >
+
+        <h2 id="form-title">
+          Register for free
+        </h2>
+
+        <p class="sub">
+          All three fields are required.
+        </p>
+
+
+        <div
+          id="connectionError"
+          class="connection-error"
+          role="alert"
+        ></div>
+
+
+        <form
+          id="reg"
+          novalidate
+        >
+
+          <!-- FULL NAME -->
+
+          <div class="field">
+
+            <label for="name">
+              Full name
+            </label>
+
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              aria-describedby="name-err"
+            >
+
+            <p
+              class="error"
+              id="name-err"
+              role="alert"
+            ></p>
+
+          </div>
+
+
+          <!-- REGISTRATION NUMBER -->
+
+          <div class="field">
+
+            <label for="regno">
+              Registration number
+            </label>
+
+            <input
+              id="regno"
+              name="registration_number"
+              type="text"
+              inputmode="numeric"
+              autocomplete="off"
+              maxlength="9"
+              pattern="[0-9]{9}"
+              required
+              aria-describedby="regno-hint regno-err"
+            >
+
+            <p
+              class="hint"
+              id="regno-hint"
+            >
+            </p>
+
+            <p
+              class="error"
+              id="regno-err"
+              role="alert"
+            ></p>
+
+          </div>
+
+
+          <!-- EMAIL -->
+
+          <div class="field">
+
+            <label for="email">
+              Email
+            </label>
+
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              aria-describedby="email-err"
+            >
+
+            <p
+              class="error"
+              id="email-err"
+              role="alert"
+            ></p>
+
+          </div>
+
+
+          <button
+            class="btn"
+            type="submit"
+            id="submit"
+          >
+            Reserve my seat
+          </button>
+
+
+          <p class="fine">
+            We only use your details to manage event entry.
+          </p>
+
+        </form>
+
+      </div>
+
+
+      <!-- =========================
+           SUCCESS SCREEN
+      ========================= -->
+
+      <div
+        class="success"
+        id="success"
+        tabindex="-1"
+        aria-live="polite"
+      >
+
+        <div
+          class="tick"
+          aria-hidden="true"
+        >
+          &#10003;
+        </div>
+
+        <h2>
+          You're registered!
+        </h2>
+
+        <p>
+          Your seat is reserved. Keep an eye on your inbox for event details.
+        </p>
+
+
+        <div
+          class="summary"
+          id="summary"
+        ></div>
+
+
+        <a
+          class="btn ghost"
+          href="frontend.html"
+        >
+          Back to home
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       FOOTER
+  ========================= -->
+
+  <footer>
+
+    <div class="foot-top">
+
+      <a
+        class="logo"
+        href="frontend.html"
+      >
+        <span class="ted">TED</span><span class="x">x</span><span class="name">AASTMT</span>
+      </a>
+
+
+      <div class="footer-info">
+
+        <p>
+          contact@yourclub.edu
+          &nbsp;|&nbsp;
+          Instagram
+          &nbsp;|&nbsp;
+          LinkedIn
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <p class="legal">
+      This independent TEDx event is operated under license from TED.
+    </p>
+
+  </footer>
+
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================= -->
+
+  <script>
+
+    /* ========================================
+       BACKEND
+    ======================================== */
+
+    const FORM_ENDPOINT =
+      "http://localhost:5000/register";
+
+    const STATUS_ENDPOINT =
+      "http://localhost:5000/event-status";
+
+
+    /* ========================================
+       ELEMENTS
+    ======================================== */
+
+    const form =
+      document.getElementById("reg");
+
+    const submitButton =
+      document.getElementById("submit");
+
+    const seatsElement =
+      document.getElementById("seats");
+
+    const formbox =
+      document.getElementById("formbox");
+
+    const success =
+      document.getElementById("success");
+
+    const summary =
+      document.getElementById("summary");
+
+    const connectionError =
+      document.getElementById("connectionError");
+
+    const registrationNumber =
+      document.getElementById("regno");
+
+
+    /* ========================================
+       FORM FIELDS
+    ======================================== */
+
+    const fields = {
+
+      name: {
+
+        el: document.getElementById("name"),
+
+        err: document.getElementById("name-err"),
+
+        check: function(value) {
+
+          if (value.length < 3) {
+            return "Please enter your full name.";
+          }
+
+          return "";
+
+        }
+
+      },
+
+
+      regno: {
+
+        el: registrationNumber,
+
+        err: document.getElementById("regno-err"),
+
+        check: function(value) {
+
+          if (!/^\d{9}$/.test(value)) {
+
+            return "Registration number must be exactly 9 digits.";
+
+          }
+
+          return "";
+
+        }
+
+      },
+
+
+      email: {
+
+        el: document.getElementById("email"),
+
+        err: document.getElementById("email-err"),
+
+        check: function(value) {
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
+
+            return "Enter a valid email address.";
+
+          }
+
+          return "";
+
+        }
+
+      }
+
+    };
+
+
+    /* ========================================
+       REGISTRATION NUMBER
+       ONLY ALLOWS 9 DIGITS
+    ======================================== */
+
+    registrationNumber.addEventListener(
+      "input",
+      function() {
+
+        this.value = this.value
+          .replace(/\D/g, "")
+          .slice(0, 9);
+
+      }
+    );
+
+
+    /* ========================================
+       VALIDATION
+    ======================================== */
+
+    function validate(field) {
+
+      const value =
+        field.el.value.trim();
+
+      const message =
+        field.check(value);
+
+      field.err.textContent =
+        message;
+
+      field.el.setAttribute(
+        "aria-invalid",
+        message ? "true" : "false"
+      );
+
+      return !message;
+
+    }
+
+
+    Object.keys(fields).forEach(
+      function(key) {
+
+        fields[key].el.addEventListener(
+          "blur",
+          function() {
+
+            validate(fields[key]);
+
+          }
+        );
+
+
+        fields[key].el.addEventListener(
+          "input",
+          function() {
+
+            if (
+              fields[key].el.getAttribute(
+                "aria-invalid"
+              ) === "true"
+            ) {
+
+              validate(fields[key]);
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+    /* ========================================
+       ESCAPE HTML
+    ======================================== */
+
+    function escapeHTML(value) {
+
+      return value.replace(
+        /[&<>"']/g,
+        function(character) {
+
+          return {
+
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+
+          }[character];
+
+        }
+      );
+
+    }
+
+
+    /* ========================================
+       SHOW CLOSED REGISTRATION
+    ======================================== */
+
+    function showClosedMessage() {
+
+      seatsElement.textContent =
+        "0 seats";
+
+      formbox.innerHTML = `
+
+        <div class="closed">
+
+          <h2>
+            Registration closed
+          </h2>
+
+          <p>
+            All 100 seats have been reserved.
+          </p>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /* ========================================
+       UPDATE SEAT COUNT
+    ======================================== */
+
+    async function updateSeats() {
+
+      try {
+
+        const response =
+          await fetch(
+            STATUS_ENDPOINT,
+            {
+              method: "GET",
+              cache: "no-store"
+            }
+          );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Server returned " +
+            response.status
+          );
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        console.log(
+          "Event status:",
+          data
+        );
+
+
+        connectionError.style.display =
+          "none";
+
+
+        /* SEATS AVAILABLE */
+
+        if (
+          data.registrationOpen === true &&
+          data.seatsRemaining > 0
+        ) {
+
+          seatsElement.textContent =
+            data.seatsRemaining +
+            (
+              data.seatsRemaining === 1
+                ? " seat"
+                : " seats"
+            );
+
+          return;
+
+        }
+
+
+        /* NO SEATS */
+
+        showClosedMessage();
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Could not load seat count:",
+          error
+        );
+
+
+        seatsElement.textContent =
+          "Unable to load";
+
+
+        connectionError.style.display =
+          "block";
+
+
+        connectionError.textContent =
+          "We couldn't connect to the registration server. Please make sure the Node.js server is running on port 5000.";
+
+      }
+
+    }
+
+
+    /* ========================================
+       LOAD SEATS WHEN PAGE OPENS
+    ======================================== */
+
+    updateSeats();
+
+
+    /* ========================================
+       SUBMIT REGISTRATION
+    ======================================== */
+
+    form.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        /* -------------------------------
+           VALIDATE
+        ------------------------------- */
+
+        let valid = true;
+
+        let firstInvalid = null;
+
+
+        Object.keys(fields).forEach(
+          function(key) {
+
+            const isValid =
+              validate(fields[key]);
+
+
+            if (!isValid) {
+
+              valid = false;
+
+              if (!firstInvalid) {
+
+                firstInvalid =
+                  fields[key].el;
+
+              }
+
+            }
+
+          }
+        );
+
+
+        if (!valid) {
+
+          firstInvalid.focus();
+
+          return;
+
+        }
+
+
+        /* -------------------------------
+           DATA
+        ------------------------------- */
+
+        const registrationData = {
+
+          name:
+            fields.name.el.value.trim(),
+
+          registration_number:
+            fields.regno.el.value.trim(),
+
+          email:
+            fields.email.el.value.trim().toLowerCase()
+
+        };
+
+
+        /* -------------------------------
+           BUTTON
+        ------------------------------- */
+
+        submitButton.disabled =
+          true;
+
+        submitButton.textContent =
+          "Reserving…";
+
+
+        connectionError.style.display =
+          "none";
+
+
+        try {
+
+          console.log(
+            "Sending registration:",
+            registrationData
+          );
+
+
+          /* -------------------------------
+             SEND TO BACKEND
+          ------------------------------- */
+
+          const response =
+            await fetch(
+              FORM_ENDPOINT,
+              {
+
+                method: "POST",
+
+                headers: {
+                  "Content-Type": "application/json"
+                },
+
+                body:
+                  JSON.stringify(
+                    registrationData
+                  )
+
+              }
+            );
+
+
+          /* -------------------------------
+             SERVER RESPONSE
+          ------------------------------- */
+
+          let result = {};
+
+          try {
+
+            result =
+              await response.json();
+
+          }
+
+          catch {
+
+            result = {};
+
+          }
+
+
+          console.log(
+            "Registration response:",
+            response.status,
+            result
+          );
+
+
+          /* -------------------------------
+             SUCCESS
+          ------------------------------- */
+
+          if (response.ok) {
+
+            summary.innerHTML =
+
+              "<b>Name:</b> " +
+              escapeHTML(
+                registrationData.name
+              ) +
+
+              "<br>" +
+
+              "<b>Registration no.:</b> " +
+              escapeHTML(
+                registrationData.registration_number
+              ) +
+
+              "<br>" +
+
+              "<b>Email:</b> " +
+              escapeHTML(
+                registrationData.email
+              );
+
+
+            formbox.classList.add(
+              "hide"
+            );
+
+
+            success.classList.add(
+              "show"
+            );
+
+
+            success.focus();
+
+
+            /*
+              Update the number immediately.
+
+              Example:
+              100 → 99
+              99 → 98
+              etc.
+            */
+
+            await updateSeats();
+
+            return;
+
+          }
+
+
+          /* -------------------------------
+             REGISTRATION FAILED
+          ------------------------------- */
+
+          submitButton.disabled =
+            false;
+
+          submitButton.textContent =
+            "Reserve my seat";
+
+
+          alert(
+            result.message ||
+            "Registration failed. Please try again."
+          );
+
+
+          /* Check seat count again */
+
+          await updateSeats();
+
+        }
+
+
+        catch (error) {
+
+          console.error(
+            "Registration request failed:",
+            error
+          );
+
+
+          submitButton.disabled =
+            false;
+
+          submitButton.textContent =
+            "Reserve my seat";
+
+
+          connectionError.style.display =
+            "block";
+
+
+          connectionError.textContent =
+            "The registration server could not be reached. Please make sure the Node.js server is running on port 5000.";
+
+
+          alert(
+            "Could not connect to the registration server. Please try again."
+          );
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+
+</html>
