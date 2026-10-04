@@ -71,13 +71,18 @@ app.get("/rate.html", (req, res) => {
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
+
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true,
+        trim: true
     },
+
     password: {
         type: String,
         required: true
@@ -92,15 +97,23 @@ const eventSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true
     },
+
     totalSeats: {
         type: Number,
         required: true
     },
+
     seatsRemaining: {
         type: Number,
         required: true
+    },
+
+    registrationOpen: {
+        type: Boolean,
+        default: true
     }
 });
 
@@ -111,23 +124,42 @@ const Event = mongoose.model("Event", eventSchema);
 const registrationSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
+
     registration_number: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true
     },
+
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true,
+        trim: true
     },
+
     registeredAt: {
         type: Date,
         default: Date.now
     }
 });
+
+// These indexes make duplicate registrations impossible
+// even if two requests arrive at almost the same time.
+registrationSchema.index(
+    { registration_number: 1 },
+    { unique: true }
+);
+
+registrationSchema.index(
+    { email: 1 },
+    { unique: true }
+);
 
 const Registration = mongoose.model(
     "Registration",
@@ -148,6 +180,7 @@ app.post("/signup", async (req, res) => {
             });
         }
 
+        const cleanName = name.trim();
         const cleanEmail = email.trim().toLowerCase();
 
         const existingUser = await User.findOne({
@@ -161,7 +194,7 @@ app.post("/signup", async (req, res) => {
         }
 
         const user = new User({
-            name: name.trim(),
+            name: cleanName,
             email: cleanEmail,
             password
         });
@@ -174,6 +207,13 @@ app.post("/signup", async (req, res) => {
 
     } catch (error) {
         console.error("SIGNUP ERROR:", error);
+
+        // Duplicate email from MongoDB
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "An account with this email already exists."
+            });
+        }
 
         res.status(500).json({
             message: "Server error."
@@ -224,43 +264,52 @@ app.post("/login", async (req, res) => {
     }
 });
 
+// ==================== ENSURE EVENT EXISTS ====================
+
+async function ensureEvent() {
+    await connectDB();
+
+    let event = await Event.findOne({
+        name: "TEDxAASTMT 2026"
+    });
+
+    if (!event) {
+        event = await Event.create({
+            name: "TEDxAASTMT 2026",
+            totalSeats: 100,
+            seatsRemaining: 100,
+            registrationOpen: true
+        });
+    }
+
+    return event;
+}
+
 // ==================== EVENT STATUS ====================
 
 app.get("/event-status", async (req, res) => {
     try {
-        await connectDB();
-
-        let event = await Event.findOne({
-            name: "TEDxAASTMT 2026"
-        });
-
-        if (!event) {
-            event = await Event.create({
-                name: "TEDxAASTMT 2026",
-                totalSeats: 100,
-                seatsRemaining: 100,
-                registrationOpen: true
-            });
-        }
+        const event = await ensureEvent();
 
         res.json({
             seatsRemaining: event.seatsRemaining,
             totalSeats: event.totalSeats,
-            registrationOpen: true
+            registrationOpen: event.seatsRemaining > 0
         });
 
     } catch (error) {
-        console.error("Event status error:", error);
+        console.error("EVENT STATUS ERROR:", error);
 
         res.status(500).json({
             message: "Failed to load event status."
         });
     }
 });
+
 // ==================== REGISTER ====================
 
 app.post("/register", async (req, res) => {
-    const session = await mongoose.startSession();
+    let session = null;
 
     try {
         await connectDB();
@@ -271,57 +320,131 @@ app.post("/register", async (req, res) => {
             email
         } = req.body;
 
+        // ----------------------------
+        // BASIC VALIDATION
+        // ----------------------------
+
         if (!name || !registration_number || !email) {
             return res.status(400).json({
                 message: "Please fill in all fields."
             });
         }
 
-        const cleanName = name.trim();
-        const cleanEmail = email.trim().toLowerCase();
-        const cleanRegNo = registration_number.trim();
+        const cleanName = String(name).trim();
+        const cleanEmail = String(email).trim().toLowerCase();
+        const cleanRegNo = String(registration_number).trim();
 
-        let savedRegistration;
+        if (cleanName.length < 3) {
+            return res.status(400).json({
+                message: "Please enter your full name."
+            });
+        }
+
+        if (!/^\d{9}$/.test(cleanRegNo)) {
+            return res.status(400).json({
+                message: "Registration number must be exactly 9 digits."
+            });
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) {
+            return res.status(400).json({
+                message: "Please enter a valid email address."
+            });
+        }
+
+        // ----------------------------
+        // START DATABASE TRANSACTION
+        // ----------------------------
+
+        session = await mongoose.startSession();
+
+        let savedRegistration = null;
 
         await session.withTransaction(async () => {
 
-            const existingRegistration =
+            // ----------------------------
+            // CHECK EMAIL
+            // ----------------------------
+
+            const existingByEmail =
                 await Registration.findOne({
-                    $or: [
-                        { email: cleanEmail },
-                        { registration_number: cleanRegNo }
-                    ]
+                    email: cleanEmail
                 }).session(session);
 
-            if (existingRegistration) {
-                throw new Error("ALREADY_REGISTERED");
+            if (existingByEmail) {
+                throw new Error("EMAIL_ALREADY_REGISTERED");
             }
 
-            const event = await Event.findOneAndUpdate(
-                {
-                    name: "TEDxAASTMT 2026",
-                    seatsRemaining: { $gt: 0 }
-                },
-                {
-                    $inc: {
-                        seatsRemaining: -1
-                    }
-                },
-                {
-                    new: true,
-                    session
-                }
-            );
+            // ----------------------------
+            // CHECK REGISTRATION NUMBER
+            // ----------------------------
+
+            const existingByRegNo =
+                await Registration.findOne({
+                    registration_number: cleanRegNo
+                }).session(session);
+
+            if (existingByRegNo) {
+                throw new Error("REGISTRATION_NUMBER_ALREADY_REGISTERED");
+            }
+
+            // ----------------------------
+            // GET / CREATE EVENT
+            // ----------------------------
+
+            let event = await Event.findOne({
+                name: "TEDxAASTMT 2026"
+            }).session(session);
 
             if (!event) {
+                event = await Event.create(
+                    [{
+                        name: "TEDxAASTMT 2026",
+                        totalSeats: 100,
+                        seatsRemaining: 100,
+                        registrationOpen: true
+                    }],
+                    { session }
+                );
+
+                event = event[0];
+            }
+
+            // ----------------------------
+            // RESERVE ONE SEAT ATOMICALLY
+            // ----------------------------
+
+            const updatedEvent =
+                await Event.findOneAndUpdate(
+                    {
+                        name: "TEDxAASTMT 2026",
+                        seatsRemaining: { $gt: 0 }
+                    },
+                    {
+                        $inc: {
+                            seatsRemaining: -1
+                        }
+                    },
+                    {
+                        new: true,
+                        session
+                    }
+                );
+
+            if (!updatedEvent) {
                 throw new Error("EVENT_FULL");
             }
 
-            const registration = new Registration({
-                name: cleanName,
-                registration_number: cleanRegNo,
-                email: cleanEmail
-            });
+            // ----------------------------
+            // CREATE REGISTRATION
+            // ----------------------------
+
+            const registration =
+                new Registration({
+                    name: cleanName,
+                    registration_number: cleanRegNo,
+                    email: cleanEmail
+                });
 
             await registration.save({
                 session
@@ -330,7 +453,11 @@ app.post("/register", async (req, res) => {
             savedRegistration = registration;
         });
 
-        res.status(201).json({
+        // ----------------------------
+        // SUCCESS
+        // ----------------------------
+
+        return res.status(201).json({
             message: "Seat reserved successfully!",
             registration: {
                 name: savedRegistration.name,
@@ -344,37 +471,97 @@ app.post("/register", async (req, res) => {
 
         console.error("REGISTRATION ERROR:", error);
 
+        // ----------------------------
+        // SPECIFIC DUPLICATE ERRORS
+        // ----------------------------
+
+        if (error.message === "EMAIL_ALREADY_REGISTERED") {
+            return res.status(400).json({
+                message: "This email is already registered."
+            });
+        }
+
+        if (
+            error.message ===
+            "REGISTRATION_NUMBER_ALREADY_REGISTERED"
+        ) {
+            return res.status(400).json({
+                message:
+                    "This registration number is already registered."
+            });
+        }
+
+        // ----------------------------
+        // EVENT FULL
+        // ----------------------------
+
         if (error.message === "EVENT_FULL") {
             return res.status(400).json({
                 message: "Sorry, all seats are full."
             });
         }
 
-        if (error.message === "ALREADY_REGISTERED") {
+        // ----------------------------
+        // MONGODB DUPLICATE KEY
+        // ----------------------------
+
+        if (error.code === 11000) {
+
+            const duplicateField =
+                Object.keys(error.keyPattern || {})[0];
+
+            if (duplicateField === "email") {
+                return res.status(400).json({
+                    message:
+                        "This email is already registered."
+                });
+            }
+
+            if (
+                duplicateField ===
+                "registration_number"
+            ) {
+                return res.status(400).json({
+                    message:
+                        "This registration number is already registered."
+                });
+            }
+
             return res.status(400).json({
                 message:
-                    "This email or registration number is already registered."
+                    "This registration already exists."
             });
         }
 
-        res.status(500).json({
-            message: "Server error."
+        // ----------------------------
+        // GENERAL ERROR
+        // ----------------------------
+
+        return res.status(500).json({
+            message:
+                "Something went wrong while reserving your seat. Please try again."
         });
 
     } finally {
-        await session.endSession();
+
+        if (session) {
+            await session.endSession();
+        }
     }
 });
 
 // ==================== LOCAL SERVER ====================
 
 if (require.main === module) {
+
     const PORT = process.env.PORT || 5000;
 
     connectDB()
         .then(async () => {
 
-            console.log("MongoDB connected successfully!");
+            console.log(
+                "MongoDB connected successfully!"
+            );
 
             await Event.findOneAndUpdate(
                 {
@@ -384,7 +571,8 @@ if (require.main === module) {
                     $setOnInsert: {
                         name: "TEDxAASTMT 2026",
                         totalSeats: 100,
-                        seatsRemaining: 100
+                        seatsRemaining: 100,
+                        registrationOpen: true
                     }
                 },
                 {
@@ -393,7 +581,16 @@ if (require.main === module) {
                 }
             );
 
-            console.log("Event seat counter ready!");
+            console.log(
+                "Event seat counter ready!"
+            );
+
+            // Make sure unique indexes exist
+            await Registration.init();
+
+            console.log(
+                "Registration indexes ready!"
+            );
 
             app.listen(PORT, () => {
                 console.log(
@@ -403,7 +600,10 @@ if (require.main === module) {
 
         })
         .catch((error) => {
-            console.error("MongoDB startup error:", error);
+            console.error(
+                "MongoDB startup error:",
+                error
+            );
         });
 }
 
