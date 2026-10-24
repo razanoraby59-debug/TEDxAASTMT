@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Join the team | TEDxAASTMT</title>
+  <meta name="description" content="Join the TEDxAASTMT organizing team. Choose from Coaches, Operation & PR, Media & Marketing, or HR.">
+
+  <style>
+    :root {
+      --red: #EB0028;
+      --red-dark: #C60022;
+      --black: #000;
+      --ink: #171717;
+      --grey: #555;
+      --light-grey: #e3e3e3;
+      --soft: #f5f5f5;
+      --white: #fff;
+      --font: Arial, Helvetica, sans-serif;
+      --page-width: 1200px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+    body {
+      width: 100%;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 3px;
+    }
+
+    /* HEADER */
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px max(32px, calc((100% - var(--page-width)) / 2));
+      background: rgba(255, 255, 255, 0.97);
+      border-bottom: 1px solid var(--light-grey);
+      backdrop-filter: blur(8px);
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: baseline;
+      white-space: nowrap;
+      font-size: 1.4rem;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .ted, .x { color: var(--red); font-weight: 800; }
+    .aastmt { color: var(--black); font-weight: 800; }
+
+    .nav nav { display: flex; align-items: center; gap: 26px; }
+    .nav nav a:not(.btn) { font-size: 0.9rem; font-weight: 700; }
+    .nav nav a:not(.btn):hover { color: var(--red); }
+
+    /* BUTTONS */
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 48px;
+      padding: 12px 28px;
+      background: var(--red);
+      color: var(--white);
+      border: 2px solid var(--red);
+      border-radius: 2px;
+      text-align: center;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
+    .btn.wide { min-width: 220px; }
+
+    .btn.outline {
+      background: transparent;
+      color: var(--black);
+      border-color: var(--black);
+    }
+
+    .btn.outline:hover { background: var(--black); color: var(--white); }
+
+    .nav .btn.nav-btn {
+      min-height: 36px;
+      padding: 6px 16px;
+      font-size: 0.82rem;
+    }
+
+    /* GENERAL SECTIONS */
+
+    main { width: 100%; }
+
+    section {
+      width: 100%;
+      max-width: var(--page-width);
+      margin: 0 auto;
+      padding: 88px 48px;
+    }
+
+    h2 {
+      position: relative;
+      width: fit-content;
+      max-width: 100%;
+      padding-bottom: 14px;
+      margin-bottom: 32px;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+    }
+
+    h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 48px;
+      height: 4px;
+      background: var(--red);
+    }
+
+    h3 { font-size: 1.1rem; line-height: 1.35; }
+
+    /* HERO */
+
+    .hero {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding-top: 120px;
+      padding-bottom: 72px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 64px;
+      left: 48px;
+      width: 64px;
+      height: 6px;
+      background: var(--red);
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 6.5vw, 5.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      font-weight: 800;
+    }
+
+    .hero h1 .red-text { color: var(--red); }
+
+    .hero .theme {
+      max-width: 720px;
+      margin-top: 28px;
+      font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .hero .when {
+      margin-top: 10px;
+      margin-bottom: 28px;
+      color: var(--grey);
+      font-size: 0.95rem;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+    /* TEAMS */
+
+    .teams { padding-top: 40px; }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .team-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 28px 28px;
+      background: var(--white);
+      border: 1px solid var(--light-grey);
+      border-top: 4px solid var(--black);
+      transition: border-top-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .team-card:hover {
+      border-top-color: var(--red);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.07);
+    }
+
+    .team-num {
+      color: var(--red);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .team-card h3 {
+      margin-top: 8px;
+      font-size: 1.45rem;
+      letter-spacing: -0.03em;
+    }
+
+    .team-card p {
+      margin-top: 12px;
+      color: var(--grey);
+      font-size: 0.97rem;
+    }
+
+    .team-card ul {
+      margin: 16px 0 24px;
+      padding-left: 18px;
+      color: var(--ink);
+      font-size: 0.92rem;
+    }
+
+    .team-card li { margin-bottom: 4px; }
+    .team-card li::marker { color: var(--red); }
+
+    .team-card .btn {
+      align-self: flex-start;
+      margin-top: auto;
+      min-height: 40px;
+      padding: 8px 20px;
+      font-size: 0.85rem;
+    }
+
+    /* APPLICATION FORM */
+
+    .apply-wrap {
+      max-width: none;
+      background: var(--soft);
+      border-top: 1px solid var(--light-grey);
+      border-bottom: 1px solid var(--light-grey);
+      padding: 88px max(48px, calc((100% - 1104px) / 2));
+    }
+
+    .apply-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 56px;
+      align-items: start;
+    }
+
+    .apply-inner > div:first-child p {
+      color: var(--grey);
+      font-size: 1.02rem;
+      max-width: 420px;
+    }
+
+    form {
+      display: grid;
+      gap: 20px;
+      padding: 36px 32px;
+      background: var(--white);
+      border-top: 6px solid var(--red);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: var(--font);
+      font-size: 0.97rem;
+      color: var(--ink);
+      background: var(--white);
+      border: 1px solid #bdbdbd;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+    }
+
+    input:hover, select:hover, textarea:hover { border-color: var(--black); }
+    input:focus, select:focus, textarea:focus { border-color: var(--red); }
+
+    textarea { min-height: 130px; resize: vertical; }
+
+    .form-note {
+      color: var(--grey);
+      font-size: 0.82rem;
+    }
+
+    .form-status {
+      display: none;
+      padding: 12px 14px;
+      background: var(--soft);
+      border-left: 4px solid var(--red);
+      font-size: 0.9rem;
+    }
+
+    .form-status.show { display: block; }
+
+    form .btn { width: 100%; }
+
+    /* FILE UPLOAD */
+
+    .optional {
+      color: var(--grey);
+      font-weight: 400;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .upload {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 16px;
+      background: var(--soft);
+      border: 1px dashed #9a9a9a;
+      border-radius: 2px;
+      cursor: pointer;
+      font-weight: 400;
+      letter-spacing: 0;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .upload:hover {
+      border-color: var(--red);
+      background: #fff5f6;
+    }
+
+    .upload svg {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      color: var(--red);
+    }
+
+    .upload-text { display: flex; flex-direction: column; min-width: 0; }
+
+    .upload-text strong {
+      font-size: 0.95rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .upload-text small {
+      color: var(--grey);
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .visually-hidden:focus-visible + .remove-file,
+    .field:has(.visually-hidden:focus-visible) .upload {
+      outline: 3px solid var(--red);
+      outline-offset: 3px;
+    }
+
+    .remove-file {
+      align-self: flex-start;
+      padding: 0;
+      background: none;
+      border: 0;
+      color: var(--red);
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .remove-file[hidden] { display: none; }
+
+    /* CTA BAND */
+
+    .tickets {
+      max-width: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      background: var(--black);
+      color: var(--white);
+      border-top: 6px solid var(--red);
+      padding: 72px max(48px, calc((100% - 1104px) / 2));
+    }
+
+    .tickets > div:first-child { max-width: 650px; }
+    .tickets h2 { margin-bottom: 18px; color: var(--white); }
+    .tickets p { color: #d0d0d0; font-size: 1.05rem; }
+    .tickets-actions { flex: 0 0 auto; width: 260px; }
+    .tickets-actions .btn { width: 100%; }
+
+    /* FOOTER */
+
+    footer {
+      width: 100%;
+      padding: 36px max(32px, calc((100% - var(--page-width)) / 2));
+      background: var(--black);
+      color: var(--white);
+      border-top: 1px solid #222;
+    }
+
+    .foot-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    footer .logo .aastmt { color: var(--white); }
+    .footer-info { text-align: right; }
+
+    .social-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 18px;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      color: var(--white);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .social-links a:hover { color: var(--red); transform: translateY(-2px); }
+    .social-links svg { width: 24px; height: 24px; }
+
+    .legal { color: #aaa; font-size: 0.8rem; }
+    .made-by { margin-top: 6px; color: #777; }
+
+    /* TABLETS AND SMALL LAPTOPS */
+
+    @media (max-width: 1000px) {
+      section { padding: 72px 36px; }
+      .hero::before { left: 36px; }
+      .apply-wrap { padding: 72px 36px; }
+      .apply-inner { grid-template-columns: 1fr; gap: 32px; }
+      .apply-inner > div:first-child p { max-width: 640px; }
+      .tickets { padding: 64px 36px; }
+      .nav { padding-left: 28px; padding-right: 28px; }
+      footer { padding-left: 28px; padding-right: 28px; }
+    }
+
+    @media (max-width: 760px) {
+      .nav { min-height: 68px; padding: 14px 22px; }
+      .nav nav { gap: 12px; }
+      .nav nav a:not(.btn) { display: none; }
+      .logo { font-size: 1.2rem; }
+
+      section { padding: 60px 24px; }
+
+      .hero { padding-top: 110px; padding-bottom: 48px; }
+      .hero::before { top: 50px; left: 24px; width: 52px; height: 5px; }
+      .hero .theme { margin-top: 24px; }
+
+      .teams { padding-top: 24px; }
+      .team-grid { grid-template-columns: 1fr; }
+
+      .apply-wrap { padding: 60px 24px; }
+      form { padding: 28px 20px; }
+      .row { grid-template-columns: 1fr; }
+
+      .tickets {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 28px;
+        padding: 56px 24px;
+      }
+
+      .tickets-actions { width: 100%; max-width: 340px; }
+      footer { padding: 32px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      section { padding: 48px 20px; }
+      .hero { padding: 96px 20px 40px; }
+      .hero::before { left: 20px; top: 42px; }
+      .hero .theme { font-size: 1.05rem; }
+
+      .actions { flex-direction: column; width: 100%; }
+      .actions .btn { width: 100%; }
+
+      .apply-wrap { padding: 48px 20px; }
+      .team-card { padding: 28px 20px 24px; }
+
+      .foot-top { align-items: flex-start; flex-direction: column; }
+      .footer-info { text-align: left; }
+      .social-links { justify-content: flex-start; }
+      footer { padding: 30px 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <a class="logo" href="index.html" aria-label="TEDxAASTMT home">
+      <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a href="index.html#about">About</a>
+      <a href="index.html#speakers">Speakers</a>
+      <a href="index.html#gallery">Gallery</a>
+      <a class="btn nav-btn" href="#apply">Join us</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>
+          <span class="red-text">Join</span> the team<br>
+          behind the ideas
+        </h1>
+
+        <p class="when">TEDxAASTMT is built by students. Pick a team, bring your energy, and help us create something worth sharing.</p>
+
+      </div>
+    </section>
+
+    <!-- TEAMS -->
+    <section id="teams" class="teams">
+      <h2>Our teams</h2>
+
+      <div class="team-grid">
+        <article class="team-card">
+          <span class="team-num">01</span>
+          <h3>Coaches</h3>
+          <p>Coaches work closely with our speakers, helping them shape their ideas into clear, memorable talks.</p>
+          <ul>
+            <li>Guide speakers through their talk</li>
+            <li>Give feedback during rehearsals</li>
+            <li>Help speakers feel ready for the stage</li>
+          </ul>
+          <a class="btn outline" href="#apply" data-team="Coaches">Apply to Coaches</a>
+        </article>
+
+        <article class="team-card">
+          <span class="team-num">02</span>
+          <h3>Operation &amp; PR</h3>
+          <p>The team that makes the event run smoothly, from logistics and venue to partners and communication.</p>
+          <ul>
+            <li>Plan schedules, venue and logistics</li>
+            <li>Coordinate with sponsors and partners</li>
+            <li>Handle on-the-day operations</li>
+          </ul>
+          <a class="btn outline" href="#apply" data-team="Operation & PR">Apply to Operation &amp; PR</a>
+        </article>
+
+        <article class="team-card">
+          <span class="team-num">03</span>
+          <h3>Media &amp; Marketing</h3>
+          <p>The creative voice of TEDxAASTMT, telling our story through visuals, content and campaigns.</p>
+          <ul>
+            <li>Design graphics and social content</li>
+            <li>Photograph and film the event</li>
+            <li>Run promotion and campaigns</li>
+          </ul>
+          <a class="btn outline" href="#apply" data-team="Media & Marketing">Apply to Media &amp; Marketing</a>
+        </article>
+
+        <article class="team-card">
+          <span class="team-num">04</span>
+          <h3>HR</h3>
+          <p>HR looks after the people behind the event, keeping the team organized, motivated and connected.</p>
+          <ul>
+            <li>Recruit and onboard new members</li>
+            <li>Organize team activities and meetings</li>
+            <li>Support members throughout the journey</li>
+          </ul>
+          <a class="btn outline" href="#apply" data-team="HR">Apply to HR</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- APPLICATION -->
+    <section id="apply" class="apply-wrap">
+      <div class="apply-inner">
+        <div>
+          <h2>Apply to join</h2>
+          <p>Tell us a little about yourself and which team interests you most. We'll review your application and get back to you by email.</p>
+        </div>
+
+        <form id="join-form" novalidate>
+          <div class="row">
+            <div class="field">
+              <label for="name">Full name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="phone">Phone number</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="college">College / Major</label>
+              <input id="college" name="college" type="text" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="team">Preferred team</label>
+            <select id="team" name="team" required>
+              <option value="" selected disabled>Choose a team</option>
+              <option>Coaches</option>
+              <option>Operation &amp; PR</option>
+              <option>Media &amp; Marketing</option>
+              <option>HR</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="why">Why do you want to join?</label>
+            <textarea id="why" name="why" required></textarea>
+          </div>
+
+          <div class="field">
+            <label for="sample">Any work sample you'd like to share? <span class="optional">(optional)</span></label>
+            <label class="upload" for="sample">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="upload-text">
+                <strong id="file-name">Choose a file</strong>
+                <small>Portfolio, design, article, video, CV. PDF, images, DOC, PPT, MP4 or ZIP. Max 10 MB.</small>
+              </span>
+            </label>
+            <input id="sample" name="sample" type="file" class="visually-hidden"
+                   accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.mp4,.zip">
+            <button type="button" class="remove-file" id="remove-file" hidden>Remove file</button>
+          </div>
+
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+
+          <button class="btn" type="submit">Submit application</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- CTA -->
+  
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-top">
+      <a class="logo" href="index.html" aria-label="TEDxAASTMT home">
+        <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
+      </a>
+
+      <div class="footer-info">
+        <div class="social-links">
+          <a href="https://www.instagram.com/tedxaastmt/"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"
+                    stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4"
+                      stroke="currentColor" stroke-width="2"/>
+              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
+            </svg>
+          </a>
+
+          <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor"
+                d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/>
+            </svg>
+          </a>
+
+          <a href="https://mail.google.com/mail/?view=cm&amp;to=tedxaastmt26@gmail.com"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Email" title="Email">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="2.5" y="4.5" width="19" height="15" rx="2"
+                    stroke="currentColor" stroke-width="2"/>
+              <path d="m3.5 6 8.5 7 8.5-7"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <p class="legal">
+      This independent TEDx event is operated under license from TED.
+    </p>
+
+    <p class="legal made-by">Made by Razan AlOraby</p>
+  </footer>
+
+  <script>
+    // Pre-select the team when a team card button is clicked
+    document.querySelectorAll('[data-team]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.getElementById('team').value = btn.getAttribute('data-team');
+      });
+    });
+
+    // Work sample upload
+    var MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+    var sample = document.getElementById('sample');
+    var fileName = document.getElementById('file-name');
+    var removeBtn = document.getElementById('remove-file');
+
+    function clearSample() {
+      sample.value = '';
+      fileName.textContent = 'Choose a file';
+      removeBtn.hidden = true;
+    }
+
+    sample.addEventListener('change', function () {
+      var file = sample.files[0];
+      if (!file) { clearSample(); return; }
+
+      if (file.size > MAX_SIZE) {
+        clearSample();
+        status.classList.add('show');
+        status.textContent = 'That file is larger than 10 MB. Please choose a smaller one.';
+        return;
+      }
+
+      status.classList.remove('show');
+      fileName.textContent = file.name;
+      removeBtn.hidden = false;
+    });
+
+    removeBtn.addEventListener('click', clearSample);
+
+    // Build an email from the form
+    var form = document.getElementById('join-form');
+    var status = document.getElementById('form-status');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var fields = ['name', 'email', 'phone', 'college', 'team', 'why'];
+      var data = {};
+      var missing = false;
+
+      fields.forEach(function (id) {
+        var el = document.getElementById(id);
+        data[id] = el.value.trim();
+        if (!data[id]) missing = true;
+      });
+
+      status.classList.add('show');
+
+      if (missing) {
+        status.textContent = 'Please fill in every field before submitting.';
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        status.textContent = 'Please enter a valid email address.';
+        return;
+      }
+
+      var subject = 'TEDxAASTMT application - ' + data.team;
+      var body =
+        'Name: ' + data.name + '\n' +
+        'Email: ' + data.email + '\n' +
+        'Phone: ' + data.phone + '\n' +
+        'College / Major: ' + data.college + '\n' +
+        'Preferred team: ' + data.team + '\n\n' +
+        'Why I want to join:\n' + data.why;
+
+      var file = sample.files[0];
+      if (file) {
+        body += '\n\nWork sample: ' + file.name + ' (attached below)';
+      }
+
+      status.textContent = 'Thanks, ' + data.name.split(' ')[0] + '! Your email app should open now.' +
+        (file ? ' Please attach "' + file.name + '" to the email before you press send.' : ' Just press send.');
+
+      window.location.href = 'mailto:tedxaastmt26@gmail.com' +
+        '?subject=' + encodeURIComponent(subject) +
+        '&body=' + encodeURIComponent(body);
+    });
+  </script>
+</body>
+</html>
