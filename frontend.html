@@ -134,7 +134,6 @@
     .btn:hover {
       background: var(--red-dark);
       border-color: var(--red-dark);
-
     }
 
     .btn.wide {
@@ -150,6 +149,14 @@
     .btn.outline:hover {
       background: var(--black);
       color: var(--white);
+    }
+
+    /* SMALLER NAVIGATION BUTTON */
+
+    .nav .btn.nav-btn {
+      min-height: 36px;
+      padding: 6px 16px;
+      font-size: 0.82rem;
     }
 
     /* GENERAL SECTIONS */
@@ -701,7 +708,7 @@
       <a href="#about">About</a>
       <a href="#speakers">Speakers</a>
       <a href="#gallery">Gallery</a>
-      <a class="btn" href="#tickets">Join us</a>
+      <a class="btn nav-btn" href="#tickets">Join us</a>
     </nav>
   </header>
 
@@ -717,12 +724,10 @@
         <p class="theme">Ideas worth sharing. from our campus.</p>
         <p class="when">Event date and venue to be announced</p>
 
-        
-<div class="actions">
-  <a class="btn wide" href="register.html">Attend an event</a>
-  <a class="btn wide outline" href="signup.html">Join the team</a>
-</div>
-
+        <div class="actions">
+          <a class="btn wide" href="register.html">Attend an event</a>
+          <a class="btn wide outline" href="signup.html">Join the team</a>
+        </div>
       </div>
     </section>
 
@@ -929,9 +934,9 @@
             </svg>
           </a>
 
-          <a href="https://mail.google.com/mail/?view=cm&to=tedxaastmt26@gmail.com"
-   target="_blank" rel="noopener noreferrer"
-   aria-label="Email" title="Email">
+          <a href="https://mail.google.com/mail/?view=cm&amp;to=tedxaastmt26@gmail.com"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Email" title="Email">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="2.5" y="4.5" width="19" height="15" rx="2"
                     stroke="currentColor" stroke-width="2"/>
