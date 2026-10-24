@@ -41,7 +41,7 @@
     /* Wordmark */
     .ted, .x, .aastmt { font-weight: 800; }
     .ted, .x { color: var(--red); }
-    .aastmt { color: var(--brand-grey); }
+    .aastmt { black; }
     .logo { font-size: 1.4rem; letter-spacing: -0.02em; font-weight: 800; }
 
     /* Nav */
@@ -273,52 +273,113 @@
 
     /* Footer */
 
-    footer {
-      background: var(--black);
-      color: var(--white);
+    
+/* FOOTER — matches frontend.html */
 
-      padding: 2.5rem clamp(1rem, 4vw, 3rem);
+footer {
+  width: 100%;
+  padding: 36px max(32px, calc((100% - 1200px) / 2));
+  background: var(--black);
+  color: var(--white);
+  border-top: 1px solid #222;
+}
 
-      border-top: 1px solid #222;
-    }
+.foot-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
 
-    footer .logo .ted,
-    footer .logo .x,
-    footer .logo .name {
-      font-weight: 800 !important;
-    }
+footer .logo {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  font-size: 1.4rem;
+  letter-spacing: -0.04em;
+  font-weight: 900;
+  line-height: 1;
+}
 
-    footer .logo .ted,
-    footer .logo .x {
-      color: var(--red);
-    }
+footer .logo .ted,
+footer .logo .x {
+  color: var(--red);
+  font-weight: 900;
+}
 
-    footer .logo .name {
-      color: var(--brand-grey);
-    }
+footer .logo .aastmt {
+  color: #fff;
+  font-weight: 900;
+}
 
-    .foot-top {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
+.footer-info {
+  text-align: right;
+}
 
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
+.social-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+}
 
-    .footer-info {
-      text-align: right;
-    }
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--white);
+  transition: color 0.2s, transform 0.2s;
+}
 
-    .footer-info .president {
-      margin-top: 0.35rem;
-      color: var(--white);
-    }
+.social-links a:hover {
+  color: var(--red);
+  transform: translateY(-2px);
+}
 
-    .legal {
-      font-size: 0.8rem;
-      color: #aaa;
-    }
+.social-links svg {
+  width: 24px;
+  height: 24px;
+}
+
+.legal {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.made-by {
+  margin-top: 6px;
+  color: #777;
+}
+
+@media (max-width: 1000px) {
+  footer {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  footer {
+    padding: 30px 20px;
+  }
+
+  .foot-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer-info {
+    text-align: left;
+  }
+
+  .social-links {
+    justify-content: flex-start;
+  }
+}
+
     @media (max-width: 860px) {
       .auth { grid-template-columns: 1fr; }
       .auth-side { padding-top: 2.5rem; padding-bottom: 2.5rem; }
@@ -388,7 +449,7 @@
 
           <label class="check">
             <input type="checkbox" id="terms" name="terms" required>
-            <span>I agree to the <a class="link" href="terms.html">Terms</a> and <a class="link" href="privacy.html">Privacy Policy</a>.</span>
+            <span>I agree to the <a class="link" href="terms.html">Terms and Privacy Policy</a>.</span>
           </label>
 
           <button type="submit" class="btn">Sign up</button>
@@ -404,32 +465,54 @@
 
   </main>
 <footer>
-
     <div class="foot-top">
-
-      <a class="logo" href="#top">
-
-        <span class="ted">TED</span><span class="x">x</span><span class="name aastmt">AASTMT</span>
-
+      <a class="logo" href="#top" aria-label="TEDxAASTMT home">
+        <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
       </a>
 
-
       <div class="footer-info">
+        <div class="social-links">
+          <a href="https://www.instagram.com/tedxaastmt/"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"
+                    stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4"
+                      stroke="currentColor" stroke-width="2"/>
+              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
+            </svg>
+          </a>
 
-        <p>
-          contact@yourclub.edu &nbsp;|&nbsp;
-          Instagram &nbsp;|&nbsp;
-          LinkedIn
-        </p>
+          <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor"
+                d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/>
+            </svg>
+          </a>
+
+          <a href="https://mail.google.com/mail/?view=cm&amp;to=tedxaastmt26@gmail.com"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Email" title="Email">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="2.5" y="4.5" width="19" height="15" rx="2"
+                    stroke="currentColor" stroke-width="2"/>
+              <path d="m3.5 6 8.5 7 8.5-7"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
       </div>
-
     </div>
-
 
     <p class="legal">
       This independent TEDx event is operated under license from TED.
     </p>
 
+    <p class="legal made-by">Made by Razan AlOraby</p>
   </footer>
 
   <script>
