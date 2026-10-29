@@ -347,6 +347,38 @@
 
     textarea { min-height: 130px; resize: vertical; }
 
+    /* REGISTRATION NUMBER */
+
+    .reg-input {
+      position: relative;
+    }
+
+    .reg-input svg {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      transform: translateY(-50%);
+      color: var(--grey);
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .reg-input input {
+      padding-left: 42px;
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reg-input:focus-within svg { color: var(--red); }
+
+    .field-hint {
+      color: var(--grey);
+      font-size: 0.76rem;
+      line-height: 1.4;
+    }
+
     .form-note {
       color: var(--grey);
       font-size: 0.82rem;
@@ -685,15 +717,31 @@
             </div>
           </div>
 
-          <div class="field">
-            <label for="team">Preferred team</label>
-            <select id="team" name="team" required>
-              <option value="" selected disabled>Choose a team</option>
-              <option>Coaches</option>
-              <option>Operation &amp; PR</option>
-              <option>Media &amp; Marketing</option>
-              <option>HR</option>
-            </select>
+          <div class="row">
+            <div class="field">
+              <label for="regnum">Registration number</label>
+              <div class="reg-input">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"
+                        stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input id="regnum" name="regnum" type="text"
+                       inputmode="numeric" autocomplete="off"
+                       placeholder="" required>
+              </div>
+              <span class="field-hint">Your student ID / registration number.</span>
+            </div>
+            <div class="field">
+              <label for="team">Preferred team</label>
+              <select id="team" name="team" required>
+                <option value="" selected disabled>Choose a team</option>
+                <option>Coaches</option>
+                <option>Operation &amp; PR</option>
+                <option>Media &amp; Marketing</option>
+                <option>HR</option>
+              </select>
+            </div>
           </div>
 
           <div class="field">
@@ -807,6 +855,8 @@
       });
     });
 
+    var statusBox = document.getElementById('form-status');
+
     // Work sample upload
     var MAX_SIZE = 10 * 1024 * 1024; // 10 MB
     var sample = document.getElementById('sample');
@@ -825,12 +875,12 @@
 
       if (file.size > MAX_SIZE) {
         clearSample();
-        status.classList.add('show');
-        status.textContent = 'That file is larger than 10 MB. Please choose a smaller one.';
+        statusBox.classList.add('show');
+        statusBox.textContent = 'That file is larger than 10 MB. Please choose a smaller one.';
         return;
       }
 
-      status.classList.remove('show');
+      statusBox.classList.remove('show');
       fileName.textContent = file.name;
       removeBtn.hidden = false;
     });
@@ -839,12 +889,11 @@
 
     // Build an email from the form
     var form = document.getElementById('join-form');
-    var status = document.getElementById('form-status');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var fields = ['name', 'email', 'phone', 'college', 'team', 'why'];
+      var fields = ['name', 'email', 'phone', 'college', 'regnum', 'team', 'why'];
       var data = {};
       var missing = false;
 
@@ -854,15 +903,15 @@
         if (!data[id]) missing = true;
       });
 
-      status.classList.add('show');
+      statusBox.classList.add('show');
 
       if (missing) {
-        status.textContent = 'Please fill in every field before submitting.';
+        statusBox.textContent = 'Please fill in every field before submitting.';
         return;
       }
 
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        status.textContent = 'Please enter a valid email address.';
+        statusBox.textContent = 'Please enter a valid email address.';
         return;
       }
 
@@ -872,6 +921,7 @@
         'Email: ' + data.email + '\n' +
         'Phone: ' + data.phone + '\n' +
         'College / Major: ' + data.college + '\n' +
+        'Registration number: ' + data.regnum + '\n' +
         'Preferred team: ' + data.team + '\n\n' +
         'Why I want to join:\n' + data.why;
 
@@ -880,7 +930,7 @@
         body += '\n\nWork sample: ' + file.name + ' (attached below)';
       }
 
-      status.textContent = 'Thanks, ' + data.name.split(' ')[0] + '! Your email app should open now.' +
+      statusBox.textContent = 'Thanks, ' + data.name.split(' ')[0] + '! Your email app should open now.' +
         (file ? ' Please attach "' + file.name + '" to the email before you press send.' : ' Just press send.');
 
       window.location.href = 'mailto:tedxaastmt26@gmail.com' +
