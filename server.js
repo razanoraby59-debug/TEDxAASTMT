@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -136,6 +135,8 @@ const htmlPages = [
     "register.html",
     "signup.html",
     "login.html",
+    "profile.html",
+    "checkin.html",
     "privacy.html",
     "terms.html",
     "rate.html"
@@ -210,6 +211,26 @@ const eventSchema = new mongoose.Schema({
     registrationOpen: {
         type: Boolean,
         default: true
+    },
+
+    // Optional details shown on the ticket. Set them in MongoDB when known.
+    eventDate: {
+        type: Date,
+        default: null
+    },
+
+    eventTime: {
+        type: String,
+        default: null,
+        trim: true,
+        maxlength: 60
+    },
+
+    location: {
+        type: String,
+        default: null,
+        trim: true,
+        maxlength: 200
     }
 });
 
@@ -244,6 +265,39 @@ const registrationSchema = new mongoose.Schema({
     registeredAt: {
         type: Date,
         default: Date.now
+    },
+
+    // ----- Ticket fields -----
+
+    // The logged-in account this registration belongs to.
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+        index: true
+    },
+
+    // Random secret encoded in the QR code. Contains no personal data.
+    ticketToken: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+
+    // Short, non-sensitive reference printed on the ticket.
+    ticketId: {
+        type: String
+    },
+
+    status: {
+        type: String,
+        enum: ["registered", "checked_in", "invalid"],
+        default: "registered"
+    },
+
+    checkedInAt: {
+        type: Date,
+        default: null
     }
 });
 
@@ -331,6 +385,139 @@ const Application = mongoose.model(
     "applications"
 );
 
+// ==================== AUTH TOKENS ====================
+// Stateless signed tokens (works on Vercel, no session store needed).
+// Requires AUTH_SECRET in the environment.
+
+const TOKEN_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+
+function signToken(userId) {
+    const payload = Buffer.from(
+        JSON.stringify({
+            sub: String(userId),
+            exp: Date.now() + TOKEN_LIFETIME_MS
+        })
+    ).toString("base64url");
+
+    const signature = crypto
+        .createHmac("sha256", process.env.AUTH_SECRET)
+        .update(payload)
+        .digest("base64url");
+
+    return `${payload}.${signature}`;
+}
+
+function verifyToken(token) {
+    if (!process.env.AUTH_SECRET || typeof token !== "string") {
+        return null;
+    }
+
+    const parts = token.split(".");
+
+    if (parts.length !== 2) {
+        return null;
+    }
+
+    const [payload, signature] = parts;
+
+    const expected = crypto
+        .createHmac("sha256", process.env.AUTH_SECRET)
+        .update(payload)
+        .digest("base64url");
+
+    const a = Buffer.from(signature);
+    const b = Buffer.from(expected);
+
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+        return null;
+    }
+
+    try {
+        const data = JSON.parse(
+            Buffer.from(payload, "base64url").toString("utf8")
+        );
+
+        if (!data.exp || data.exp < Date.now() || !data.sub) {
+            return null;
+        }
+
+        return data.sub;
+    } catch {
+        return null;
+    }
+}
+
+function bearerToken(req) {
+    const header = req.headers.authorization || "";
+    return header.startsWith("Bearer ") ? header.slice(7) : null;
+}
+
+// Returns the logged-in user or null (does not reject the request).
+async function getOptionalUser(req) {
+    const userId = verifyToken(bearerToken(req));
+
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+        return null;
+    }
+
+    return User.findById(userId).select("-password");
+}
+
+async function requireAuth(req, res, next) {
+    try {
+        await connectDB();
+
+        const user = await getOptionalUser(req);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Please log in to continue."
+            });
+        }
+
+        req.user = user;
+        next();
+
+    } catch (error) {
+        console.error("AUTH ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+}
+
+// Staff-only protection for the check-in endpoint.
+function requireCheckinKey(req, res, next) {
+    const expected = process.env.CHECKIN_KEY;
+
+    if (!expected) {
+        return res.status(500).json({
+            message: "CHECKIN_KEY is not configured on the server."
+        });
+    }
+
+    const provided = String(req.headers["x-checkin-key"] || "");
+
+    const a = Buffer.from(provided);
+    const b = Buffer.from(expected);
+
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+        return res.status(403).json({
+            message: "Invalid check-in key."
+        });
+    }
+
+    next();
+}
+
+function newTicketFields() {
+    return {
+        ticketToken: crypto.randomBytes(24).toString("hex"),
+        ticketId: `TDX-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
+    };
+}
+
 // ==================== SIGN UP ====================
 
 app.post("/signup", async (req, res) => {
@@ -410,6 +597,14 @@ app.post("/login", async (req, res) => {
     try {
         await connectDB();
 
+        if (!process.env.AUTH_SECRET) {
+            console.error("LOGIN ERROR: AUTH_SECRET is not configured.");
+
+            return res.status(500).json({
+                message: "Server is not configured for login."
+            });
+        }
+
         const { email, password } = req.body;
 
         if (
@@ -448,6 +643,7 @@ app.post("/login", async (req, res) => {
 
         return res.json({
             message: "Login successful!",
+            token: signToken(user._id),
             user: {
                 name: user.name,
                 email: user.email
@@ -567,6 +763,15 @@ app.post("/register", async (req, res) => {
             });
         }
 
+        // Link the registration to the logged-in account.
+        // If no valid login token was sent, fall back to the account that
+        // uses the same email address (if there is one).
+        let owner = await getOptionalUser(req);
+
+        if (!owner) {
+            owner = await User.findOne({ email: cleanEmail }).select("-password");
+        }
+
         session = await mongoose.startSession();
 
         let savedRegistration = null;
@@ -588,6 +793,17 @@ app.post("/register", async (req, res) => {
                 throw new Error(
                     "REGISTRATION_NUMBER_ALREADY_REGISTERED"
                 );
+            }
+
+            // One ticket per account.
+            if (owner) {
+                const existingForUser = await Registration.findOne({
+                    user: owner._id
+                }).session(session);
+
+                if (existingForUser) {
+                    throw new Error("ACCOUNT_ALREADY_REGISTERED");
+                }
             }
 
             let event = await Event.findOne({
@@ -634,7 +850,9 @@ app.post("/register", async (req, res) => {
             const registration = new Registration({
                 name: cleanName,
                 registration_number: cleanRegNo,
-                email: cleanEmail
+                email: cleanEmail,
+                user: owner ? owner._id : null,
+                ...newTicketFields()
             });
 
             await registration.save({ session });
@@ -642,7 +860,8 @@ app.post("/register", async (req, res) => {
             savedRegistration = {
                 name: registration.name,
                 registration_number: registration.registration_number,
-                email: registration.email
+                email: registration.email,
+                ticketId: registration.ticketId
             };
         });
 
@@ -666,6 +885,12 @@ app.post("/register", async (req, res) => {
         ) {
             return res.status(400).json({
                 message: "This registration number is already registered."
+            });
+        }
+
+        if (error.message === "ACCOUNT_ALREADY_REGISTERED") {
+            return res.status(400).json({
+                message: "This account already has a registration."
             });
         }
 
@@ -712,6 +937,179 @@ app.post("/register", async (req, res) => {
         if (session) {
             await session.endSession();
         }
+    }
+});
+
+// ==================== PROFILE: ACCOUNT INFO ====================
+
+app.get("/api/me", requireAuth, async (req, res) => {
+    try {
+        const registration = await Registration.findOne({
+            $or: [
+                { user: req.user._id },
+                { email: req.user.email }
+            ]
+        }).select("registration_number");
+
+        return res.json({
+            name: req.user.name,
+            email: req.user.email,
+            // MongoDB ObjectIds contain their creation time.
+            createdAt: req.user._id.getTimestamp(),
+            registrationNumber: registration
+                ? registration.registration_number
+                : null
+        });
+
+    } catch (error) {
+        console.error("ME ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+});
+
+// ==================== PROFILE: MY TICKET ====================
+
+const STATUS_MESSAGES = {
+    registered: "Registered \u2013 Your ticket is ready!",
+    checked_in: "Checked In \u2013 You have been checked in successfully.",
+    invalid: "Invalid \u2013 This ticket is not valid."
+};
+
+app.get("/api/ticket", requireAuth, async (req, res) => {
+    try {
+        let registration = await Registration.findOne({
+            $or: [
+                { user: req.user._id },
+                { email: req.user.email }
+            ]
+        });
+
+        if (!registration) {
+            return res.json({ registered: false });
+        }
+
+        let changed = false;
+
+        // Link older registrations to this account.
+        if (!registration.user) {
+            registration.user = req.user._id;
+            changed = true;
+        }
+
+        // Create a ticket for registrations made before tickets existed.
+        if (!registration.ticketToken) {
+            Object.assign(registration, newTicketFields());
+            changed = true;
+        }
+
+        if (changed) {
+            await registration.save();
+        }
+
+        const event = await ensureEvent();
+
+        return res.json({
+            registered: true,
+            attendee: {
+                name: registration.name
+            },
+            event: {
+                name: event.name,
+                date: event.eventDate || null,
+                time: event.eventTime || null,
+                location: event.location || null
+            },
+            ticket: {
+                ticketId: registration.ticketId,
+                token: registration.ticketToken,
+                status: registration.status,
+                statusMessage: STATUS_MESSAGES[registration.status],
+                checkedInAt: registration.checkedInAt
+            }
+        });
+
+    } catch (error) {
+        console.error("TICKET ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+});
+
+// ==================== CHECK-IN (STAFF) ====================
+
+app.post("/api/checkin", requireCheckinKey, async (req, res) => {
+    try {
+        await connectDB();
+
+        const { token } = req.body;
+
+        if (
+            typeof token !== "string" ||
+            !/^[a-f0-9]{48}$/.test(token.trim())
+        ) {
+            return res.status(400).json({
+                result: "invalid",
+                message: "This is not a valid TEDxAASTMT ticket."
+            });
+        }
+
+        const cleanToken = token.trim();
+
+        // Atomic: only one scan can ever move a ticket to checked_in.
+        const checkedIn = await Registration.findOneAndUpdate(
+            { ticketToken: cleanToken, status: "registered" },
+            { $set: { status: "checked_in", checkedInAt: new Date() } },
+            { returnDocument: "after" }
+        );
+
+        if (checkedIn) {
+            return res.json({
+                result: "ok",
+                message: "Check-in successful.",
+                name: checkedIn.name,
+                ticketId: checkedIn.ticketId
+            });
+        }
+
+        const existing = await Registration.findOne({
+            ticketToken: cleanToken
+        });
+
+        if (!existing) {
+            return res.status(404).json({
+                result: "invalid",
+                message: "Ticket not found."
+            });
+        }
+
+        if (existing.status === "checked_in") {
+            return res.status(409).json({
+                result: "already_used",
+                message: "This ticket has already been used.",
+                name: existing.name,
+                ticketId: existing.ticketId,
+                checkedInAt: existing.checkedInAt
+            });
+        }
+
+        return res.status(403).json({
+            result: "invalid",
+            message: "This ticket is not valid.",
+            name: existing.name,
+            ticketId: existing.ticketId
+        });
+
+    } catch (error) {
+        console.error("CHECKIN ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
     }
 });
 
