@@ -1,956 +1,1323 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Profile | TEDxAASTMT</title>
-  <meta name="description" content="Your TEDxAASTMT profile and event ticket.">
-  <meta name="robots" content="noindex">
-
-  <style>
-    :root {
-      --red: #EB0028;
-      --red-dark: #C60022;
-      --black: #000;
-      --ink: #171717;
-      --grey: #555;
-      --light-grey: #e3e3e3;
-      --soft: #f5f5f5;
-      --white: #fff;
-      --green: #1E9E4A;
-      --font: Arial, Helvetica, sans-serif;
-      --page-width: 1200px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      font-family: var(--font);
-      color: var(--ink);
-      background: var(--white);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1350' preserveAspectRatio='xMidYMid slice'%3E%3Cpath d='M0 230 L845 738 L1080 350 L1080 860 L775 1350 L475 1350 L695 983 L0 562 Z' fill='%23EB0028' fill-opacity='0.11'/%3E%3C/svg%3E") center / cover no-repeat,
-        #fff;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    a:focus-visible, button:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
-
-    /* WORDMARK: TEDx in red, AASTMT in black */
-    .ted, .x { color: var(--red); font-weight: 800; }
-    .aastmt { color: #000; font-weight: 800; }
-
-    /* NAV */
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 76px;
-      padding: 16px max(32px, calc((100% - var(--page-width)) / 2));
-      background: rgba(255, 255, 255, 0.97);
-      border-bottom: 1px solid var(--light-grey);
-      backdrop-filter: blur(8px);
-    }
-
-    .logo {
-      display: inline-flex;
-      align-items: baseline;
-      white-space: nowrap;
-      font-size: 1.4rem;
-      letter-spacing: -0.04em;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .nav nav { display: flex; align-items: center; gap: 26px; }
-    .nav nav a { font-size: 0.9rem; font-weight: 700; position: relative; padding: 4px 0; }
-    .nav nav a:hover { color: var(--red); }
-    .nav nav a.active { color: var(--red); }
-    .nav nav a.active::after {
-      content: "";
-      position: absolute;
-      left: 0; right: 0; bottom: -4px;
-      height: 3px;
-      background: var(--red);
-    }
-
-    /* Back to home */
-.nav .back {
-  font-size: 0.95rem;
-  font-weight: 600;
-  position: relative;
-  transition: color 0.2s;
-}
-
-.nav .back::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  height: 2px;
-  width: 0;
-  background: var(--red);
-  transition: width 0.25s;
-}
-
-.nav .back:hover {
-  color: var(--red);
-}
-
-.nav .back:hover::after {
-  width: 100%;
-}
-
-    /* BUTTONS */
-    .btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 48px;
-      padding: 12px 28px;
-      background: var(--red);
-      color: var(--white);
-      border: 2px solid var(--red);
-      border-radius: 2px;
-      font: inherit;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-    }
-    .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
-    .btn.outline { background: transparent; color: var(--black); border-color: var(--black); }
-    .btn.outline:hover { background: var(--black); color: var(--white); }
-    .btn:disabled { opacity: 0.6; cursor: wait; }
-
-    /* LAYOUT */
-    main {
-      flex: 1;
-      width: 100%;
-      max-width: var(--page-width);
-      margin: 0 auto;
-      padding: 64px 48px 96px;
-    }
-
-    .eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      color: var(--red);
-      font-size: 0.78rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 40px; height: 5px;
-      background: var(--red);
-    }
-
-    h1 {
-      font-size: clamp(2.2rem, 5vw, 3.8rem);
-      line-height: 1.05;
-      letter-spacing: -0.05em;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-
-    .lead { color: var(--grey); font-size: 1.05rem; max-width: 560px; margin-bottom: 44px; }
-
-    h2 {
-      position: relative;
-      width: fit-content;
-      padding-bottom: 14px;
-      margin-bottom: 28px;
-      font-size: clamp(1.4rem, 2.4vw, 1.9rem);
-      letter-spacing: -0.03em;
-    }
-
-    h2::after {
-      content: "";
-      position: absolute;
-      left: 0; bottom: 0;
-      width: 48px; height: 4px;
-      background: var(--red);
-    }
-
-    section + section { margin-top: 64px; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 14px; }
-
-    /* LOGGED-OUT VIEW */
-    .welcome {
-      position: relative;
-      padding: 64px 56px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid var(--light-grey);
-      border-top: 6px solid var(--red);
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.08);
-    }
-
-    .welcome .lead { margin-bottom: 32px; }
-
-    .welcome-perks {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 44px;
-      padding-top: 28px;
-      border-top: 1px solid var(--light-grey);
-    }
-
-    .welcome-perks div {
-      font-size: 0.9rem;
-      color: var(--grey);
-    }
-
-    .welcome-perks strong {
-      display: block;
-      margin-bottom: 2px;
-      color: var(--black);
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    /* ACCOUNT CARD */
-    .account {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid var(--light-grey);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-    }
-
-    .account-top {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      padding: 28px 32px;
-    }
-
-    .avatar {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: var(--red);
-      color: var(--white);
-      font-size: 1.6rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .account-top h3 { font-size: 1.4rem; letter-spacing: -0.03em; overflow-wrap: anywhere; }
-    .account-top p { color: var(--grey); overflow-wrap: anywhere; }
-
-    .facts-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      border-top: 1px solid var(--light-grey);
-    }
-
-    .facts-row div {
-      padding: 18px 32px;
-      border-right: 1px solid var(--light-grey);
-      min-width: 0;
-    }
-
-    .facts-row div:last-child { border-right: 0; }
-
-    .facts-row dt {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--grey);
-    }
-
-    .facts-row dd { font-weight: 700; overflow-wrap: anywhere; }
-
-    /* TICKET */
-    .ticket {
-      display: grid;
-      grid-template-columns: 1fr 330px;
-      background: var(--white);
-      border: 1px solid var(--light-grey);
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.1);
-    }
-
-    .ticket-details {
-      position: relative;
-      padding: 36px 40px;
-      min-width: 0;
-      border-left: 8px solid var(--red);
-    }
-
-    .ticket-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 26px;
-    }
-
-    .ticket-head .logo { font-size: 1.15rem; }
-
-    .tag {
-      padding: 5px 12px;
-      border: 2px solid var(--black);
-      font-size: 0.7rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .ticket h3 {
-      font-size: clamp(1.6rem, 3vw, 2.4rem);
-      line-height: 1.1;
-      letter-spacing: -0.04em;
-      margin-bottom: 26px;
-    }
-
-    .ticket dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; }
-
-    .ticket dt {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--grey);
-    }
-
-    .ticket dd { font-size: 1.05rem; font-weight: 700; overflow-wrap: anywhere; }
-    .ticket dl .full { grid-column: 1 / -1; }
-
-    .status {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-top: 30px;
-      padding: 14px 18px;
-      background: var(--soft);
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
-
-    .status::before {
-      content: "";
-      flex: 0 0 auto;
-      width: 12px; height: 12px;
-      margin-top: 6px;
-      border-radius: 50%;
-      background: var(--black);
-    }
-
-    .status.registered { background: #fff0f2; color: var(--red-dark); }
-    .status.registered::before { background: var(--red); }
-    .status.checked_in { background: #eefaf2; color: #146b32; }
-    .status.checked_in::before { background: var(--green); }
-    .status.invalid { background: #ececec; }
-
-    .ticket-qr {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
-      padding: 36px 28px;
-      background: var(--black);
-      color: var(--white);
-      border-left: 2px dashed #555;
-    }
-
-    .scan-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #bbb;
-    }
-
-    .qr-box {
-      padding: 14px;
-      background: var(--white);
-      line-height: 0;
-    }
-
-    .qr-box.used { opacity: 0.4; }
-    .qr-box canvas, .qr-box img { max-width: 100%; height: auto; }
-
-    .ref { font-size: 0.8rem; color: #bbb; text-align: center; }
-    .ref strong { color: var(--white); letter-spacing: 0.1em; }
-
-    .ticket-qr .btn { width: 100%; }
-
-    /* STATES */
-    .empty {
-      padding: 44px 40px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid var(--light-grey);
-      border-left: 8px solid var(--black);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-    }
-
-    .empty h3 { font-size: 1.4rem; letter-spacing: -0.03em; margin-bottom: 8px; }
-    .empty p { color: var(--grey); margin-bottom: 22px; max-width: 520px; }
-
-    .loading { color: var(--grey); padding: 40px 0; }
-
-    .notice {
-      display: none;
-      margin-bottom: 24px;
-      padding: 12px 16px;
-      background: #fff0f2;
-      border-left: 4px solid var(--red);
-      color: var(--red-dark);
-      font-size: 0.9rem;
-    }
-    .notice.show { display: block; }
-
-    /* FOOTER */
-    footer {
-      width: 100%;
-      padding: 36px max(32px, calc((100% - var(--page-width)) / 2));
-      background: var(--black);
-      color: var(--white);
-      border-top: 1px solid #222;
-    }
-
-    .foot-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 28px;
-    }
-
-    footer .logo .aastmt { color: var(--white); }
-    .footer-info { text-align: right; }
-    .social-links { display: flex; align-items: center; justify-content: flex-end; gap: 18px; }
-    .social-links a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px; height: 32px;
-      color: var(--white);
-      transition: color 0.2s, transform 0.2s;
-    }
-    .social-links a:hover { color: var(--red); transform: translateY(-2px); }
-    .social-links svg { width: 24px; height: 24px; }
-    .legal { color: #aaa; font-size: 0.8rem; }
-    .made-by { margin-top: 6px; color: #777; }
-
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      main { padding: 48px 28px 72px; }
-      .ticket { grid-template-columns: 1fr; }
-      .ticket-qr { border-left: 0; border-top: 2px dashed #555; }
-    }
-
-    @media (max-width: 760px) {
-      .nav { min-height: 68px; padding: 14px 22px; }
-      .nav nav { gap: 14px; }
-      .nav nav a { font-size: 0.78rem; }
-      .logo { font-size: 1.2rem; }
-      .welcome { padding: 44px 28px; }
-      .welcome-perks { grid-template-columns: 1fr; }
-      .facts-row div { border-right: 0; border-bottom: 1px solid var(--light-grey); padding: 16px 24px; }
-      .facts-row div:last-child { border-bottom: 0; }
-      .account-top { padding: 24px; }
-      footer { padding: 32px 24px; }
-      body::before { background-position: 60% center; }
-    }
-
-    @media (max-width: 480px) {
-      main { padding: 36px 20px 56px; }
-      .nav nav a.hide-sm { display: none; }
-      .welcome { padding: 36px 22px; }
-      .ticket-details { padding: 26px 20px; }
-      .ticket dl { grid-template-columns: 1fr; }
-      .account-top { gap: 16px; }
-      .avatar { width: 56px; height: 56px; font-size: 1.25rem; }
-      .actions .btn { width: 100%; }
-      .foot-top { align-items: flex-start; flex-direction: column; }
-      .footer-info { text-align: left; }
-      .social-links { justify-content: flex-start; }
-      footer { padding: 30px 20px; }
-    }
-  </style>
-</head>
-
-<body>
-  <header class="nav">
-    <a class="logo" href="/" aria-label="TEDxAASTMT home">
-      <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
-    </a>
-
-    <a class="back" href="frontend.html">&larr; Back to home</a>
-  </header>
-
-  <main>
-    <div id="loading" class="loading">Loading your profile&hellip;</div>
-
-    <!-- Shown to visitors who are not logged in -->
-    <div id="loggedOut" hidden>
-      <div class="welcome">
-        <div class="eyebrow">My profile</div>
-        <h1>Welcome to <br><span class="ted">TEDx</span><span class="aastmt">AASTMT</span></h1>
-        <p class="lead">Log in or sign up to view your account details and event tickets.</p>
-
-        <div class="actions">
-          <a class="btn" href="login.html">Log In</a>
-          <a class="btn outline" href="signup.html">Sign Up</a>
-        </div>
-
-        <div class="welcome-perks">
-          <div><strong>Your account</strong>See your details in one place.</div>
-          <div><strong>Your ticket</strong>Get a personal QR code after you register.</div>
-          <div><strong>Easy entry</strong>Show your QR at the door. No paperwork.</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="content" hidden>
-      <div class="eyebrow">My profile</div>
-      <h1 id="welcome">Welcome back!</h1>
-      <p class="lead">Your account details and event ticket are below.</p>
-
-      <div class="notice" id="notice" role="alert"></div>
-
-      <section aria-labelledby="acct">
-        <h2 id="acct">My Account</h2>
-        <div class="account" id="account"></div>
-      </section>
-
-      <section aria-labelledby="tk">
-        <h2 id="tk">My Event Ticket</h2>
-        <div id="ticketArea"></div>
-      </section>
-
-      <section>
-        <div class="actions">
-          <button class="btn outline" id="logout" type="button">Log out</button>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <footer>
-    <div class="foot-top">
-      <a class="logo" href="/" aria-label="TEDxAASTMT home">
-        <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
-      </a>
-
-      <div class="footer-info">
-        <div class="social-links">
-          <a href="https://www.instagram.com/tedxaastmt/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
-              <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
-              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
-            </svg>
-          </a>
-
-          <a href="https://chat.whatsapp.com/JM1mXQBwc4v1iBPRBeJx5q" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp group" title="WhatsApp group">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
-              <path d="M20.52 3.48A11.8 11.8 0 0 0 12.1 0C5.56 0 .23 5.32.23 11.87c0 2.1.55 4.15 1.6 5.96L.13 24l6.33-1.66a11.9 11.9 0 0 0 5.63 1.43h.01c6.55 0 11.87-5.32 11.87-11.87 0-3.17-1.23-6.15-3.45-8.42ZM12.1 21.75h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.76.99 1-3.67-.24-.38a9.83 9.83 0 0 1-1.51-5.23c0-5.47 4.45-9.92 9.93-9.92 2.65 0 5.14 1.03 7.01 2.91a9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.92 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
-            </svg>
-          </a>
-
-          <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor" d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/>
-            </svg>
-          </a>
-
-          <a href="https://mail.google.com/mail/?view=cm&amp;to=tedxaastmt26@gmail.com" target="_blank" rel="noopener noreferrer" aria-label="Email" title="Email">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="2.5" y="4.5" width="19" height="15" rx="2" stroke="currentColor" stroke-width="2"/>
-              <path d="m3.5 6 8.5 7 8.5-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <p class="legal">This independent TEDx event is operated under license from TED.</p>
-    <p class="legal made-by">Made by Razan AlOraby</p>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script>
-    const TOKEN_KEY = 'tedx_token';
-
-    const loading = document.getElementById('loading');
-    const loggedOut = document.getElementById('loggedOut');
-    const content = document.getElementById('content');
-    const notice = document.getElementById('notice');
-    const account = document.getElementById('account');
-    const ticketArea = document.getElementById('ticketArea');
-
-    class AuthError extends Error {}
-
-    function showLoggedOut() {
-      // Remove any private data from the page, then show the public view.
-      account.textContent = '';
-      ticketArea.textContent = '';
-      notice.classList.remove('show');
-      content.hidden = true;
-      loading.hidden = true;
-      loggedOut.hidden = false;
-    }
-
-    function showLoggedIn() {
-      loading.hidden = true;
-      loggedOut.hidden = true;
-      content.hidden = false;
-    }
-
-    function el(tag, className, text) {
-      const node = document.createElement(tag);
-      if (className) node.className = className;
-      if (text !== undefined) node.textContent = text;
-      return node;
-    }
-
-    function formatDate(value) {
-      if (!value) return null;
-      const d = new Date(value);
-      if (isNaN(d)) return null;
-      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
-    async function api(path) {
-      const token = localStorage.getItem(TOKEN_KEY);
-      if (!token) throw new AuthError('no token');
-
-      const res = await fetch(path, { headers: { Authorization: 'Bearer ' + token } });
-      if (res.status === 401) throw new AuthError('unauthorized');
-
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || 'Request failed.');
-      return data;
-    }
-
-    function initials(name) {
-      const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
-      if (!parts.length) return '?';
-      const first = parts[0][0];
-      const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
-      return (first + last).toUpperCase();
-    }
-
-    function renderAccount(me) {
-      const first = (me.name || '').split(' ')[0] || 'there';
-      document.getElementById('welcome').textContent = 'Welcome back, ' + first + '!';
-
-      account.textContent = '';
-
-      const top = el('div', 'account-top');
-      top.appendChild(el('div', 'avatar', initials(me.name)));
-      const who = el('div');
-      who.appendChild(el('h3', null, me.name));
-      who.appendChild(el('p', null, me.email));
-      top.appendChild(who);
-      account.appendChild(top);
-
-      const facts = [];
-      if (me.registrationNumber) facts.push(['Registration number', me.registrationNumber]);
-      const created = formatDate(me.createdAt);
-      if (created) facts.push(['Member since', created]);
-
-      if (facts.length) {
-        const dl = el('dl', 'facts-row');
-        facts.forEach(([label, value]) => {
-          const wrap = el('div');
-          wrap.appendChild(el('dt', null, label));
-          wrap.appendChild(el('dd', null, value));
-          dl.appendChild(wrap);
-        });
-        account.appendChild(dl);
-      }
-    }
-
-    function detail(dl, label, value, full) {
-      if (!value) return;
-      const wrap = el('div', full ? 'full' : '');
-      wrap.appendChild(el('dt', null, label));
-      wrap.appendChild(el('dd', null, value));
-      dl.appendChild(wrap);
-    }
-
-    function eventDetails(ev) {
-      return {
-        date: formatDate(ev.date),
-        time: ev.time || null,
-        location: ev.location || null
-      };
-    }
-
-    function renderTicket(data) {
-      ticketArea.textContent = '';
-
-      if (!data.registered) {
-        const box = el('div', 'empty');
-        box.appendChild(el('h3', null, 'No ticket yet'));
-        box.appendChild(el('p', null, "You haven't registered for an event yet. Register to get your personal QR ticket."));
-        const link = el('a', 'btn', 'Attend an event');
-        link.href = 'register.html';
-        box.appendChild(link);
-        ticketArea.appendChild(box);
-        return;
-      }
-
-      const { attendee, event, ticket } = data;
-      const when = eventDetails(event);
-
-      const card = el('article', 'ticket');
-      const details = el('div', 'ticket-details');
-
-      const head = el('div', 'ticket-head');
-      const brand = el('div', 'logo');
-      brand.innerHTML = '<span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>';
-      head.appendChild(brand);
-      head.appendChild(el('span', 'tag', 'Admit one'));
-      details.appendChild(head);
-
-      details.appendChild(el('h3', null, event.name));
-
-      const dl = el('dl');
-      detail(dl, 'Attendee', attendee.name, true);
-      detail(dl, 'Date', when.date);
-      detail(dl, 'Time', when.time);
-      detail(dl, 'Location', when.location, true);
-      detail(dl, 'Ticket ID', ticket.ticketId);
-      details.appendChild(dl);
-
-      details.appendChild(el('div', 'status ' + ticket.status, ticket.statusMessage));
-      card.appendChild(details);
-
-      const side = el('div', 'ticket-qr');
-
-      if (ticket.status === 'invalid') {
-        side.appendChild(el('p', 'ref', 'This ticket is no longer valid. Please contact the TEDxAASTMT team.'));
-      } else {
-        side.appendChild(el('div', 'scan-label', 'Scan at the entrance'));
-
-        const box = el('div', 'qr-box' + (ticket.status === 'checked_in' ? ' used' : ''));
-        side.appendChild(box);
-        new QRCode(box, {
-          text: ticket.token,
-          width: 220,
-          height: 220,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.M
-        });
-
-        const ref = el('p', 'ref');
-        ref.appendChild(document.createTextNode('Ticket ID '));
-        ref.appendChild(el('strong', null, ticket.ticketId));
-        side.appendChild(ref);
-
-        const dlBtn = el('button', 'btn', 'Download My Ticket');
-        dlBtn.type = 'button';
-        dlBtn.addEventListener('click', () => downloadTicket(data, dlBtn));
-        side.appendChild(dlBtn);
-      }
-
-      card.appendChild(side);
-      ticketArea.appendChild(card);
-    }
-
-    // ---------- Download ticket as PNG ----------
-    function fitText(ctx, text, maxWidth) {
-      const words = String(text).split(' ');
-      const lines = [];
-      let line = '';
-      for (const w of words) {
-        const test = line ? line + ' ' + w : w;
-        if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
-        else line = test;
-      }
-      if (line) lines.push(line);
-      return lines;
-    }
-
-    function downloadTicket(data, button) {
-      button.disabled = true;
-
-      try {
-        const { attendee, event, ticket } = data;
-        const when = eventDetails(event);
-
-        // Large offscreen QR for a sharp, easy-to-scan result.
-        const holder = document.createElement('div');
-        new QRCode(holder, {
-          text: ticket.token,
-          width: 640,
-          height: 640,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.M
-        });
-        const qrCanvas = holder.querySelector('canvas');
-        if (!qrCanvas) throw new Error('QR failed');
-
-        const W = 900, H = 1400;
-        const c = document.createElement('canvas');
-        c.width = W; c.height = H;
-        const ctx = c.getContext('2d');
-        const font = 'Arial, Helvetica, sans-serif';
-
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, W, H);
-
-        // Red top bar
-        ctx.fillStyle = '#EB0028';
-        ctx.fillRect(0, 0, W, 24);
-
-        // Wordmark: TEDx red, AASTMT black
-        ctx.textBaseline = 'alphabetic';
-        ctx.textAlign = 'left';
-        ctx.font = '800 64px ' + font;
-        const tedxW = ctx.measureText('TEDx').width;
-        const aastmtW = ctx.measureText('AASTMT').width;
-        const x0 = (W - tedxW - aastmtW) / 2;
-        ctx.fillStyle = '#EB0028';
-        ctx.fillText('TEDx', x0, 130);
-        ctx.fillStyle = '#000';
-        ctx.fillText('AASTMT', x0 + tedxW, 130);
-
-        // Event name
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#000';
-        ctx.font = '800 54px ' + font;
-        let y = 230;
-        for (const line of fitText(ctx, event.name, W - 160)) { ctx.fillText(line, W / 2, y); y += 64; }
-
-        // Date / time / location
-        ctx.fillStyle = '#555';
-        ctx.font = '600 32px ' + font;
-        y += 4;
-        const dateLine = [when.date, when.time].filter(Boolean).join('  \u2022  ');
-        if (dateLine) { ctx.fillText(dateLine, W / 2, y); y += 46; }
-        if (when.location) {
-          for (const line of fitText(ctx, when.location, W - 160)) { ctx.fillText(line, W / 2, y); y += 42; }
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const fs = require("fs");
+const crypto = require("crypto");
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// ==================== PROJECT DIRECTORIES ====================
+
+const PROJECT_DIR = __dirname;
+const FRONTEND_DIR = path.join(PROJECT_DIR, "public");
+
+// Vercel's filesystem is read-only except for /tmp.
+const UPLOAD_DIR = process.env.VERCEL
+    ? path.join("/tmp", "tedx-uploads")
+    : path.join(__dirname, "uploads");
+
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+// ==================== MIDDLEWARE ====================
+
+app.use(cors());
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+// ==================== FILE UPLOADS ====================
+
+const allowedExtensions = new Set([
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".ppt",
+    ".pptx",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".mp4",
+    ".zip"
+]);
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, UPLOAD_DIR);
+        },
+
+        filename: (req, file, cb) => {
+            const extension = path.extname(file.originalname).toLowerCase();
+            cb(null, `${crypto.randomUUID()}${extension}`);
+        }
+    }),
+
+    limits: {
+        fileSize: 10 * 1024 * 1024,
+        files: 1
+    },
+
+    fileFilter: (req, file, cb) => {
+        const extension = path.extname(file.originalname).toLowerCase();
+
+        if (!allowedExtensions.has(extension)) {
+            return cb(
+                new Error(
+                    "Unsupported file type. Allowed: PDF, DOC, DOCX, PPT, PPTX, PNG, JPG, JPEG, MP4, ZIP."
+                )
+            );
         }
 
-        // Divider
-        y += 24;
-        ctx.fillStyle = '#EB0028';
-        ctx.fillRect(W / 2 - 40, y, 80, 6);
-        y += 70;
+        cb(null, true);
+    }
+});
 
-        // Attendee
-        ctx.fillStyle = '#555';
-        ctx.font = '700 24px ' + font;
-        ctx.fillText('ATTENDEE', W / 2, y);
-        y += 54;
-        ctx.fillStyle = '#000';
-        ctx.font = '800 48px ' + font;
-        for (const line of fitText(ctx, attendee.name, W - 160)) { ctx.fillText(line, W / 2, y); y += 56; }
+// ==================== MONGODB CONNECTION ====================
 
-        // QR (centered, with quiet zone)
-        const qrSize = 600;
-        const qrX = (W - qrSize) / 2;
-        const qrY = Math.max(y + 20, 760);
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(qrX - 24, qrY - 24, qrSize + 48, qrSize + 48);
-        ctx.strokeStyle = '#e3e3e3';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(qrX - 24, qrY - 24, qrSize + 48, qrSize + 48);
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+let mongoPromise = null;
 
-        // Ticket reference
-        ctx.fillStyle = '#555';
-        ctx.font = '700 28px ' + font;
-        ctx.fillText('Ticket ID: ' + ticket.ticketId, W / 2, qrY + qrSize + 80);
-
-        ctx.fillStyle = '#888';
-        ctx.font = '400 22px ' + font;
-        ctx.fillText('Show this QR code at the entrance.', W / 2, qrY + qrSize + 122);
-
-        // Footer
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, H - 70, W, 70);
-        ctx.fillStyle = '#bbb';
-        ctx.font = '400 18px ' + font;
-        ctx.fillText('This independent TEDx event is operated under license from TED.', W / 2, H - 28);
-
-        c.toBlob((blob) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'TEDxAASTMT-ticket-' + ticket.ticketId + '.png';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-          button.disabled = false;
-        }, 'image/png');
-
-      } catch (e) {
-        console.error(e);
-        notice.textContent = 'Could not create the ticket image. Please try again.';
-        notice.classList.add('show');
-        button.disabled = false;
-      }
+async function connectDB() {
+    if (mongoose.connection.readyState === 1) {
+        return;
     }
 
-    // Log out and stay on this page in its logged-out state.
-    document.getElementById('logout').addEventListener('click', () => {
-      localStorage.removeItem(TOKEN_KEY);
-      showLoggedOut();
-      window.scrollTo(0, 0);
+    if (!process.env.MONGODB_URI) {
+        throw new Error("MONGODB_URI is not configured.");
+    }
+
+    if (!mongoPromise) {
+        mongoPromise = mongoose
+            .connect(process.env.MONGODB_URI, {
+                serverSelectionTimeoutMS: 10000
+            })
+            .catch((error) => {
+                mongoPromise = null;
+                throw error;
+            });
+    }
+
+    await mongoPromise;
+}
+
+// ==================== FRONTEND PAGES ====================
+
+// Look in /public first, then the project root.
+function findFrontendFile(filename) {
+    const candidates = [
+        path.join(FRONTEND_DIR, filename),
+        path.join(PROJECT_DIR, filename)
+    ];
+
+    return candidates.find((filePath) => fs.existsSync(filePath));
+}
+
+// Homepage
+app.get("/", (req, res) => {
+    const homepage = findFrontendFile("frontend.html");
+
+    if (!homepage) {
+        return res.status(404).send(
+            "Homepage not found. Put frontend.html in the public folder or project root."
+        );
+    }
+
+    return res.sendFile(homepage);
+});
+
+// Other HTML pages
+const htmlPages = [
+    "join.html",
+    "register.html",
+    "signup.html",
+    "login.html",
+    "profile.html",
+    "checkin.html",
+    "privacy.html",
+    "terms.html",
+    "rate.html"
+];
+
+for (const page of htmlPages) {
+    app.get(`/${page}`, (req, res) => {
+        const filePath = findFrontendFile(page);
+
+        if (!filePath) {
+            return res.status(404).send(
+                `Page not found: ${page}. Put it in the public folder or project root.`
+            );
+        }
+
+        return res.sendFile(filePath);
+    });
+}
+
+// Serve static assets from /public.
+app.use(express.static(FRONTEND_DIR));
+
+// ==================== USER SCHEMA ====================
+
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 120
+    },
+
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        maxlength: 254
+    },
+
+    password: {
+        type: String,
+        required: true
+    }
+});
+
+const User = mongoose.model("User", userSchema);
+
+// ==================== EVENT SCHEMA ====================
+
+const eventSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
+
+    totalSeats: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+
+    seatsRemaining: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+
+    registrationOpen: {
+        type: Boolean,
+        default: true
+    },
+
+    // Optional details shown on the ticket. Set them in MongoDB when known.
+    eventDate: {
+        type: Date,
+        default: null
+    },
+
+    eventTime: {
+        type: String,
+        default: null,
+        trim: true,
+        maxlength: 60
+    },
+
+    location: {
+        type: String,
+        default: null,
+        trim: true,
+        maxlength: 200
+    }
+});
+
+const Event = mongoose.model("Event", eventSchema);
+
+// ==================== EVENT REGISTRATION SCHEMA ====================
+
+const registrationSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 120
+    },
+
+    registration_number: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
+
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        maxlength: 254
+    },
+
+    registeredAt: {
+        type: Date,
+        default: Date.now
+    },
+
+    // ----- Ticket fields -----
+
+    // The logged-in account this registration belongs to.
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+        index: true
+    },
+
+    // Random secret encoded in the QR code. Contains no personal data.
+    ticketToken: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+
+    // Short, non-sensitive reference printed on the ticket.
+    ticketId: {
+        type: String
+    },
+
+    status: {
+        type: String,
+        enum: ["registered", "checked_in", "invalid"],
+        default: "registered"
+    },
+
+    checkedInAt: {
+        type: Date,
+        default: null
+    }
+});
+
+const Registration = mongoose.model(
+    "Registration",
+    registrationSchema
+);
+
+// ==================== TEAM APPLICATION SCHEMA ====================
+
+const applicationSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 120
+    },
+
+    email: {
+        type: String,
+        required: true,
+        lowercase: true,
+        trim: true,
+        maxlength: 254
+    },
+
+    phone: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 30
+    },
+
+    college: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 150
+    },
+
+    team: {
+        type: String,
+        required: true,
+        enum: [
+            "Coaches",
+            "Operation & PR",
+            "Media & Marketing",
+            "HR"
+        ]
+    },
+
+    why: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 3000
+    },
+
+    sampleName: {
+        type: String,
+        default: null,
+        maxlength: 255
+    },
+
+    samplePath: {
+        type: String,
+        default: null
+    },
+
+    status: {
+        type: String,
+        enum: ["pending", "accepted", "rejected"],
+        default: "pending"
+    },
+
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const Application = mongoose.model(
+    "Application",
+    applicationSchema,
+    "applications"
+);
+
+// ==================== AUTH TOKENS ====================
+// Stateless signed tokens (works on Vercel, no session store needed).
+// Requires AUTH_SECRET in the environment.
+
+const TOKEN_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+
+function signToken(userId) {
+    const payload = Buffer.from(
+        JSON.stringify({
+            sub: String(userId),
+            exp: Date.now() + TOKEN_LIFETIME_MS
+        })
+    ).toString("base64url");
+
+    const signature = crypto
+        .createHmac("sha256", process.env.AUTH_SECRET)
+        .update(payload)
+        .digest("base64url");
+
+    return `${payload}.${signature}`;
+}
+
+function verifyToken(token) {
+    if (!process.env.AUTH_SECRET || typeof token !== "string") {
+        return null;
+    }
+
+    const parts = token.split(".");
+
+    if (parts.length !== 2) {
+        return null;
+    }
+
+    const [payload, signature] = parts;
+
+    const expected = crypto
+        .createHmac("sha256", process.env.AUTH_SECRET)
+        .update(payload)
+        .digest("base64url");
+
+    const a = Buffer.from(signature);
+    const b = Buffer.from(expected);
+
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+        return null;
+    }
+
+    try {
+        const data = JSON.parse(
+            Buffer.from(payload, "base64url").toString("utf8")
+        );
+
+        if (!data.exp || data.exp < Date.now() || !data.sub) {
+            return null;
+        }
+
+        return data.sub;
+    } catch {
+        return null;
+    }
+}
+
+function bearerToken(req) {
+    const header = req.headers.authorization || "";
+    return header.startsWith("Bearer ") ? header.slice(7) : null;
+}
+
+// Returns the logged-in user or null (does not reject the request).
+async function getOptionalUser(req) {
+    const userId = verifyToken(bearerToken(req));
+
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+        return null;
+    }
+
+    return User.findById(userId).select("-password");
+}
+
+async function requireAuth(req, res, next) {
+    try {
+        await connectDB();
+
+        const user = await getOptionalUser(req);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Please log in to continue."
+            });
+        }
+
+        req.user = user;
+        next();
+
+    } catch (error) {
+        console.error("AUTH ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+}
+
+// Staff-only protection for the check-in endpoint.
+function requireCheckinKey(req, res, next) {
+    const expected = process.env.CHECKIN_KEY;
+
+    if (!expected) {
+        return res.status(500).json({
+            message: "CHECKIN_KEY is not configured on the server."
+        });
+    }
+
+    const provided = String(req.headers["x-checkin-key"] || "");
+
+    const a = Buffer.from(provided);
+    const b = Buffer.from(expected);
+
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+        return res.status(403).json({
+            message: "Invalid check-in key."
+        });
+    }
+
+    next();
+}
+
+function newTicketFields() {
+    return {
+        ticketToken: crypto.randomBytes(24).toString("hex"),
+        ticketId: `TDX-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
+    };
+}
+
+// ==================== SIGN UP ====================
+
+app.post("/signup", async (req, res) => {
+    try {
+        await connectDB();
+
+        const { name, email, password } = req.body;
+
+        if (
+            typeof name !== "string" ||
+            typeof email !== "string" ||
+            typeof password !== "string" ||
+            !name.trim() ||
+            !email.trim() ||
+            !password
+        ) {
+            return res.status(400).json({
+                message: "Please fill in all fields."
+            });
+        }
+
+        const cleanName = name.trim();
+        const cleanEmail = email.trim().toLowerCase();
+
+        if (cleanName.length > 120 || cleanEmail.length > 254) {
+            return res.status(400).json({
+                message: "Name or email is too long."
+            });
+        }
+
+        if (password.length < 8 || password.length > 128) {
+            return res.status(400).json({
+                message: "Password must be between 8 and 128 characters."
+            });
+        }
+
+        const existingUser = await User.findOne({
+            email: cleanEmail
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                message: "An account with this email already exists."
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        await User.create({
+            name: cleanName,
+            email: cleanEmail,
+            password: hashedPassword
+        });
+
+        return res.status(201).json({
+            message: "Account created successfully!"
+        });
+
+    } catch (error) {
+        console.error("SIGNUP ERROR:", error);
+
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "An account with this email already exists."
+            });
+        }
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+});
+
+// ==================== LOGIN ====================
+
+app.post("/login", async (req, res) => {
+    try {
+        await connectDB();
+
+        if (!process.env.AUTH_SECRET) {
+            console.error("LOGIN ERROR: AUTH_SECRET is not configured.");
+
+            return res.status(500).json({
+                message: "Server is not configured for login."
+            });
+        }
+
+        const { email, password } = req.body;
+
+        if (
+            typeof email !== "string" ||
+            typeof password !== "string" ||
+            !email.trim() ||
+            !password
+        ) {
+            return res.status(400).json({
+                message: "Please enter your email and password."
+            });
+        }
+
+        const cleanEmail = email.trim().toLowerCase();
+
+        const user = await User.findOne({
+            email: cleanEmail
+        });
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid email or password."
+            });
+        }
+
+        const isMatch = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!isMatch) {
+            return res.status(401).json({
+                message: "Invalid email or password."
+            });
+        }
+
+        return res.json({
+            message: "Login successful!",
+            token: signToken(user._id),
+            user: {
+                name: user.name,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        console.error("LOGIN ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+});
+
+// ==================== ENSURE EVENT EXISTS ====================
+
+async function ensureEvent() {
+    await connectDB();
+
+    let event = await Event.findOne({
+        name: "TEDxAASTMT 2026"
     });
 
-    (async function init() {
-      // No token: show the public version immediately, no API calls.
-      if (!localStorage.getItem(TOKEN_KEY)) {
-        showLoggedOut();
-        return;
-      }
+    if (!event) {
+        try {
+            event = await Event.create({
+                name: "TEDxAASTMT 2026",
+                totalSeats: 100,
+                seatsRemaining: 100,
+                registrationOpen: true
+            });
 
-      try {
-        const [me, ticket] = await Promise.all([api('/api/me'), api('/api/ticket')]);
-        renderAccount(me);
-        renderTicket(ticket);
-        showLoggedIn();
-      } catch (e) {
-        // Not authenticated (or token rejected): show the logged-out page.
-        if (e instanceof AuthError) {
-          showLoggedOut();
-          return;
+        } catch (error) {
+            if (error.code !== 11000) {
+                throw error;
+            }
+
+            event = await Event.findOne({
+                name: "TEDxAASTMT 2026"
+            });
         }
-        loading.hidden = false;
-        loading.textContent = 'Could not load your profile. ' + (e.message || 'Please try again.');
-        console.error(e);
-      }
-    })();
-  </script>
-</body>
-</html>
+    }
+
+    return event;
+}
+
+// ==================== EVENT STATUS ====================
+
+app.get("/event-status", async (req, res) => {
+    try {
+        const event = await ensureEvent();
+
+        return res.json({
+            seatsRemaining: event.seatsRemaining,
+            totalSeats: event.totalSeats,
+            registrationOpen:
+                event.registrationOpen &&
+                event.seatsRemaining > 0
+        });
+
+    } catch (error) {
+        console.error("EVENT STATUS ERROR:", error);
+
+        return res.status(500).json({
+            message: "Failed to load event status."
+        });
+    }
+});
+
+// ==================== REGISTER FOR THE EVENT ====================
+
+app.post("/register", async (req, res) => {
+    let session = null;
+
+    try {
+        await connectDB();
+
+        const {
+            name,
+            registration_number,
+            email
+        } = req.body;
+
+        if (
+            typeof name !== "string" ||
+            typeof registration_number !== "string" ||
+            typeof email !== "string" ||
+            !name.trim() ||
+            !registration_number.trim() ||
+            !email.trim()
+        ) {
+            return res.status(400).json({
+                message: "Please fill in all fields."
+            });
+        }
+
+        const cleanName = name.trim();
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanRegNo = registration_number.trim();
+
+        if (cleanName.length < 3 || cleanName.length > 120) {
+            return res.status(400).json({
+                message: "Please enter your full name."
+            });
+        }
+
+        if (!/^\d{9}$/.test(cleanRegNo)) {
+            return res.status(400).json({
+                message: "Registration number must be exactly 9 digits."
+            });
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) {
+            return res.status(400).json({
+                message: "Please enter a valid email address."
+            });
+        }
+
+        // Link the registration to the logged-in account.
+        // If no valid login token was sent, fall back to the account that
+        // uses the same email address (if there is one).
+        let owner = await getOptionalUser(req);
+
+        if (!owner) {
+            owner = await User.findOne({ email: cleanEmail }).select("-password");
+        }
+
+        session = await mongoose.startSession();
+
+        let savedRegistration = null;
+
+        await session.withTransaction(async () => {
+            const existingByEmail = await Registration.findOne({
+                email: cleanEmail
+            }).session(session);
+
+            if (existingByEmail) {
+                throw new Error("EMAIL_ALREADY_REGISTERED");
+            }
+
+            const existingByRegNo = await Registration.findOne({
+                registration_number: cleanRegNo
+            }).session(session);
+
+            if (existingByRegNo) {
+                throw new Error(
+                    "REGISTRATION_NUMBER_ALREADY_REGISTERED"
+                );
+            }
+
+            // One ticket per account.
+            if (owner) {
+                const existingForUser = await Registration.findOne({
+                    user: owner._id
+                }).session(session);
+
+                if (existingForUser) {
+                    throw new Error("ACCOUNT_ALREADY_REGISTERED");
+                }
+            }
+
+            let event = await Event.findOne({
+                name: "TEDxAASTMT 2026"
+            }).session(session);
+
+            if (!event) {
+                const createdEvents = await Event.create(
+                    [{
+                        name: "TEDxAASTMT 2026",
+                        totalSeats: 100,
+                        seatsRemaining: 100,
+                        registrationOpen: true
+                    }],
+                    { session }
+                );
+
+                event = createdEvents[0];
+            }
+
+            if (!event.registrationOpen) {
+                throw new Error("REGISTRATION_CLOSED");
+            }
+
+            const updatedEvent = await Event.findOneAndUpdate(
+                {
+                    name: "TEDxAASTMT 2026",
+                    registrationOpen: true,
+                    seatsRemaining: { $gt: 0 }
+                },
+                {
+                    $inc: { seatsRemaining: -1 }
+                },
+                {
+                    returnDocument: "after",
+                    session
+                }
+            );
+
+            if (!updatedEvent) {
+                throw new Error("EVENT_FULL");
+            }
+
+            const registration = new Registration({
+                name: cleanName,
+                registration_number: cleanRegNo,
+                email: cleanEmail,
+                user: owner ? owner._id : null,
+                ...newTicketFields()
+            });
+
+            await registration.save({ session });
+
+            savedRegistration = {
+                name: registration.name,
+                registration_number: registration.registration_number,
+                email: registration.email,
+                ticketId: registration.ticketId
+            };
+        });
+
+        return res.status(201).json({
+            message: "Seat reserved successfully!",
+            registration: savedRegistration
+        });
+
+    } catch (error) {
+        console.error("REGISTRATION ERROR:", error);
+
+        if (error.message === "EMAIL_ALREADY_REGISTERED") {
+            return res.status(400).json({
+                message: "This email is already registered."
+            });
+        }
+
+        if (
+            error.message ===
+            "REGISTRATION_NUMBER_ALREADY_REGISTERED"
+        ) {
+            return res.status(400).json({
+                message: "This registration number is already registered."
+            });
+        }
+
+        if (error.message === "ACCOUNT_ALREADY_REGISTERED") {
+            return res.status(400).json({
+                message: "This account already has a registration."
+            });
+        }
+
+        if (error.message === "EVENT_FULL") {
+            return res.status(400).json({
+                message: "Sorry, all seats are full."
+            });
+        }
+
+        if (error.message === "REGISTRATION_CLOSED") {
+            return res.status(400).json({
+                message: "Event registration is currently closed."
+            });
+        }
+
+        if (error.code === 11000) {
+            const duplicateField = Object.keys(
+                error.keyPattern || {}
+            )[0];
+
+            if (duplicateField === "email") {
+                return res.status(400).json({
+                    message: "This email is already registered."
+                });
+            }
+
+            if (duplicateField === "registration_number") {
+                return res.status(400).json({
+                    message: "This registration number is already registered."
+                });
+            }
+
+            return res.status(400).json({
+                message: "This registration already exists."
+            });
+        }
+
+        return res.status(500).json({
+            message:
+                "Something went wrong while reserving your seat. Please try again."
+        });
+
+    } finally {
+        if (session) {
+            await session.endSession();
+        }
+    }
+});
+
+// ==================== PROFILE: ACCOUNT INFO ====================
+
+app.get("/api/me", requireAuth, async (req, res) => {
+    try {
+        const registration = await Registration.findOne({
+            $or: [
+                { user: req.user._id },
+                { email: req.user.email }
+            ]
+        }).select("registration_number");
+
+        return res.json({
+            name: req.user.name,
+            email: req.user.email,
+            // MongoDB ObjectIds contain their creation time.
+            createdAt: req.user._id.getTimestamp(),
+            registrationNumber: registration
+                ? registration.registration_number
+                : null
+        });
+
+    } catch (error) {
+        console.error("ME ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+});
+
+// ==================== PROFILE: MY TICKET ====================
+
+const STATUS_MESSAGES = {
+    registered: "Registered \u2013 Your ticket is ready!",
+    checked_in: "Checked In \u2013 You have been checked in successfully.",
+    invalid: "Invalid \u2013 This ticket is not valid."
+};
+
+app.get("/api/ticket", requireAuth, async (req, res) => {
+    try {
+        let registration = await Registration.findOne({
+            $or: [
+                { user: req.user._id },
+                { email: req.user.email }
+            ]
+        });
+
+        if (!registration) {
+            return res.json({ registered: false });
+        }
+
+        let changed = false;
+
+        // Link older registrations to this account.
+        if (!registration.user) {
+            registration.user = req.user._id;
+            changed = true;
+        }
+
+        // Create a ticket for registrations made before tickets existed.
+        if (!registration.ticketToken) {
+            Object.assign(registration, newTicketFields());
+            changed = true;
+        }
+
+        if (changed) {
+            await registration.save();
+        }
+
+        const event = await ensureEvent();
+
+        return res.json({
+            registered: true,
+            attendee: {
+                name: registration.name
+            },
+            event: {
+                name: event.name,
+                date: event.eventDate || null,
+                time: event.eventTime || null,
+                location: event.location || null
+            },
+            ticket: {
+                ticketId: registration.ticketId,
+                token: registration.ticketToken,
+                status: registration.status,
+                statusMessage: STATUS_MESSAGES[registration.status],
+                checkedInAt: registration.checkedInAt
+            }
+        });
+
+    } catch (error) {
+        console.error("TICKET ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+});
+
+// ==================== CHECK-IN (STAFF) ====================
+
+app.post("/api/checkin", requireCheckinKey, async (req, res) => {
+    try {
+        await connectDB();
+
+        const { token } = req.body;
+
+        if (
+            typeof token !== "string" ||
+            !/^[a-f0-9]{48}$/.test(token.trim())
+        ) {
+            return res.status(400).json({
+                result: "invalid",
+                message: "This is not a valid TEDxAASTMT ticket."
+            });
+        }
+
+        const cleanToken = token.trim();
+
+        // Atomic: only one scan can ever move a ticket to checked_in.
+        const checkedIn = await Registration.findOneAndUpdate(
+            { ticketToken: cleanToken, status: "registered" },
+            { $set: { status: "checked_in", checkedInAt: new Date() } },
+            { returnDocument: "after" }
+        );
+
+        if (checkedIn) {
+            return res.json({
+                result: "ok",
+                message: "Check-in successful.",
+                name: checkedIn.name,
+                ticketId: checkedIn.ticketId
+            });
+        }
+
+        const existing = await Registration.findOne({
+            ticketToken: cleanToken
+        });
+
+        if (!existing) {
+            return res.status(404).json({
+                result: "invalid",
+                message: "Ticket not found."
+            });
+        }
+
+        if (existing.status === "checked_in") {
+            return res.status(409).json({
+                result: "already_used",
+                message: "This ticket has already been used.",
+                name: existing.name,
+                ticketId: existing.ticketId,
+                checkedInAt: existing.checkedInAt
+            });
+        }
+
+        return res.status(403).json({
+            result: "invalid",
+            message: "This ticket is not valid.",
+            name: existing.name,
+            ticketId: existing.ticketId
+        });
+
+    } catch (error) {
+        console.error("CHECKIN ERROR:", error);
+
+        return res.status(500).json({
+            message: "Server error."
+        });
+    }
+});
+
+// ==================== SUBMIT TEAM APPLICATION ====================
+
+app.post(
+    "/applications",
+
+    // Process the optional uploaded sample.
+    (req, res, next) => {
+        upload.single("sample")(req, res, (error) => {
+            if (error) {
+                const message =
+                    error.code === "LIMIT_FILE_SIZE"
+                        ? "File is too large. Maximum size is 10 MB."
+                        : error.message;
+
+                return res.status(400).json({ message });
+            }
+
+            next();
+        });
+    },
+
+    async (req, res) => {
+        let applicationSaved = false;
+
+        try {
+            await connectDB();
+
+            const {
+                name,
+                email,
+                phone,
+                college,
+                team,
+                why
+            } = req.body;
+
+            const cleanName =
+                typeof name === "string" ? name.trim() : "";
+
+            const cleanEmail =
+                typeof email === "string"
+                    ? email.trim().toLowerCase()
+                    : "";
+
+            const cleanPhone =
+                typeof phone === "string" ? phone.trim() : "";
+
+            const cleanCollege =
+                typeof college === "string" ? college.trim() : "";
+
+            const cleanWhy =
+                typeof why === "string" ? why.trim() : "";
+
+            const validTeams = [
+                "Coaches",
+                "Operation & PR",
+                "Media & Marketing",
+                "HR"
+            ];
+
+            if (
+                !cleanName ||
+                !cleanEmail ||
+                !cleanPhone ||
+                !cleanCollege ||
+                !cleanWhy ||
+                typeof team !== "string" ||
+                !validTeams.includes(team)
+            ) {
+                return res.status(400).json({
+                    message: "Please complete all required fields."
+                });
+            }
+
+            if (
+                cleanName.length > 120 ||
+                cleanEmail.length > 254 ||
+                cleanPhone.length > 30 ||
+                cleanCollege.length > 150 ||
+                cleanWhy.length > 3000
+            ) {
+                return res.status(400).json({
+                    message:
+                        "One or more fields exceed the allowed length."
+                });
+            }
+
+            if (
+                !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)
+            ) {
+                return res.status(400).json({
+                    message: "Please enter a valid email address."
+                });
+            }
+
+            const application = await Application.create({
+                name: cleanName,
+                email: cleanEmail,
+                phone: cleanPhone,
+                college: cleanCollege,
+                team,
+                why: cleanWhy,
+
+                sampleName: req.file
+                    ? path.basename(req.file.originalname).slice(0, 255)
+                    : null,
+
+                samplePath: req.file
+                    ? req.file.path
+                    : null
+            });
+
+            applicationSaved = true;
+
+            return res.status(201).json({
+                message:
+                    "Your application has been submitted successfully!",
+                applicationId: application._id
+            });
+
+        } catch (error) {
+            console.error(
+                "APPLICATION SUBMISSION ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                message:
+                    "We couldn't save your application. Please try again."
+            });
+
+        } finally {
+            // Remove the uploaded file if saving the application failed.
+            if (req.file && !applicationSaved) {
+                fs.unlink(req.file.path, (error) => {
+                    if (error) {
+                        console.error(
+                            "UPLOAD CLEANUP ERROR:",
+                            error
+                        );
+                    }
+                });
+            }
+        }
+    }
+);
+
+// ==================== HEALTH CHECK ====================
+
+app.get("/status", (req, res) => {
+    return res.json({
+        status: "online",
+        message: "TEDxAASTMT server is running."
+    });
+});
+
+// ==================== START LOCAL SERVER ====================
+
+async function startServer() {
+    try {
+        await connectDB();
+
+        console.log("MongoDB connected successfully!");
+
+        await Event.findOneAndUpdate(
+            { name: "TEDxAASTMT 2026" },
+            {
+                $setOnInsert: {
+                    name: "TEDxAASTMT 2026",
+                    totalSeats: 100,
+                    seatsRemaining: 100,
+                    registrationOpen: true
+                }
+            },
+            {
+                upsert: true,
+                returnDocument: "after"
+            }
+        );
+
+        console.log("Event seat counter ready!");
+
+        await Registration.init();
+        console.log("Registration indexes ready!");
+
+        await Application.init();
+        console.log("Application collection ready!");
+
+        app.listen(PORT, () => {
+            console.log(
+                `TEDxAASTMT server running on port ${PORT}`
+            );
+        });
+
+    } catch (error) {
+        console.error("SERVER STARTUP ERROR:", error);
+        process.exitCode = 1;
+    }
+}
+
+// Start a local server only when this file is run directly.
+// Vercel imports the Express app through index.js.
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = app;
+
