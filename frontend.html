@@ -1,11 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TEDxAASTMT | Ideas worth sharing</title>
-  <meta name="description" content="TEDxAASTMT is a student-led TEDx initiative at AASTMT, bringing people together through ideas, stories, and perspectives.">
+  <title>My Profile | TEDxAASTMT</title>
+  <meta name="description" content="Your TEDxAASTMT profile and event ticket.">
+  <meta name="robots" content="noindex">
 
   <style>
     :root {
@@ -17,60 +17,53 @@
       --light-grey: #e3e3e3;
       --soft: #f5f5f5;
       --white: #fff;
+      --green: #1E9E4A;
       --font: Arial, Helvetica, sans-serif;
       --page-width: 1200px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 80px;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
-      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       font-family: var(--font);
       color: var(--ink);
       background: var(--white);
-      line-height: 1.65;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
 
-    img {
-      display: block;
-      max-width: 100%;
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1350' preserveAspectRatio='xMidYMid slice'%3E%3Cpath d='M0 230 L845 738 L1080 350 L1080 860 L775 1350 L475 1350 L695 983 L0 562 Z' fill='%23EB0028' fill-opacity='0.11'/%3E%3C/svg%3E") center / cover no-repeat,
+        #fff;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
 
-    button, a {
-      -webkit-tap-highlight-color: transparent;
-    }
+    /* WORDMARK: TEDx in red, AASTMT in black */
+    .ted, .x { color: var(--red); font-weight: 800; }
+    .aastmt { color: #000; font-weight: 800; }
 
-    a:focus-visible {
-      outline: 3px solid var(--red);
-      outline-offset: 4px;
-    }
-
-    /* HEADER */
-
+    /* NAV */
     .nav {
       position: sticky;
       top: 0;
       z-index: 100;
-      width: 100%;
-      min-height: 76px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      min-height: 76px;
       padding: 16px max(32px, calc((100% - var(--page-width)) / 2));
       background: rgba(255, 255, 255, 0.97);
       border-bottom: 1px solid var(--light-grey);
@@ -87,33 +80,19 @@
       line-height: 1;
     }
 
-    .ted, .x {
-      color: var(--red);
-      font-weight: 800;
-    }
-
-    .aastmt {
-      color: var(--black);
-      font-weight: 800;
-    }
-
-    .nav nav {
-      display: flex;
-      align-items: center;
-      gap: 26px;
-    }
-
-    .nav nav a:not(.btn) {
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .nav nav a:not(.btn):hover {
-      color: var(--red);
+    .nav nav { display: flex; align-items: center; gap: 26px; }
+    .nav nav a { font-size: 0.9rem; font-weight: 700; position: relative; padding: 4px 0; }
+    .nav nav a:hover { color: var(--red); }
+    .nav nav a.active { color: var(--red); }
+    .nav nav a.active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: -4px;
+      height: 3px;
+      background: var(--red);
     }
 
     /* BUTTONS */
-
     .btn {
       display: inline-flex;
       justify-content: center;
@@ -124,298 +103,306 @@
       color: var(--white);
       border: 2px solid var(--red);
       border-radius: 2px;
-      text-align: center;
+      font: inherit;
       font-size: 0.95rem;
       font-weight: 700;
-      transition: background 0.2s, border-color 0.2s, transform 0.2s;
       cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
     }
+    .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
+    .btn.outline { background: transparent; color: var(--black); border-color: var(--black); }
+    .btn.outline:hover { background: var(--black); color: var(--white); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
 
-    .btn:hover {
-      background: var(--red-dark);
-      border-color: var(--red-dark);
-    }
-
-    .btn.wide {
-      min-width: 220px;
-    }
-
-    .btn.outline {
-      background: transparent;
-      color: var(--black);
-      border-color: var(--black);
-    }
-
-    .btn.outline:hover {
-      background: var(--black);
-      color: var(--white);
-    }
-
-    /* SMALLER NAVIGATION BUTTON */
-
-    .nav .btn.nav-btn {
-      min-height: 36px;
-      padding: 6px 16px;
-      font-size: 0.82rem;
-    }
-
-    /* GENERAL SECTIONS */
-
+    /* LAYOUT */
     main {
-      width: 100%;
-    }
-
-    section {
+      flex: 1;
       width: 100%;
       max-width: var(--page-width);
       margin: 0 auto;
-      padding: 88px 48px;
+      padding: 64px 48px 96px;
     }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      color: var(--red);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 40px; height: 5px;
+      background: var(--red);
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .lead { color: var(--grey); font-size: 1.05rem; max-width: 560px; margin-bottom: 44px; }
 
     h2 {
       position: relative;
       width: fit-content;
-      max-width: 100%;
       padding-bottom: 14px;
-      margin-bottom: 32px;
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
-      line-height: 1.15;
-      letter-spacing: -0.035em;
+      margin-bottom: 28px;
+      font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+      letter-spacing: -0.03em;
     }
 
     h2::after {
       content: "";
       position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 48px;
-      height: 4px;
+      left: 0; bottom: 0;
+      width: 48px; height: 4px;
       background: var(--red);
     }
 
-    h3 {
-      font-size: 1.1rem;
-      line-height: 1.35;
-    }
+    section + section { margin-top: 64px; }
 
-    /* HERO */
+    .actions { display: flex; flex-wrap: wrap; gap: 14px; }
 
-    .hero {
+    /* LOGGED-OUT VIEW */
+    .welcome {
       position: relative;
-      min-height: min(760px, 78vh);
-      display: flex;
-      align-items: center;
-      padding-top: 100px;
-      padding-bottom: 100px;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      top: 64px;
-      left: 48px;
-      width: 64px;
-      height: 6px;
-      background: var(--red);
-    }
-
-    .hero-text {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .hero h1 {
-      font-size: clamp(4.5rem, 8vw, 7rem);
-      line-height: 0.92;
-      letter-spacing: -0.065em;
-      font-weight: 800;
-    }
-
-    .hero h1 .aastmt {
-      color: var(--black);
-    }
-
-    .hero .theme {
-      max-width: 720px;
-      margin-top: 28px;
-      font-size: clamp(1.1rem, 1.7vw, 1.45rem);
-      line-height: 1.4;
-      font-weight: 700;
-    }
-
-    .hero .when {
-      margin-top: 10px;
-      margin-bottom: 28px;
-      color: var(--grey);
-      font-size: 0.95rem;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
-
-    /* ABOUT */
-
-    .about-title .red-text,
-    .about-title .grey-text {
-      display: block;
-    }
-
-    .red-text {
-      color: var(--red);
-    }
-
-    .grey-text {
-      color: var(--black);
-    }
-
-    .about-grid {
-      max-width: 850px;
-      font-size: 1.05rem;
-    }
-
-    .facts {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 24px;
-      margin-top: 42px;
-      padding-top: 24px;
-      border-top: 3px solid var(--black);
-      list-style: none;
-    }
-
-    .facts li {
-      text-align: center;
-      color: var(--grey);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-
-    .facts strong {
-      display: block;
-      color: var(--red);
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.2;
-      letter-spacing: -0.04em;
-      text-transform: none;
-      white-space: nowrap;
-    }
-
-    /* SPEAKERS */
-
-    .grid.four {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 36px 24px;
-    }
-
-    .speaker {
-      min-width: 0;
-    }
-
-    .photo {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background: var(--soft);
-      border: 1px dashed #c8c8c8;
-      color: var(--grey);
-      text-align: center;
-    }
-
-    .photo.square {
-      aspect-ratio: 1;
-    }
-
-    .photo img {
-      position: absolute;
-      z-index: 2;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .photo span {
-      position: relative;
-      padding: 12px;
-      font-size: 0.85rem;
-    }
-
-    .photo small {
-      font-size: 0.75rem;
-      opacity: 0.75;
-    }
-
-    .speaker h3 {
-      margin-top: 14px;
-    }
-
-    .speaker p {
-      margin-top: 5px;
-      color: var(--grey);
-      font-size: 0.92rem;
-    }
-
-    /* JOIN / REGISTRATION */
-
-    .tickets {
-      max-width: none;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 40px;
-      background: var(--black);
-      color: var(--white);
+      padding: 64px 56px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--light-grey);
       border-top: 6px solid var(--red);
-      padding: 72px max(48px, calc((100% - 1104px) / 2));
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.08);
     }
 
-    .tickets > div:first-child {
-      max-width: 650px;
-    }
+    .welcome .lead { margin-bottom: 32px; }
 
-    .tickets h2 {
-      margin-bottom: 18px;
-      color: var(--white);
-    }
-
-    .tickets p {
-      color: #d0d0d0;
-      font-size: 1.05rem;
-    }
-
-    .tickets-actions {
-      flex: 0 0 auto;
-      width: 260px;
-    }
-
-    .tickets-actions .btn {
-      width: 100%;
-    }
-
-    /* GALLERY */
-
-    .masonry {
+    .welcome-perks {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
+      margin-top: 44px;
+      padding-top: 28px;
+      border-top: 1px solid var(--light-grey);
     }
 
-    .masonry .photo.wide {
-      grid-column: span 2;
+    .welcome-perks div {
+      font-size: 0.9rem;
+      color: var(--grey);
     }
+
+    .welcome-perks strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--black);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ACCOUNT CARD */
+    .account {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--light-grey);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .account-top {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 28px 32px;
+    }
+
+    .avatar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--red);
+      color: var(--white);
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .account-top h3 { font-size: 1.4rem; letter-spacing: -0.03em; overflow-wrap: anywhere; }
+    .account-top p { color: var(--grey); overflow-wrap: anywhere; }
+
+    .facts-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      border-top: 1px solid var(--light-grey);
+    }
+
+    .facts-row div {
+      padding: 18px 32px;
+      border-right: 1px solid var(--light-grey);
+      min-width: 0;
+    }
+
+    .facts-row div:last-child { border-right: 0; }
+
+    .facts-row dt {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--grey);
+    }
+
+    .facts-row dd { font-weight: 700; overflow-wrap: anywhere; }
+
+    /* TICKET */
+    .ticket {
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      background: var(--white);
+      border: 1px solid var(--light-grey);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.1);
+    }
+
+    .ticket-details {
+      position: relative;
+      padding: 36px 40px;
+      min-width: 0;
+      border-left: 8px solid var(--red);
+    }
+
+    .ticket-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+
+    .ticket-head .logo { font-size: 1.15rem; }
+
+    .tag {
+      padding: 5px 12px;
+      border: 2px solid var(--black);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .ticket h3 {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 26px;
+    }
+
+    .ticket dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; }
+
+    .ticket dt {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--grey);
+    }
+
+    .ticket dd { font-size: 1.05rem; font-weight: 700; overflow-wrap: anywhere; }
+    .ticket dl .full { grid-column: 1 / -1; }
+
+    .status {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 30px;
+      padding: 14px 18px;
+      background: var(--soft);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .status::before {
+      content: "";
+      flex: 0 0 auto;
+      width: 12px; height: 12px;
+      margin-top: 6px;
+      border-radius: 50%;
+      background: var(--black);
+    }
+
+    .status.registered { background: #fff0f2; color: var(--red-dark); }
+    .status.registered::before { background: var(--red); }
+    .status.checked_in { background: #eefaf2; color: #146b32; }
+    .status.checked_in::before { background: var(--green); }
+    .status.invalid { background: #ececec; }
+
+    .ticket-qr {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 36px 28px;
+      background: var(--black);
+      color: var(--white);
+      border-left: 2px dashed #555;
+    }
+
+    .scan-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #bbb;
+    }
+
+    .qr-box {
+      padding: 14px;
+      background: var(--white);
+      line-height: 0;
+    }
+
+    .qr-box.used { opacity: 0.4; }
+    .qr-box canvas, .qr-box img { max-width: 100%; height: auto; }
+
+    .ref { font-size: 0.8rem; color: #bbb; text-align: center; }
+    .ref strong { color: var(--white); letter-spacing: 0.1em; }
+
+    .ticket-qr .btn { width: 100%; }
+
+    /* STATES */
+    .empty {
+      padding: 44px 40px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--light-grey);
+      border-left: 8px solid var(--black);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .empty h3 { font-size: 1.4rem; letter-spacing: -0.03em; margin-bottom: 8px; }
+    .empty p { color: var(--grey); margin-bottom: 22px; max-width: 520px; }
+
+    .loading { color: var(--grey); padding: 40px 0; }
+
+    .notice {
+      display: none;
+      margin-bottom: 24px;
+      padding: 12px 16px;
+      background: #fff0f2;
+      border-left: 4px solid var(--red);
+      color: var(--red-dark);
+      font-size: 0.9rem;
+    }
+    .notice.show { display: block; }
 
     /* FOOTER */
-
     footer {
       width: 100%;
       padding: 36px max(32px, calc((100% - var(--page-width)) / 2));
@@ -432,545 +419,517 @@
       margin-bottom: 28px;
     }
 
-    footer .logo .aastmt {
-      color: var(--white);
-    }
-
-    .footer-info {
-      text-align: right;
-    }
-
-    .social-links {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 18px;
-    }
-
+    footer .logo .aastmt { color: var(--white); }
+    .footer-info { text-align: right; }
+    .social-links { display: flex; align-items: center; justify-content: flex-end; gap: 18px; }
     .social-links a {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 32px; height: 32px;
       color: var(--white);
       transition: color 0.2s, transform 0.2s;
     }
+    .social-links a:hover { color: var(--red); transform: translateY(-2px); }
+    .social-links svg { width: 24px; height: 24px; }
+    .legal { color: #aaa; font-size: 0.8rem; }
+    .made-by { margin-top: 6px; color: #777; }
 
-    .social-links a:hover {
-      color: var(--red);
-      transform: translateY(-2px);
-    }
-
-    .social-links svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .legal {
-      color: #aaa;
-      font-size: 0.8rem;
-    }
-
-    .made-by {
-      margin-top: 6px;
-      color: #777;
-    }
-
-    /* TABLETS AND SMALL LAPTOPS */
-
-    @media (max-width: 1000px) {
-      section {
-        padding: 72px 36px;
-      }
-
-      .hero {
-        min-height: 68vh;
-      }
-
-      .hero::before {
-        left: 36px;
-      }
-
-      .grid.four {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .tickets {
-        padding: 64px 36px;
-      }
-
-      .nav {
-        padding-left: 28px;
-        padding-right: 28px;
-      }
-
-      footer {
-        padding-left: 28px;
-        padding-right: 28px;
-      }
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      main { padding: 48px 28px 72px; }
+      .ticket { grid-template-columns: 1fr; }
+      .ticket-qr { border-left: 0; border-top: 2px dashed #555; }
     }
 
     @media (max-width: 760px) {
-      .nav {
-        min-height: 68px;
-        padding: 14px 22px;
-      }
-
-      .nav nav {
-        gap: 12px;
-      }
-
-      .nav nav a:not(.btn) {
-        display: none;
-      }
-
-      .logo {
-        font-size: 1.2rem;
-      }
-
-      section {
-        padding: 60px 24px;
-      }
-
-      .hero {
-        min-height: auto;
-        padding-top: 110px;
-        padding-bottom: 72px;
-      }
-
-      .hero::before {
-        top: 50px;
-        left: 24px;
-        width: 52px;
-        height: 5px;
-      }
-
-      .hero h1 {
-        font-size: clamp(3.5rem, 12vw, 5.5rem);
-      }
-
-      .hero .theme {
-        margin-top: 24px;
-      }
-
-      .grid.four {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 28px 16px;
-      }
-
-      .tickets {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 28px;
-        padding: 56px 24px;
-      }
-
-      .tickets-actions {
-        width: 100%;
-        max-width: 340px;
-      }
-
-      .masonry {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-      }
-
-      .facts {
-        gap: 8px;
-      }
-
-      .facts li {
-        font-size: 0.68rem;
-        letter-spacing: 0.025em;
-      }
-
-      .facts strong {
-        font-size: clamp(1.7rem, 6vw, 2.4rem);
-      }
-
-      footer {
-        padding: 32px 24px;
-      }
+      .nav { min-height: 68px; padding: 14px 22px; }
+      .nav nav { gap: 14px; }
+      .nav nav a { font-size: 0.78rem; }
+      .logo { font-size: 1.2rem; }
+      .welcome { padding: 44px 28px; }
+      .welcome-perks { grid-template-columns: 1fr; }
+      .facts-row div { border-right: 0; border-bottom: 1px solid var(--light-grey); padding: 16px 24px; }
+      .facts-row div:last-child { border-bottom: 0; }
+      .account-top { padding: 24px; }
+      footer { padding: 32px 24px; }
+      body::before { background-position: 60% center; }
     }
-
-    /* PHONES */
 
     @media (max-width: 480px) {
-      section {
-        padding: 48px 20px;
-      }
-
-      .hero {
-        padding: 96px 20px 56px;
-      }
-
-      .hero::before {
-        left: 20px;
-        top: 42px;
-      }
-
-      .hero h1 {
-        font-size: clamp(3rem, 14vw, 4.3rem);
-      }
-
-      .hero .theme {
-        font-size: 1.05rem;
-      }
-
-      .hero .when {
-        font-size: 0.88rem;
-      }
-
-      .actions {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .actions .btn {
-        width: 100%;
-      }
-
-      .grid.four {
-        gap: 24px 12px;
-      }
-
-      .speaker h3 {
-        font-size: 0.95rem;
-      }
-
-      .speaker p {
-        font-size: 0.82rem;
-      }
-
-      .facts {
-        gap: 4px;
-        padding-top: 18px;
-      }
-
-      .facts li {
-        font-size: 0.58rem;
-      }
-
-      .facts strong {
-        font-size: clamp(1.45rem, 7vw, 2rem);
-      }
-
-      .about-grid {
-        font-size: 0.97rem;
-      }
-
-      .masonry {
-        gap: 8px;
-      }
-
-      .masonry .photo.wide {
-        grid-column: span 2;
-      }
-
-      .foot-top {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .footer-info {
-        text-align: left;
-      }
-
-      .social-links {
-        justify-content: flex-start;
-      }
-
-      footer {
-        padding: 30px 20px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
-
-      *, *::before, *::after {
-        transition-duration: 0.01ms !important;
-      }
+      main { padding: 36px 20px 56px; }
+      .nav nav a.hide-sm { display: none; }
+      .welcome { padding: 36px 22px; }
+      .ticket-details { padding: 26px 20px; }
+      .ticket dl { grid-template-columns: 1fr; }
+      .account-top { gap: 16px; }
+      .avatar { width: 56px; height: 56px; font-size: 1.25rem; }
+      .actions .btn { width: 100%; }
+      .foot-top { align-items: flex-start; flex-direction: column; }
+      .footer-info { text-align: left; }
+      .social-links { justify-content: flex-start; }
+      footer { padding: 30px 20px; }
     }
   </style>
 </head>
 
 <body>
   <header class="nav">
-    <a class="logo" href="#top" aria-label="TEDxAASTMT home">
+    <a class="logo" href="/" aria-label="TEDxAASTMT home">
       <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
     </a>
 
     <nav aria-label="Main navigation">
-      <a href="#about">About</a>
-      <a href="#speakers">Speakers</a>
-      <a href="#gallery">Gallery</a>
-      <a class="btn nav-btn" href="#tickets">Join us</a>
+      <a href="/">Home</a>
+      <a class="hide-sm" href="/#about">About</a>
+      <a class="hide-sm" href="/#speakers">Speakers</a>
+      <a class="hide-sm" href="/#gallery">Gallery</a>
+      <a class="active" href="profile.html" aria-current="page">Profile</a>
     </nav>
   </header>
 
-  <main id="top">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-text">
-        <h1>
-          <span class="ted">TED</span><span class="x">x</span><br>
-          <span class="aastmt">AASTMT</span>
-        </h1>
+  <main>
+    <div id="loading" class="loading">Loading your profile&hellip;</div>
 
-        <p class="theme">Ideas worth sharing. from our campus.</p>
-        <p class="when">Event date and venue to be announced</p>
+    <!-- Shown to visitors who are not logged in -->
+    <div id="loggedOut" hidden>
+      <div class="welcome">
+        <div class="eyebrow">My profile</div>
+        <h1>Welcome to <br><span class="ted">TEDx</span><span class="aastmt">AASTMT</span></h1>
+        <p class="lead">Log in to view your account details and event tickets.</p>
 
         <div class="actions">
-          <a class="btn wide" href="register.html">Attend an event</a>
-          <a class="btn wide outline" href="join.html">Join the team</a>
+          <a class="btn" href="login.html">Log In</a>
+          <a class="btn outline" href="signup.html">Sign Up</a>
+        </div>
+
+        <div class="welcome-perks">
+          <div><strong>Your account</strong>See your details in one place.</div>
+          <div><strong>Your ticket</strong>Get a personal QR code after you register.</div>
+          <div><strong>Easy entry</strong>Show your QR at the door. No paperwork.</div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ABOUT -->
-    <section id="about" class="about">
-      <h2 class="about-title">
-        <span class="red-text">Ideas worth sharing</span>
-        <span class="grey-text">from our campus</span>
-      </h2>
+    <div id="content" hidden>
+      <div class="eyebrow">My profile</div>
+      <h1 id="welcome">Welcome back!</h1>
+      <p class="lead">Your account details and event ticket are below.</p>
 
-      <div class="about-grid">
-        <p>
-          TEDxAASTMT is a student-led TEDx initiative at AASTMT, bringing people
-          together through ideas, stories, and perspectives that inspire meaningful
-          conversations and encourage our community to think differently.
-        </p>
-      </div>
+      <div class="notice" id="notice" role="alert"></div>
 
-      <ul class="facts">
-        <li><strong>8</strong>Speakers</li>
-        <li><strong>100</strong>Seats</li>
-        <li><strong>1 day</strong>Of talks</li>
-      </ul>
-    </section>
+      <section aria-labelledby="acct">
+        <h2 id="acct">My Account</h2>
+        <div class="account" id="account"></div>
+      </section>
 
-    <!-- SPEAKERS -->
-    <section id="speakers" class="speakers">
-      <h2>Speakers</h2>
+      <section aria-labelledby="tk">
+        <h2 id="tk">My Event Ticket</h2>
+        <div id="ticketArea"></div>
+      </section>
 
-      <div class="grid four">
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-1.jpg" alt="Speaker 1" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-1.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-2.jpg" alt="Speaker 2" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-2.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-3.jpg" alt="Speaker 3" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-3.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-4.jpg" alt="Speaker 4" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-4.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-5.jpg" alt="Speaker 5" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-5.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-6.jpg" alt="Speaker 6" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-6.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-7.jpg" alt="Speaker 7" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-7.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-
-        <article class="speaker">
-          <div class="photo square">
-            <img src="images/speaker-8.jpg" alt="Speaker 8" onerror="this.remove()">
-            <span>Speaker photo<br><small>speaker-8.jpg</small></span>
-          </div>
-          <h3>Speaker announcement coming soon</h3>
-          <p>More details will be announced soon.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- REGISTRATION -->
-    <section id="tickets" class="tickets">
-      <div>
-        <h2>Join us</h2>
-        <p>
-          Signup or login to continue and stay connected with TEDxAASTMT.
-        </p>
-      </div>
-
-      <div class="tickets-actions">
-        <a class="btn" href="signup.html">Create an account</a>
-      </div>
-    </section>
-
-    <!-- GALLERY -->
-    <section id="gallery" class="gallery">
-      <h2>Community Moments</h2>
-
-      <div class="masonry">
-        <div class="photo wide">
-          <img src="images/gallery-1.jpg" alt="TEDxAASTMT event audience" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-1.jpg</small></span>
+      <section>
+        <div class="actions">
+          <button class="btn outline" id="logout" type="button">Log out</button>
         </div>
-
-        <div class="photo">
-          <img src="images/gallery-2.jpg" alt="TEDxAASTMT team backstage" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-2.jpg</small></span>
-        </div>
-
-        <div class="photo">
-          <img src="images/gallery-3.jpg" alt="Speaker on stage" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-3.jpg</small></span>
-        </div>
-
-        <div class="photo">
-          <img src="images/gallery-4.jpg" alt="Networking break" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-4.jpg</small></span>
-        </div>
-
-        <div class="photo">
-          <img src="images/gallery-5.jpg" alt="Event hall" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-5.jpg</small></span>
-        </div>
-
-        <div class="photo wide">
-          <img src="images/gallery-6.jpg" alt="Opening talk" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-6.jpg</small></span>
-        </div>
-
-        <div class="photo">
-          <img src="images/gallery-7.jpg" alt="Volunteers" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-7.jpg</small></span>
-        </div>
-
-        <div class="photo">
-          <img src="images/gallery-8.jpg" alt="Stage setup" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-8.jpg</small></span>
-        </div>
-
-        <div class="photo">
-          <img src="images/gallery-9.jpg" alt="Speaker Q and A" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-9.jpg</small></span>
-        </div>
-
-        <div class="photo">
-          <img src="images/gallery-10.jpg" alt="Group photo" onerror="this.remove()">
-          <span>Gallery photo<br><small>gallery-10.jpg</small></span>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <div class="foot-top">
-      <a class="logo" href="#top" aria-label="TEDxAASTMT home">
+      <a class="logo" href="/" aria-label="TEDxAASTMT home">
         <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
       </a>
 
       <div class="footer-info">
         <div class="social-links">
-          <a href="https://www.instagram.com/tedxaastmt/"
-             target="_blank" rel="noopener noreferrer"
-             aria-label="Instagram" title="Instagram">
+          <a href="https://www.instagram.com/tedxaastmt/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="5"
-                    stroke="currentColor" stroke-width="2"/>
-              <circle cx="12" cy="12" r="4"
-                      stroke="currentColor" stroke-width="2"/>
+              <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
               <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
             </svg>
           </a>
 
-          
-<a href="https://chat.whatsapp.com/JM1mXQBwc4v1iBPRBeJx5q"
-   target="_blank"
-   rel="noopener noreferrer"
-   aria-label="WhatsApp group"
-   title="WhatsApp group">
-  <svg xmlns="http://www.w3.org/2000/svg"
-       viewBox="0 0 24 24"
-       width="24"
-       height="24"
-       fill="currentColor"
-       aria-hidden="true">
-    <path d="M20.52 3.48A11.8 11.8 0 0 0 12.1 0C5.56 0 .23 5.32.23 11.87c0 2.1.55 4.15 1.6 5.96L.13 24l6.33-1.66a11.9 11.9 0 0 0 5.63 1.43h.01c6.55 0 11.87-5.32 11.87-11.87 0-3.17-1.23-6.15-3.45-8.42ZM12.1 21.75h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.76.99 1-3.67-.24-.38a9.83 9.83 0 0 1-1.51-5.23c0-5.47 4.45-9.92 9.93-9.92 2.65 0 5.14 1.03 7.01 2.91a9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.92 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
-  </svg>
-</a>
-
-
-          <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/"
-             target="_blank" rel="noopener noreferrer"
-             aria-label="Facebook" title="Facebook">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor"
-                d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/>
+          <a href="https://chat.whatsapp.com/JM1mXQBwc4v1iBPRBeJx5q" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp group" title="WhatsApp group">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+              <path d="M20.52 3.48A11.8 11.8 0 0 0 12.1 0C5.56 0 .23 5.32.23 11.87c0 2.1.55 4.15 1.6 5.96L.13 24l6.33-1.66a11.9 11.9 0 0 0 5.63 1.43h.01c6.55 0 11.87-5.32 11.87-11.87 0-3.17-1.23-6.15-3.45-8.42ZM12.1 21.75h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.76.99 1-3.67-.24-.38a9.83 9.83 0 0 1-1.51-5.23c0-5.47 4.45-9.92 9.93-9.92 2.65 0 5.14 1.03 7.01 2.91a9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.92 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
             </svg>
           </a>
 
-          <a href="https://mail.google.com/mail/?view=cm&amp;to=tedxaastmt26@gmail.com"
-             target="_blank" rel="noopener noreferrer"
-             aria-label="Email" title="Email">
+          <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/>
+            </svg>
+          </a>
+
+          <a href="https://mail.google.com/mail/?view=cm&amp;to=tedxaastmt26@gmail.com" target="_blank" rel="noopener noreferrer" aria-label="Email" title="Email">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="2.5" y="4.5" width="19" height="15" rx="2"
-                    stroke="currentColor" stroke-width="2"/>
-              <path d="m3.5 6 8.5 7 8.5-7"
-                    stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="2.5" y="4.5" width="19" height="15" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="m3.5 6 8.5 7 8.5-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </a>
         </div>
       </div>
     </div>
 
-    <p class="legal">
-      This independent TEDx event is operated under license from TED.
-    </p>
-
+    <p class="legal">This independent TEDx event is operated under license from TED.</p>
     <p class="legal made-by">Made by Razan AlOraby</p>
   </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const TOKEN_KEY = 'tedx_token';
+
+    const loading = document.getElementById('loading');
+    const loggedOut = document.getElementById('loggedOut');
+    const content = document.getElementById('content');
+    const notice = document.getElementById('notice');
+    const account = document.getElementById('account');
+    const ticketArea = document.getElementById('ticketArea');
+
+    class AuthError extends Error {}
+
+    function showLoggedOut() {
+      // Remove any private data from the page, then show the public view.
+      account.textContent = '';
+      ticketArea.textContent = '';
+      notice.classList.remove('show');
+      content.hidden = true;
+      loading.hidden = true;
+      loggedOut.hidden = false;
+    }
+
+    function showLoggedIn() {
+      loading.hidden = true;
+      loggedOut.hidden = true;
+      content.hidden = false;
+    }
+
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+
+    function formatDate(value) {
+      if (!value) return null;
+      const d = new Date(value);
+      if (isNaN(d)) return null;
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    async function api(path) {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) throw new AuthError('no token');
+
+      const res = await fetch(path, { headers: { Authorization: 'Bearer ' + token } });
+      if (res.status === 401) throw new AuthError('unauthorized');
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || 'Request failed.');
+      return data;
+    }
+
+    function initials(name) {
+      const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return '?';
+      const first = parts[0][0];
+      const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+      return (first + last).toUpperCase();
+    }
+
+    function renderAccount(me) {
+      const first = (me.name || '').split(' ')[0] || 'there';
+      document.getElementById('welcome').textContent = 'Welcome back, ' + first + '!';
+
+      account.textContent = '';
+
+      const top = el('div', 'account-top');
+      top.appendChild(el('div', 'avatar', initials(me.name)));
+      const who = el('div');
+      who.appendChild(el('h3', null, me.name));
+      who.appendChild(el('p', null, me.email));
+      top.appendChild(who);
+      account.appendChild(top);
+
+      const facts = [];
+      if (me.registrationNumber) facts.push(['Registration number', me.registrationNumber]);
+      const created = formatDate(me.createdAt);
+      if (created) facts.push(['Member since', created]);
+
+      if (facts.length) {
+        const dl = el('dl', 'facts-row');
+        facts.forEach(([label, value]) => {
+          const wrap = el('div');
+          wrap.appendChild(el('dt', null, label));
+          wrap.appendChild(el('dd', null, value));
+          dl.appendChild(wrap);
+        });
+        account.appendChild(dl);
+      }
+    }
+
+    function detail(dl, label, value, full) {
+      if (!value) return;
+      const wrap = el('div', full ? 'full' : '');
+      wrap.appendChild(el('dt', null, label));
+      wrap.appendChild(el('dd', null, value));
+      dl.appendChild(wrap);
+    }
+
+    function eventDetails(ev) {
+      return {
+        date: formatDate(ev.date),
+        time: ev.time || null,
+        location: ev.location || null
+      };
+    }
+
+    function renderTicket(data) {
+      ticketArea.textContent = '';
+
+      if (!data.registered) {
+        const box = el('div', 'empty');
+        box.appendChild(el('h3', null, 'No ticket yet'));
+        box.appendChild(el('p', null, "You haven't registered for an event yet. Register to get your personal QR ticket."));
+        const link = el('a', 'btn', 'Attend an event');
+        link.href = 'register.html';
+        box.appendChild(link);
+        ticketArea.appendChild(box);
+        return;
+      }
+
+      const { attendee, event, ticket } = data;
+      const when = eventDetails(event);
+
+      const card = el('article', 'ticket');
+      const details = el('div', 'ticket-details');
+
+      const head = el('div', 'ticket-head');
+      const brand = el('div', 'logo');
+      brand.innerHTML = '<span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>';
+      head.appendChild(brand);
+      head.appendChild(el('span', 'tag', 'Admit one'));
+      details.appendChild(head);
+
+      details.appendChild(el('h3', null, event.name));
+
+      const dl = el('dl');
+      detail(dl, 'Attendee', attendee.name, true);
+      detail(dl, 'Date', when.date);
+      detail(dl, 'Time', when.time);
+      detail(dl, 'Location', when.location, true);
+      detail(dl, 'Ticket ID', ticket.ticketId);
+      details.appendChild(dl);
+
+      details.appendChild(el('div', 'status ' + ticket.status, ticket.statusMessage));
+      card.appendChild(details);
+
+      const side = el('div', 'ticket-qr');
+
+      if (ticket.status === 'invalid') {
+        side.appendChild(el('p', 'ref', 'This ticket is no longer valid. Please contact the TEDxAASTMT team.'));
+      } else {
+        side.appendChild(el('div', 'scan-label', 'Scan at the entrance'));
+
+        const box = el('div', 'qr-box' + (ticket.status === 'checked_in' ? ' used' : ''));
+        side.appendChild(box);
+        new QRCode(box, {
+          text: ticket.token,
+          width: 220,
+          height: 220,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        const ref = el('p', 'ref');
+        ref.appendChild(document.createTextNode('Ticket ID '));
+        ref.appendChild(el('strong', null, ticket.ticketId));
+        side.appendChild(ref);
+
+        const dlBtn = el('button', 'btn', 'Download My Ticket');
+        dlBtn.type = 'button';
+        dlBtn.addEventListener('click', () => downloadTicket(data, dlBtn));
+        side.appendChild(dlBtn);
+      }
+
+      card.appendChild(side);
+      ticketArea.appendChild(card);
+    }
+
+    // ---------- Download ticket as PNG ----------
+    function fitText(ctx, text, maxWidth) {
+      const words = String(text).split(' ');
+      const lines = [];
+      let line = '';
+      for (const w of words) {
+        const test = line ? line + ' ' + w : w;
+        if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+        else line = test;
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function downloadTicket(data, button) {
+      button.disabled = true;
+
+      try {
+        const { attendee, event, ticket } = data;
+        const when = eventDetails(event);
+
+        // Large offscreen QR for a sharp, easy-to-scan result.
+        const holder = document.createElement('div');
+        new QRCode(holder, {
+          text: ticket.token,
+          width: 640,
+          height: 640,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        const qrCanvas = holder.querySelector('canvas');
+        if (!qrCanvas) throw new Error('QR failed');
+
+        const W = 900, H = 1400;
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const ctx = c.getContext('2d');
+        const font = 'Arial, Helvetica, sans-serif';
+
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, W, H);
+
+        // Red top bar
+        ctx.fillStyle = '#EB0028';
+        ctx.fillRect(0, 0, W, 24);
+
+        // Wordmark: TEDx red, AASTMT black
+        ctx.textBaseline = 'alphabetic';
+        ctx.textAlign = 'left';
+        ctx.font = '800 64px ' + font;
+        const tedxW = ctx.measureText('TEDx').width;
+        const aastmtW = ctx.measureText('AASTMT').width;
+        const x0 = (W - tedxW - aastmtW) / 2;
+        ctx.fillStyle = '#EB0028';
+        ctx.fillText('TEDx', x0, 130);
+        ctx.fillStyle = '#000';
+        ctx.fillText('AASTMT', x0 + tedxW, 130);
+
+        // Event name
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#000';
+        ctx.font = '800 54px ' + font;
+        let y = 230;
+        for (const line of fitText(ctx, event.name, W - 160)) { ctx.fillText(line, W / 2, y); y += 64; }
+
+        // Date / time / location
+        ctx.fillStyle = '#555';
+        ctx.font = '600 32px ' + font;
+        y += 4;
+        const dateLine = [when.date, when.time].filter(Boolean).join('  \u2022  ');
+        if (dateLine) { ctx.fillText(dateLine, W / 2, y); y += 46; }
+        if (when.location) {
+          for (const line of fitText(ctx, when.location, W - 160)) { ctx.fillText(line, W / 2, y); y += 42; }
+        }
+
+        // Divider
+        y += 24;
+        ctx.fillStyle = '#EB0028';
+        ctx.fillRect(W / 2 - 40, y, 80, 6);
+        y += 70;
+
+        // Attendee
+        ctx.fillStyle = '#555';
+        ctx.font = '700 24px ' + font;
+        ctx.fillText('ATTENDEE', W / 2, y);
+        y += 54;
+        ctx.fillStyle = '#000';
+        ctx.font = '800 48px ' + font;
+        for (const line of fitText(ctx, attendee.name, W - 160)) { ctx.fillText(line, W / 2, y); y += 56; }
+
+        // QR (centered, with quiet zone)
+        const qrSize = 600;
+        const qrX = (W - qrSize) / 2;
+        const qrY = Math.max(y + 20, 760);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(qrX - 24, qrY - 24, qrSize + 48, qrSize + 48);
+        ctx.strokeStyle = '#e3e3e3';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(qrX - 24, qrY - 24, qrSize + 48, qrSize + 48);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+        // Ticket reference
+        ctx.fillStyle = '#555';
+        ctx.font = '700 28px ' + font;
+        ctx.fillText('Ticket ID: ' + ticket.ticketId, W / 2, qrY + qrSize + 80);
+
+        ctx.fillStyle = '#888';
+        ctx.font = '400 22px ' + font;
+        ctx.fillText('Show this QR code at the entrance.', W / 2, qrY + qrSize + 122);
+
+        // Footer
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, H - 70, W, 70);
+        ctx.fillStyle = '#bbb';
+        ctx.font = '400 18px ' + font;
+        ctx.fillText('This independent TEDx event is operated under license from TED.', W / 2, H - 28);
+
+        c.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'TEDxAASTMT-ticket-' + ticket.ticketId + '.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          button.disabled = false;
+        }, 'image/png');
+
+      } catch (e) {
+        console.error(e);
+        notice.textContent = 'Could not create the ticket image. Please try again.';
+        notice.classList.add('show');
+        button.disabled = false;
+      }
+    }
+
+    // Log out and stay on this page in its logged-out state.
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem(TOKEN_KEY);
+      showLoggedOut();
+      window.scrollTo(0, 0);
+    });
+
+    (async function init() {
+      // No token: show the public version immediately, no API calls.
+      if (!localStorage.getItem(TOKEN_KEY)) {
+        showLoggedOut();
+        return;
+      }
+
+      try {
+        const [me, ticket] = await Promise.all([api('/api/me'), api('/api/ticket')]);
+        renderAccount(me);
+        renderTicket(ticket);
+        showLoggedIn();
+      } catch (e) {
+        // Not authenticated (or token rejected): show the logged-out page.
+        if (e instanceof AuthError) {
+          showLoggedOut();
+          return;
+        }
+        loading.hidden = false;
+        loading.textContent = 'Could not load your profile. ' + (e.message || 'Please try again.');
+        console.error(e);
+      }
+    })();
+  </script>
 </body>
 </html>
