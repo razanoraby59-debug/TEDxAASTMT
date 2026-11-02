@@ -276,6 +276,16 @@ footer .logo .aastmt {
   color: var(--white);
   transition: color 0.2s, transform 0.2s;
 }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1350' preserveAspectRatio='xMidYMid slice'%3E%3Cpath d='M0 230 L845 738 L1080 350 L1080 860 L775 1350 L475 1350 L695 983 L0 562 Z' fill='%23EB0028' fill-opacity='0.11'/%3E%3C/svg%3E") center / cover no-repeat,
+    #fff;
+}
 
 .social-links a:hover {
   color: var(--red);
@@ -341,6 +351,9 @@ footer .logo .aastmt {
         width: min(100% - 2rem, 900px);
       }
     }
+    @media (max-width: 760px) {
+  body::before { background-position: 60% center; }
+}
 
     @media (prefers-reduced-motion: reduce) {
       html {
@@ -350,6 +363,7 @@ footer .logo .aastmt {
       .nav .back::after {
         transition: none;
       }
+      
     }
   </style>
 </head>
