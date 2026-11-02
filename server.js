@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 
 // ==================== PROJECT DIRECTORIES ====================
 
-const PROJECT_DIR = path.resolve(__dirname, "..");
+const PROJECT_DIR = __dirname;
 const FRONTEND_DIR = path.join(PROJECT_DIR, "public");
 
 // Vercel's filesystem is read-only except for /tmp.
@@ -1320,3 +1320,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
