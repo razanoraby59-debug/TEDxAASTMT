@@ -594,13 +594,13 @@ body::before {
                 })
             });
 
-            const data = await response.json();
-
             if (!response.ok) {
-                throw new Error(
-                    data.message || 'Login failed.'
-                );
-            }
+    throw new Error(data.message || 'Login failed.');
+}
+
+localStorage.setItem('tedx_token', data.token);
+
+window.location.href = 'profile.html';
 
             if (!data.token) {
                 throw new Error(
