@@ -645,10 +645,13 @@ body::before {
     err.style.color = 'var(--red-dark)';
     err.style.borderLeftColor = 'var(--red)';
     err.style.background = '#fff0f2';
-    err.textContent = 'Could not connect to the server. Make sure your backend is running.';
+
+    err.textContent = error.message || 
+        'Could not connect to the server. Please try again.';
+
     err.classList.add('show');
 
-    console.error(error);
+    console.error('SIGNUP ERROR:', error);
   }
 });
   </script>
