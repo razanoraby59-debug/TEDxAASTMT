@@ -580,6 +580,7 @@ form.addEventListener('submit', async (e) => {
         });
 
         const data = await response.json();
+        console.log('LOGIN RESPONSE:', response.status, data);
 
         if (!response.ok) {
             throw new Error(data.message || 'Login failed.');
@@ -613,12 +614,18 @@ form.addEventListener('submit', async (e) => {
             localStorage.getItem('authToken') ||
             sessionStorage.getItem('authToken');
 
+            console.log('TOKEN SAVED:', 
+    localStorage.getItem('authToken') ||
+    sessionStorage.getItem('authToken')
+);
         if (savedToken !== data.token) {
             throw new Error('Could not save your login session.');
         }
 
         // Redirect to the profile and QR ticket page.
-        window.location.replace('/profile.html');
+
+console.log('REDIRECTING TO:', window.location.origin + '/profile.html');
+window.location.href = window.location.origin + '/profile.html';
 
     } catch (error) {
         console.error('LOGIN ERROR:', error);
