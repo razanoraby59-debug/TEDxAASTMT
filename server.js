@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -13,12 +12,15 @@ const crypto = require("crypto");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// EVENT CONFIGURATION
+const EVENT_CAPACITY = 150;
+const EVENT_NAME = "TEDxAASTMT 2026";
+
 // ==================== PROJECT DIRECTORIES ====================
 
 const PROJECT_DIR = __dirname;
 const FRONTEND_DIR = path.join(PROJECT_DIR, "public");
 
-// Vercel's filesystem is read-only except for /tmp.
 const UPLOAD_DIR = process.env.VERCEL
     ? path.join("/tmp", "tedx-uploads")
     : path.join(__dirname, "uploads");
@@ -31,8 +33,6 @@ app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
-// Serve frontend files locally.
-// On Vercel, files in /public are served as static assets by the platform.
 app.use(express.static(FRONTEND_DIR));
 
 // ==================== FILE UPLOADS ====================
@@ -391,7 +391,10 @@ function verifyToken(token) {
 
 function bearerToken(req) {
     const header = req.headers.authorization || "";
-    return header.startsWith("Bearer ") ? header.slice(7) : null;
+
+    return header.startsWith("Bearer ")
+        ? header.slice(7)
+        : null;
 }
 
 async function getOptionalUser(req) {
@@ -428,7 +431,7 @@ async function requireAuth(req, res, next) {
     }
 }
 
-// ==================== CHECK-IN SECURITY ====================
+// ==================== CSV EXPORT SECURITY ====================
 
 function requireCheckinKey(req, res, next) {
     const expected = process.env.CHECKIN_KEY;
@@ -607,26 +610,27 @@ async function ensureEvent() {
     await connectDB();
 
     let event = await Event.findOne({
-        name: "TEDxAASTMT 2026"
+        name: EVENT_NAME
     });
 
     if (!event) {
-        return await Event.create({
-            name: "TEDxAASTMT 2026",
+        event = await Event.create({
+            name: EVENT_NAME,
             totalSeats: EVENT_CAPACITY,
             seatsRemaining: EVENT_CAPACITY,
             registrationOpen: true
         });
+
+        return event;
     }
 
-    // Migrate the existing event to the new capacity.
     if (event.totalSeats !== EVENT_CAPACITY) {
         const registeredCount = await Registration.countDocuments({
             status: { $in: ["registered", "checked_in"] }
         });
 
         event = await Event.findOneAndUpdate(
-            { name: "TEDxAASTMT 2026" },
+            { name: EVENT_NAME },
             {
                 $set: {
                     totalSeats: EVENT_CAPACITY,
@@ -645,8 +649,6 @@ async function ensureEvent() {
 
 // ==================== EVENT STATUS ====================
 
-// ==================== EVENT STATUS ====================
-
 app.get("/event-status", async (req, res) => {
     try {
         const event = await ensureEvent();
@@ -662,7 +664,6 @@ app.get("/event-status", async (req, res) => {
         return res.json({
             registeredCount,
             seatsRemaining: event.seatsRemaining,
-            totalSeats: event.totalSeats,
             checkedInCount,
             registrationOpen:
                 event.registrationOpen &&
@@ -680,6 +681,7 @@ app.get("/event-status", async (req, res) => {
         });
     }
 });
+
 // ==================== REGISTER FOR THE EVENT ====================
 
 app.post("/register", async (req, res) => {
@@ -733,7 +735,9 @@ app.post("/register", async (req, res) => {
         let owner = await getOptionalUser(req);
 
         if (!owner) {
-            owner = await User.findOne({ email: cleanEmail }).select("-password");
+            owner = await User.findOne({
+                email: cleanEmail
+            }).select("-password");
         }
 
         session = await mongoose.startSession();
@@ -769,22 +773,12 @@ app.post("/register", async (req, res) => {
                 }
             }
 
-            let event = await Event.findOne({
-                name: "TEDxAASTMT 2026"
+            const event = await Event.findOne({
+                name: EVENT_NAME
             }).session(session);
 
             if (!event) {
-                const createdEvents = await Event.create(
-    [{
-        name: "TEDxAASTMT 2026",
-        totalSeats: 100,
-        seatsRemaining: 100,
-        registrationOpen: true
-    }],
-    { session }
-);
-
-                event = createdEvents[0];
+                throw new Error("EVENT_NOT_FOUND");
             }
 
             if (!event.registrationOpen) {
@@ -793,7 +787,7 @@ app.post("/register", async (req, res) => {
 
             const updatedEvent = await Event.findOneAndUpdate(
                 {
-                    name: "TEDxAASTMT 2026",
+                    name: EVENT_NAME,
                     registrationOpen: true,
                     seatsRemaining: { $gt: 0 }
                 },
@@ -866,6 +860,12 @@ app.post("/register", async (req, res) => {
         if (error.message === "REGISTRATION_CLOSED") {
             return res.status(400).json({
                 message: "Event registration is currently closed."
+            });
+        }
+
+        if (error.message === "EVENT_NOT_FOUND") {
+            return res.status(500).json({
+                message: "Event could not be found."
             });
         }
 
@@ -973,15 +973,18 @@ app.get("/api/ticket", requireAuth, async (req, res) => {
 
         return res.json({
             registered: true,
+
             attendee: {
                 name: registration.name
             },
+
             event: {
                 name: event.name,
                 date: event.eventDate || null,
                 time: event.eventTime || null,
                 location: event.location || null
             },
+
             ticket: {
                 ticketId: registration.ticketId,
                 token: registration.ticketToken,
@@ -1000,7 +1003,7 @@ app.get("/api/ticket", requireAuth, async (req, res) => {
     }
 });
 
-// ==================== CHECK-IN (STAFF) ====================
+// ==================== CHECK-IN ====================
 
 app.post("/api/checkin", async (req, res) => {
     try {
@@ -1021,9 +1024,19 @@ app.post("/api/checkin", async (req, res) => {
         const cleanToken = token.trim();
 
         const checkedIn = await Registration.findOneAndUpdate(
-            { ticketToken: cleanToken, status: "registered" },
-            { $set: { status: "checked_in", checkedInAt: new Date() } },
-            { returnDocument: "after" }
+            {
+                ticketToken: cleanToken,
+                status: "registered"
+            },
+            {
+                $set: {
+                    status: "checked_in",
+                    checkedInAt: new Date()
+                }
+            },
+            {
+                returnDocument: "after"
+            }
         );
 
         if (checkedIn) {
@@ -1072,10 +1085,13 @@ app.post("/api/checkin", async (req, res) => {
     }
 });
 
-// ==================== ATTENDANCE CSV EXPORT (STAFF) ====================
+// ==================== ATTENDANCE CSV EXPORT ====================
 
 function csvCell(value) {
-    const text = value === null || value === undefined ? "" : String(value);
+    const text = value === null || value === undefined
+        ? ""
+        : String(value);
+
     return `"${text.replace(/"/g, '""')}"`;
 }
 
@@ -1094,58 +1110,71 @@ function cairoTimestamp(date) {
     }).format(new Date(date));
 }
 
-app.get("/api/attendance.csv", requireCheckinKey, async (req, res) => {
-    try {
-        await connectDB();
+app.get(
+    "/api/attendance.csv",
+    requireCheckinKey,
+    async (req, res) => {
+        try {
+            await connectDB();
 
-        const checkedInOnly = req.query.checkedInOnly === "true";
-        const filter = checkedInOnly ? { status: "checked_in" } : {};
+            const checkedInOnly =
+                req.query.checkedInOnly === "true";
 
-        const registrations = await Registration.find(filter)
-            .select("name registration_number email ticketId status checkedInAt")
-            .sort({ registeredAt: 1 })
-            .lean();
+            const filter = checkedInOnly
+                ? { status: "checked_in" }
+                : {};
 
-        const headers = [
-            "Name",
-            "Registration Number",
-            "Email",
-            "Ticket ID",
-            "Status",
-            "Check-in Timestamp (Africa/Cairo)"
-        ];
+            const registrations = await Registration.find(filter)
+                .select(
+                    "name registration_number email ticketId status checkedInAt"
+                )
+                .sort({ registeredAt: 1 })
+                .lean();
 
-        const rows = registrations.map((registration) => [
-            registration.name,
-            registration.registration_number,
-            registration.email,
-            registration.ticketId,
-            registration.status,
-            cairoTimestamp(registration.checkedInAt)
-        ]);
+            const headers = [
+                "Name",
+                "Registration Number",
+                "Email",
+                "Ticket ID",
+                "Status",
+                "Check-in Timestamp (Africa/Cairo)"
+            ];
 
-        const csv = [
-            headers.map(csvCell).join(","),
-            ...rows.map((row) => row.map(csvCell).join(","))
-        ].join("\r\n");
+            const rows = registrations.map((registration) => [
+                registration.name,
+                registration.registration_number,
+                registration.email,
+                registration.ticketId,
+                registration.status,
+                cairoTimestamp(registration.checkedInAt)
+            ]);
 
-        // UTF-8 BOM helps Excel correctly display Arabic names.
-        res.setHeader("Content-Type", "text/csv; charset=utf-8");
-        res.setHeader(
-            "Content-Disposition",
-            `attachment; filename="tedxaastmt-attendance-${checkedInOnly ? "checked-in" : "all"}.csv"`
-        );
+            const csv = [
+                headers.map(csvCell).join(","),
+                ...rows.map((row) => row.map(csvCell).join(","))
+            ].join("\r\n");
 
-        return res.send("\uFEFF" + csv);
+            res.setHeader(
+                "Content-Type",
+                "text/csv; charset=utf-8"
+            );
 
-    } catch (error) {
-        console.error("ATTENDANCE EXPORT ERROR:", error);
+            res.setHeader(
+                "Content-Disposition",
+                `attachment; filename="tedxaastmt-attendance-${checkedInOnly ? "checked-in" : "all"}.csv"`
+            );
 
-        return res.status(500).json({
-            message: "Failed to export attendance."
-        });
+            return res.send("\uFEFF" + csv);
+
+        } catch (error) {
+            console.error("ATTENDANCE EXPORT ERROR:", error);
+
+            return res.status(500).json({
+                message: "Failed to export attendance."
+            });
+        }
     }
-});
+);
 
 // ==================== SUBMIT TEAM APPLICATION ====================
 
@@ -1311,14 +1340,14 @@ async function startServer() {
 
         await ensureEvent();
 
-console.log("Event seat counter ready!");
-
         console.log("Event seat counter ready!");
 
         await Registration.init();
+
         console.log("Registration indexes ready!");
 
         await Application.init();
+
         console.log("Application collection ready!");
 
         app.listen(PORT, () => {
@@ -1334,7 +1363,6 @@ console.log("Event seat counter ready!");
 }
 
 // Start a local server only when this file is run directly.
-// Vercel imports the Express app from this file.
 if (require.main === module) {
     startServer();
 }
