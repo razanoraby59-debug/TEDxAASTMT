@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -29,6 +30,10 @@ fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+// Serve frontend files locally.
+// On Vercel, files in /public are served as static assets by the platform.
+app.use(express.static(FRONTEND_DIR));
 
 // ==================== FILE UPLOADS ====================
 
@@ -104,61 +109,6 @@ async function connectDB() {
     await mongoPromise;
 }
 
-// ==================== FRONTEND PAGES ====================
-
-// Look in /public first, then the project root.
-function findFrontendFile(filename) {
-    const candidates = [
-        path.join(FRONTEND_DIR, filename),
-        path.join(PROJECT_DIR, filename)
-    ];
-
-    return candidates.find((filePath) => fs.existsSync(filePath));
-}
-
-// Homepage
-app.get("/", (req, res) => {
-    const homepage = findFrontendFile("frontend.html");
-
-    if (!homepage) {
-        return res.status(404).send(
-            "Homepage not found. Put frontend.html in the public folder or project root."
-        );
-    }
-
-    return res.sendFile(homepage);
-});
-
-// Other HTML pages
-const htmlPages = [
-    "join.html",
-    "register.html",
-    "signup.html",
-    "login.html",
-    "profile.html",
-    "checkin.html",
-    "privacy.html",
-    "terms.html",
-    "rate.html"
-];
-
-for (const page of htmlPages) {
-    app.get(`/${page}`, (req, res) => {
-        const filePath = findFrontendFile(page);
-
-        if (!filePath) {
-            return res.status(404).send(
-                `Page not found: ${page}. Put it in the public folder or project root.`
-            );
-        }
-
-        return res.sendFile(filePath);
-    });
-}
-
-// Serve static assets from /public.
-app.use(express.static(FRONTEND_DIR));
-
 // ==================== USER SCHEMA ====================
 
 const userSchema = new mongoose.Schema({
@@ -213,7 +163,6 @@ const eventSchema = new mongoose.Schema({
         default: true
     },
 
-    // Optional details shown on the ticket. Set them in MongoDB when known.
     eventDate: {
         type: Date,
         default: null
@@ -267,9 +216,6 @@ const registrationSchema = new mongoose.Schema({
         default: Date.now
     },
 
-    // ----- Ticket fields -----
-
-    // The logged-in account this registration belongs to.
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -277,14 +223,12 @@ const registrationSchema = new mongoose.Schema({
         index: true
     },
 
-    // Random secret encoded in the QR code. Contains no personal data.
     ticketToken: {
         type: String,
         unique: true,
         sparse: true
     },
 
-    // Short, non-sensitive reference printed on the ticket.
     ticketId: {
         type: String
     },
@@ -386,8 +330,6 @@ const Application = mongoose.model(
 );
 
 // ==================== AUTH TOKENS ====================
-// Stateless signed tokens (works on Vercel, no session store needed).
-// Requires AUTH_SECRET in the environment.
 
 const TOKEN_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -452,7 +394,6 @@ function bearerToken(req) {
     return header.startsWith("Bearer ") ? header.slice(7) : null;
 }
 
-// Returns the logged-in user or null (does not reject the request).
 async function getOptionalUser(req) {
     const userId = verifyToken(bearerToken(req));
 
@@ -487,7 +428,8 @@ async function requireAuth(req, res, next) {
     }
 }
 
-// Staff-only protection for the check-in endpoint.
+// ==================== CHECK-IN SECURITY ====================
+
 function requireCheckinKey(req, res, next) {
     const expected = process.env.CHECKIN_KEY;
 
@@ -669,23 +611,33 @@ async function ensureEvent() {
     });
 
     if (!event) {
-        try {
-            event = await Event.create({
-                name: "TEDxAASTMT 2026",
-                totalSeats: 100,
-                seatsRemaining: 100,
-                registrationOpen: true
-            });
+        return await Event.create({
+            name: "TEDxAASTMT 2026",
+            totalSeats: EVENT_CAPACITY,
+            seatsRemaining: EVENT_CAPACITY,
+            registrationOpen: true
+        });
+    }
 
-        } catch (error) {
-            if (error.code !== 11000) {
-                throw error;
-            }
+    // Migrate the existing event to the new capacity.
+    if (event.totalSeats !== EVENT_CAPACITY) {
+        const registeredCount = await Registration.countDocuments({
+            status: { $in: ["registered", "checked_in"] }
+        });
 
-            event = await Event.findOne({
-                name: "TEDxAASTMT 2026"
-            });
-        }
+        event = await Event.findOneAndUpdate(
+            { name: "TEDxAASTMT 2026" },
+            {
+                $set: {
+                    totalSeats: EVENT_CAPACITY,
+                    seatsRemaining: Math.max(
+                        EVENT_CAPACITY - registeredCount,
+                        0
+                    )
+                }
+            },
+            { returnDocument: "after" }
+        );
     }
 
     return event;
@@ -693,16 +645,31 @@ async function ensureEvent() {
 
 // ==================== EVENT STATUS ====================
 
+// ==================== EVENT STATUS ====================
+
 app.get("/event-status", async (req, res) => {
     try {
         const event = await ensureEvent();
 
+        const registeredCount = await Registration.countDocuments({
+            status: { $in: ["registered", "checked_in"] }
+        });
+
+        const checkedInCount = await Registration.countDocuments({
+            status: "checked_in"
+        });
+
         return res.json({
+            registeredCount,
             seatsRemaining: event.seatsRemaining,
             totalSeats: event.totalSeats,
+            checkedInCount,
             registrationOpen:
                 event.registrationOpen &&
-                event.seatsRemaining > 0
+                event.seatsRemaining > 0,
+            eventDate: event.eventDate || null,
+            eventTime: event.eventTime || null,
+            location: event.location || null
         });
 
     } catch (error) {
@@ -713,7 +680,6 @@ app.get("/event-status", async (req, res) => {
         });
     }
 });
-
 // ==================== REGISTER FOR THE EVENT ====================
 
 app.post("/register", async (req, res) => {
@@ -721,6 +687,7 @@ app.post("/register", async (req, res) => {
 
     try {
         await connectDB();
+        await ensureEvent();
 
         const {
             name,
@@ -763,9 +730,6 @@ app.post("/register", async (req, res) => {
             });
         }
 
-        // Link the registration to the logged-in account.
-        // If no valid login token was sent, fall back to the account that
-        // uses the same email address (if there is one).
         let owner = await getOptionalUser(req);
 
         if (!owner) {
@@ -795,7 +759,6 @@ app.post("/register", async (req, res) => {
                 );
             }
 
-            // One ticket per account.
             if (owner) {
                 const existingForUser = await Registration.findOne({
                     user: owner._id
@@ -812,14 +775,14 @@ app.post("/register", async (req, res) => {
 
             if (!event) {
                 const createdEvents = await Event.create(
-                    [{
-                        name: "TEDxAASTMT 2026",
-                        totalSeats: 100,
-                        seatsRemaining: 100,
-                        registrationOpen: true
-                    }],
-                    { session }
-                );
+    [{
+        name: "TEDxAASTMT 2026",
+        totalSeats: 100,
+        seatsRemaining: 100,
+        registrationOpen: true
+    }],
+    { session }
+);
 
                 event = createdEvents[0];
             }
@@ -954,7 +917,6 @@ app.get("/api/me", requireAuth, async (req, res) => {
         return res.json({
             name: req.user.name,
             email: req.user.email,
-            // MongoDB ObjectIds contain their creation time.
             createdAt: req.user._id.getTimestamp(),
             registrationNumber: registration
                 ? registration.registration_number
@@ -973,9 +935,9 @@ app.get("/api/me", requireAuth, async (req, res) => {
 // ==================== PROFILE: MY TICKET ====================
 
 const STATUS_MESSAGES = {
-    registered: "Registered \u2013 Your ticket is ready!",
-    checked_in: "Checked In \u2013 You have been checked in successfully.",
-    invalid: "Invalid \u2013 This ticket is not valid."
+    registered: "Registered – Your ticket is ready!",
+    checked_in: "Checked In – You have been checked in successfully.",
+    invalid: "Invalid – This ticket is not valid."
 };
 
 app.get("/api/ticket", requireAuth, async (req, res) => {
@@ -993,13 +955,11 @@ app.get("/api/ticket", requireAuth, async (req, res) => {
 
         let changed = false;
 
-        // Link older registrations to this account.
         if (!registration.user) {
             registration.user = req.user._id;
             changed = true;
         }
 
-        // Create a ticket for registrations made before tickets existed.
         if (!registration.ticketToken) {
             Object.assign(registration, newTicketFields());
             changed = true;
@@ -1042,7 +1002,7 @@ app.get("/api/ticket", requireAuth, async (req, res) => {
 
 // ==================== CHECK-IN (STAFF) ====================
 
-app.post("/api/checkin", requireCheckinKey, async (req, res) => {
+app.post("/api/checkin", async (req, res) => {
     try {
         await connectDB();
 
@@ -1060,7 +1020,6 @@ app.post("/api/checkin", requireCheckinKey, async (req, res) => {
 
         const cleanToken = token.trim();
 
-        // Atomic: only one scan can ever move a ticket to checked_in.
         const checkedIn = await Registration.findOneAndUpdate(
             { ticketToken: cleanToken, status: "registered" },
             { $set: { status: "checked_in", checkedInAt: new Date() } },
@@ -1113,12 +1072,86 @@ app.post("/api/checkin", requireCheckinKey, async (req, res) => {
     }
 });
 
+// ==================== ATTENDANCE CSV EXPORT (STAFF) ====================
+
+function csvCell(value) {
+    const text = value === null || value === undefined ? "" : String(value);
+    return `"${text.replace(/"/g, '""')}"`;
+}
+
+function cairoTimestamp(date) {
+    if (!date) return "";
+
+    return new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Africa/Cairo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+    }).format(new Date(date));
+}
+
+app.get("/api/attendance.csv", requireCheckinKey, async (req, res) => {
+    try {
+        await connectDB();
+
+        const checkedInOnly = req.query.checkedInOnly === "true";
+        const filter = checkedInOnly ? { status: "checked_in" } : {};
+
+        const registrations = await Registration.find(filter)
+            .select("name registration_number email ticketId status checkedInAt")
+            .sort({ registeredAt: 1 })
+            .lean();
+
+        const headers = [
+            "Name",
+            "Registration Number",
+            "Email",
+            "Ticket ID",
+            "Status",
+            "Check-in Timestamp (Africa/Cairo)"
+        ];
+
+        const rows = registrations.map((registration) => [
+            registration.name,
+            registration.registration_number,
+            registration.email,
+            registration.ticketId,
+            registration.status,
+            cairoTimestamp(registration.checkedInAt)
+        ]);
+
+        const csv = [
+            headers.map(csvCell).join(","),
+            ...rows.map((row) => row.map(csvCell).join(","))
+        ].join("\r\n");
+
+        // UTF-8 BOM helps Excel correctly display Arabic names.
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="tedxaastmt-attendance-${checkedInOnly ? "checked-in" : "all"}.csv"`
+        );
+
+        return res.send("\uFEFF" + csv);
+
+    } catch (error) {
+        console.error("ATTENDANCE EXPORT ERROR:", error);
+
+        return res.status(500).json({
+            message: "Failed to export attendance."
+        });
+    }
+});
+
 // ==================== SUBMIT TEAM APPLICATION ====================
 
 app.post(
     "/applications",
 
-    // Process the optional uploaded sample.
     (req, res, next) => {
         upload.single("sample")(req, res, (error) => {
             if (error) {
@@ -1245,7 +1278,6 @@ app.post(
             });
 
         } finally {
-            // Remove the uploaded file if saving the application failed.
             if (req.file && !applicationSaved) {
                 fs.unlink(req.file.path, (error) => {
                     if (error) {
@@ -1277,21 +1309,9 @@ async function startServer() {
 
         console.log("MongoDB connected successfully!");
 
-        await Event.findOneAndUpdate(
-            { name: "TEDxAASTMT 2026" },
-            {
-                $setOnInsert: {
-                    name: "TEDxAASTMT 2026",
-                    totalSeats: 100,
-                    seatsRemaining: 100,
-                    registrationOpen: true
-                }
-            },
-            {
-                upsert: true,
-                returnDocument: "after"
-            }
-        );
+        await ensureEvent();
+
+console.log("Event seat counter ready!");
 
         console.log("Event seat counter ready!");
 
@@ -1314,10 +1334,9 @@ async function startServer() {
 }
 
 // Start a local server only when this file is run directly.
-// Vercel imports the Express app through index.js.
+// Vercel imports the Express app from this file.
 if (require.main === module) {
     startServer();
 }
 
 module.exports = app;
-
