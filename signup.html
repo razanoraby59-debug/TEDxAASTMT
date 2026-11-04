@@ -646,13 +646,11 @@ body::before {
     err.style.borderLeftColor = 'var(--red)';
     err.style.background = '#fff0f2';
 
-    err.textContent = error.message || 
-        'Could not connect to the server. Please try again.';
+    err.textContent = error.message || 'Unknown signup error';
 
     err.classList.add('show');
-
     console.error('SIGNUP ERROR:', error);
-  }
+}
 });
   </script>
 
