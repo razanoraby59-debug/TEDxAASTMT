@@ -789,11 +789,14 @@
         </p>
       </div>
 
-      <ul class="facts">
-        <li><strong>8</strong>Speakers</li>
-        <li><strong>100</strong>Seats</li>
-        <li><strong>1 day</strong>Of talks</li>
-      </ul>
+<ul class="facts">
+  <li><strong>6</strong>Speakers</li>
+  <li>
+    <strong id="registeredCount">0</strong>
+    Registered attendees
+  </li>
+  <li><strong>2 hours </strong>Of talks</li>
+</ul>
     </section>
 
     <!-- SPEAKERS -->
@@ -1008,5 +1011,28 @@
 
     <p class="legal made-by">Made by Razan AlOraby</p>
   </footer>
+  <script>
+async function updateRegisteredCount() {
+    const counter = document.getElementById("registeredCount");
+
+    try {
+        const response = await fetch("/event-status");
+
+        if (!response.ok) {
+            throw new Error("Could not load registration count.");
+        }
+
+        const data = await response.json();
+
+        counter.textContent = Number(data.registeredCount) || 0;
+
+    } catch (error) {
+        console.error("Registration counter error:", error);
+    }
+}
+
+updateRegisteredCount();
+setInterval(updateRegisteredCount, 30000);
+</script>
 </body>
 </html>
