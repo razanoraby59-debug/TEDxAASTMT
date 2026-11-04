@@ -677,9 +677,9 @@ body::before {
         </li>
 
         <li>
-          <strong>Saturday 00 Month 2026</strong>
-          Main Hall, AASTMT
-        </li>
+  <strong id="eventDate">Loading event date...</strong>
+  <span id="eventLocation">Loading venue...</span>
+</li>
 
       </ul>
 
@@ -849,8 +849,8 @@ body::before {
         </h2>
 
         <p>
-          Your seat is reserved. Keep an eye on your inbox for event details.
-        </p>
+  Your seat has been reserved successfully. You can now view your ticket.
+</p>
 
 
         <div
@@ -859,12 +859,17 @@ body::before {
         ></div>
 
 
-        <a
-          class="btn ghost"
-          href="frontend.html"
-        >
-          Back to home
-        </a>
+        <a class="btn" href="profile.html">
+  View my ticket
+</a>
+
+<a
+  class="btn ghost"
+  href="frontend.html"
+  style="margin-top: 10px;"
+>
+  Back to home
+</a>
 
       </div>
 
@@ -950,603 +955,359 @@ body::before {
        JAVASCRIPT
   ========================= -->
 
-  <script>
+  
+<script>
+  /* ========================================
+     BACKEND ENDPOINTS
+  ======================================== */
 
-    /* ========================================
-       BACKEND
-    ======================================== */
+  const FORM_ENDPOINT = "/register";
+  const STATUS_ENDPOINT = "/event-status";
 
-    const FORM_ENDPOINT =
-  "/register";
+  /* ========================================
+     ELEMENTS
+  ======================================== */
 
-const STATUS_ENDPOINT =
-  "/event-status";
+  const form = document.getElementById("reg");
+  const submitButton = document.getElementById("submit");
+  const seatsElement = document.getElementById("seats");
+  const formbox = document.getElementById("formbox");
+  const success = document.getElementById("success");
+  const summary = document.getElementById("summary");
+  const connectionError = document.getElementById("connectionError");
 
+  const registrationNumber = document.getElementById("regno");
+  const eventDateElement = document.getElementById("eventDate");
+  const eventLocationElement = document.getElementById("eventLocation");
 
-    /* ========================================
-       ELEMENTS
-    ======================================== */
+  /* ========================================
+     FORM FIELDS
+  ======================================== */
 
-    const form =
-      document.getElementById("reg");
+  const fields = {
+    name: {
+      el: document.getElementById("name"),
+      err: document.getElementById("name-err"),
 
-    const submitButton =
-      document.getElementById("submit");
+      check(value) {
+        return value.length < 3
+          ? "Please enter your full name."
+          : "";
+      }
+    },
 
-    const seatsElement =
-      document.getElementById("seats");
+    regno: {
+      el: registrationNumber,
+      err: document.getElementById("regno-err"),
 
-    const formbox =
-      document.getElementById("formbox");
+      check(value) {
+        return !/^\d{9}$/.test(value)
+          ? "Registration number must be exactly 9 digits."
+          : "";
+      }
+    },
 
-    const success =
-      document.getElementById("success");
+    email: {
+      el: document.getElementById("email"),
+      err: document.getElementById("email-err"),
 
-    const summary =
-      document.getElementById("summary");
+      check(value) {
+        return !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)
+          ? "Enter a valid email address."
+          : "";
+      }
+    }
+  };
 
-    const connectionError =
-      document.getElementById("connectionError");
+  /* ========================================
+     REGISTRATION NUMBER INPUT
+  ======================================== */
 
-    const registrationNumber =
-      document.getElementById("regno");
+  registrationNumber.addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").slice(0, 9);
+  });
 
+  /* ========================================
+     VALIDATION
+  ======================================== */
 
-    /* ========================================
-       FORM FIELDS
-    ======================================== */
+  function validate(field) {
+    const value = field.el.value.trim();
+    const message = field.check(value);
 
-    const fields = {
+    field.err.textContent = message;
 
-      name: {
+    field.el.setAttribute(
+      "aria-invalid",
+      message ? "true" : "false"
+    );
 
-        el: document.getElementById("name"),
+    return !message;
+  }
 
-        err: document.getElementById("name-err"),
+  Object.keys(fields).forEach(key => {
+    const field = fields[key];
 
-        check: function(value) {
+    field.el.addEventListener("blur", () => {
+      validate(field);
+    });
 
-          if (value.length < 3) {
-            return "Please enter your full name.";
-          }
+    field.el.addEventListener("input", () => {
+      if (field.el.getAttribute("aria-invalid") === "true") {
+        validate(field);
+      }
+    });
+  });
 
-          return "";
+  /* ========================================
+     ESCAPE HTML
+  ======================================== */
 
-        }
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]);
+  }
 
-      },
+  /* ========================================
+     EVENT DATE FORMATTING
+  ======================================== */
 
+  function formatEventDate(value) {
+    if (!value) {
+      return "Date to be announced";
+    }
 
-      regno: {
+    // Handle YYYY-MM-DD without timezone shifting.
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
 
-        el: registrationNumber,
+    const date = dateOnly
+      ? new Date(
+          Number(dateOnly[1]),
+          Number(dateOnly[2]) - 1,
+          Number(dateOnly[3])
+        )
+      : new Date(value);
 
-        err: document.getElementById("regno-err"),
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
 
-        check: function(value) {
+    return date.toLocaleDateString("en-GB", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+  }
 
-          if (!/^\d{9}$/.test(value)) {
+  /* ========================================
+     CLOSED REGISTRATION
+  ======================================== */
 
-            return "Registration number must be exactly 9 digits.";
+  function showClosedMessage() {
+    seatsElement.textContent = "0 seats";
 
-          }
+    formbox.innerHTML = `
+      <div class="closed">
+        <h2>Registration closed</h2>
+        <p>All available seats have been reserved.</p>
+      </div>
+    `;
+  }
 
-          return "";
+  /* ========================================
+     UPDATE EVENT STATUS
+  ======================================== */
 
-        }
+  async function updateSeats() {
+    try {
+      const response = await fetch(STATUS_ENDPOINT, {
+        method: "GET",
+        cache: "no-store"
+      });
 
-      },
-
-
-      email: {
-
-        el: document.getElementById("email"),
-
-        err: document.getElementById("email-err"),
-
-        check: function(value) {
-
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
-
-            return "Enter a valid email address.";
-
-          }
-
-          return "";
-
-        }
-
+      if (!response.ok) {
+        throw new Error("Server returned " + response.status);
       }
 
+      const data = await response.json();
+
+      connectionError.style.display = "none";
+
+      // Update available seats.
+      const remaining = Number(data.seatsRemaining);
+
+      if (Number.isFinite(remaining)) {
+        seatsElement.textContent =
+          remaining + (remaining === 1 ? " seat" : " seats");
+      }
+
+      // Update event date and time.
+      const formattedDate = formatEventDate(data.eventDate);
+
+      const formattedTime = data.eventTime
+        ? " · " + data.eventTime
+        : "";
+
+      eventDateElement.textContent =
+        formattedDate + formattedTime;
+
+      // Update venue.
+      eventLocationElement.textContent =
+        data.location || "Venue to be announced";
+
+      // Check whether registration is open.
+      if (
+        data.registrationOpen === false ||
+        remaining <= 0
+      ) {
+        showClosedMessage();
+      }
+
+    } catch (error) {
+      console.error("Could not load event status:", error);
+
+      seatsElement.textContent = "Unable to load";
+
+      eventDateElement.textContent = "Date to be announced";
+      eventLocationElement.textContent = "Venue to be announced";
+
+      connectionError.style.display = "block";
+      connectionError.textContent =
+        "We couldn't load the event details. Please refresh the page and try again.";
+    }
+  }
+
+  /* ========================================
+     LOAD EVENT STATUS
+  ======================================== */
+
+  updateSeats();
+
+  /* ========================================
+     SUBMIT REGISTRATION
+  ======================================== */
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    // Validate all fields.
+    let valid = true;
+    let firstInvalid = null;
+
+    Object.keys(fields).forEach(key => {
+      const field = fields[key];
+
+      if (!validate(field)) {
+        valid = false;
+
+        if (!firstInvalid) {
+          firstInvalid = field.el;
+        }
+      }
+    });
+
+    if (!valid) {
+      firstInvalid.focus();
+      return;
+    }
+
+    // Get form data.
+    const registrationData = {
+      name: fields.name.el.value.trim(),
+
+      registration_number:
+        fields.regno.el.value.trim(),
+
+      email:
+        fields.email.el.value.trim().toLowerCase()
     };
 
+    // Retrieve the login token from either storage location.
+    const token =
+      localStorage.getItem("authToken") ||
+      sessionStorage.getItem("authToken");
 
-    /* ========================================
-       REGISTRATION NUMBER
-       ONLY ALLOWS 9 DIGITS
-    ======================================== */
+    // Disable button while submitting.
+    submitButton.disabled = true;
+    submitButton.textContent = "Reserving...";
 
-    registrationNumber.addEventListener(
-      "input",
-      function() {
+    connectionError.style.display = "none";
 
-        this.value = this.value
-          .replace(/\D/g, "")
-          .slice(0, 9);
+    try {
+      const headers = {
+        "Content-Type": "application/json"
+      };
 
+      // Include authentication token when available.
+      if (token) {
+        headers.Authorization = "Bearer " + token;
       }
-    );
 
+      const response = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(registrationData)
+      });
 
-    /* ========================================
-       VALIDATION
-    ======================================== */
-
-    function validate(field) {
-
-      const value =
-        field.el.value.trim();
-
-      const message =
-        field.check(value);
-
-      field.err.textContent =
-        message;
-
-      field.el.setAttribute(
-        "aria-invalid",
-        message ? "true" : "false"
-      );
-
-      return !message;
-
-    }
-
-
-    Object.keys(fields).forEach(
-      function(key) {
-
-        fields[key].el.addEventListener(
-          "blur",
-          function() {
-
-            validate(fields[key]);
-
-          }
-        );
-
-
-        fields[key].el.addEventListener(
-          "input",
-          function() {
-
-            if (
-              fields[key].el.getAttribute(
-                "aria-invalid"
-              ) === "true"
-            ) {
-
-              validate(fields[key]);
-
-            }
-
-          }
-        );
-
-      }
-    );
-
-
-    /* ========================================
-       ESCAPE HTML
-    ======================================== */
-
-    function escapeHTML(value) {
-
-      return value.replace(
-        /[&<>"']/g,
-        function(character) {
-
-          return {
-
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-
-          }[character];
-
-        }
-      );
-
-    }
-
-
-    /* ========================================
-       SHOW CLOSED REGISTRATION
-    ======================================== */
-
-    function showClosedMessage() {
-
-      seatsElement.textContent =
-        "0 seats";
-
-      formbox.innerHTML = `
-
-        <div class="closed">
-
-          <h2>
-            Registration closed
-          </h2>
-
-          <p>
-            All 100 seats have been reserved.
-          </p>
-
-        </div>
-
-      `;
-
-    }
-
-
-    /* ========================================
-       UPDATE SEAT COUNT
-    ======================================== */
-
-    async function updateSeats() {
+      let result = {};
 
       try {
-
-        const response =
-          await fetch(
-            STATUS_ENDPOINT,
-            {
-              method: "GET",
-              cache: "no-store"
-            }
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Server returned " +
-            response.status
-          );
-
-        }
-
-
-        const data =
-          await response.json();
-
-
-        console.log(
-          "Event status:",
-          data
-        );
-
-
-        connectionError.style.display =
-          "none";
-
-
-        /* SEATS AVAILABLE */
-
-        if (Number(data.seatsRemaining) > 0) {
-
-          seatsElement.textContent =
-            data.seatsRemaining +
-            (
-              data.seatsRemaining === 1
-                ? " seat"
-                : " seats"
-            );
-
-          return;
-
-        }
-
-
-        /* NO SEATS */
-
-        showClosedMessage();
-
+        result = await response.json();
+      } catch {
+        result = {};
       }
 
-
-      catch (error) {
-
-        console.error(
-          "Could not load seat count:",
-          error
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Registration failed. Please try again."
         );
-
-
-        seatsElement.textContent =
-          "Unable to load";
-
-
-        connectionError.style.display =
-          "block";
-
-
-        connectionError.textContent =
-          "We couldn't load the registration status. Please refresh the page and try again.";
-
       }
 
+      /* ========================================
+         REGISTRATION SUCCESS
+      ======================================== */
+
+      summary.innerHTML =
+        "<b>Name:</b> " +
+        escapeHTML(registrationData.name) +
+
+        "<br>" +
+
+        "<b>Registration no.:</b> " +
+        escapeHTML(registrationData.registration_number) +
+
+        "<br>" +
+
+        "<b>Email:</b> " +
+        escapeHTML(registrationData.email);
+
+      formbox.classList.add("hide");
+      success.classList.add("show");
+      success.focus();
+
+      // Refresh available seats.
+      await updateSeats();
+
+    } catch (error) {
+      console.error("Registration error:", error);
+
+      connectionError.style.display = "block";
+      connectionError.textContent = error.message;
+
+      submitButton.disabled = false;
+      submitButton.textContent = "Reserve my seat";
+
+      await updateSeats();
     }
+  });
+</script>
 
-
-    /* ========================================
-       LOAD SEATS WHEN PAGE OPENS
-    ======================================== */
-
-    updateSeats();
-
-
-    /* ========================================
-       SUBMIT REGISTRATION
-    ======================================== */
-
-    form.addEventListener(
-      "submit",
-      async function(event) {
-
-        event.preventDefault();
-
-
-        /* -------------------------------
-           VALIDATE
-        ------------------------------- */
-
-        let valid = true;
-
-        let firstInvalid = null;
-
-
-        Object.keys(fields).forEach(
-          function(key) {
-
-            const isValid =
-              validate(fields[key]);
-
-
-            if (!isValid) {
-
-              valid = false;
-
-              if (!firstInvalid) {
-
-                firstInvalid =
-                  fields[key].el;
-
-              }
-
-            }
-
-          }
-        );
-
-
-        if (!valid) {
-
-          firstInvalid.focus();
-
-          return;
-
-        }
-
-
-        /* -------------------------------
-           DATA
-        ------------------------------- */
-
-        const registrationData = {
-
-          name:
-            fields.name.el.value.trim(),
-
-          registration_number:
-            fields.regno.el.value.trim(),
-
-          email:
-            fields.email.el.value.trim().toLowerCase()
-
-        };
-
-
-        /* -------------------------------
-           BUTTON
-        ------------------------------- */
-
-        submitButton.disabled =
-          true;
-
-        submitButton.textContent =
-          "Reserving…";
-
-
-        connectionError.style.display =
-          "none";
-
-
-        try {
-
-          console.log(
-            "Sending registration:",
-            registrationData
-          );
-
-
-          /* -------------------------------
-             SEND TO BACKEND
-          ------------------------------- */
-
-          const response =
-            await fetch(
-              FORM_ENDPOINT,
-              {
-
-                method: "POST",
-
-                headers: {
-                  "Content-Type": "application/json"
-                },
-
-                body:
-                  JSON.stringify(
-                    registrationData
-                  )
-
-              }
-            );
-
-
-          /* -------------------------------
-             SERVER RESPONSE
-          ------------------------------- */
-
-          let result = {};
-
-          try {
-
-            result =
-              await response.json();
-
-          }
-
-          catch {
-
-            result = {};
-
-          }
-
-
-          console.log(
-            "Registration response:",
-            response.status,
-            result
-          );
-
-
-          /* -------------------------------
-             SUCCESS
-          ------------------------------- */
-
-          if (response.ok) {
-
-            summary.innerHTML =
-
-              "<b>Name:</b> " +
-              escapeHTML(
-                registrationData.name
-              ) +
-
-              "<br>" +
-
-              "<b>Registration no.:</b> " +
-              escapeHTML(
-                registrationData.registration_number
-              ) +
-
-              "<br>" +
-
-              "<b>Email:</b> " +
-              escapeHTML(
-                registrationData.email
-              );
-
-
-            formbox.classList.add(
-              "hide"
-            );
-
-
-            success.classList.add(
-              "show"
-            );
-
-
-            success.focus();
-
-
-            /*
-              Update the number immediately.
-
-              Example:
-              100 → 99
-              99 → 98
-              etc.
-            */
-
-            await updateSeats();
-
-            return;
-
-          }
-
-
-          /* -------------------------------
-             REGISTRATION FAILED
-          ------------------------------- */
-
-          submitButton.disabled =
-            false;
-
-          submitButton.textContent =
-            "Reserve my seat";
-
-
-          alert(
-            result.message ||
-            "Registration failed. Please try again."
-          );
-
-
-          /* Check seat count again */
-
-          await updateSeats();
-
-        }
-
-
-        catch (error) {
-
-          console.error(
-            "Registration request failed:",
-            error
-          );
-
-
-          submitButton.disabled =
-            false;
-
-          submitButton.textContent =
-            "Reserve my seat";
-
-
-          connectionError.style.display =
-            "block";
-
-
-          connectionError.textContent =
-            "The registration server could not be reached. Please refresh the page and try again.";
-
-
-          alert(
-            "Could not connect to the registration server. Please try again."
-          );
-
-        }
-
-      }
-    );
-
-  </script>
 
 </body>
 
