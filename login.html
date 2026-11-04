@@ -558,6 +558,12 @@ form.addEventListener('submit', async (e) => {
     const remember = form.querySelector('[name="remember"]');
     const submitButton = form.querySelector('button[type="submit"]');
 
+    if (!emailValue || !passwordValue) {
+        err.textContent = 'Please enter your email and password.';
+        err.classList.add('show');
+        return;
+    }
+
     submitButton.disabled = true;
     submitButton.textContent = 'Logging in...';
 
@@ -580,33 +586,48 @@ form.addEventListener('submit', async (e) => {
         }
 
         if (!data.token) {
-            throw new Error('No authentication token received.');
+            throw new Error('The server did not return an authentication token.');
         }
 
+        // Clear any previous login token.
         localStorage.removeItem('authToken');
         sessionStorage.removeItem('authToken');
 
+        // Save the new authentication token.
         if (remember && remember.checked) {
             localStorage.setItem('authToken', data.token);
         } else {
             sessionStorage.setItem('authToken', data.token);
         }
 
-        localStorage.setItem(
-            'loggedInUser',
-            JSON.stringify(data.user)
-        );
+        // Save the user's basic information.
+        if (data.user) {
+            localStorage.setItem(
+                'loggedInUser',
+                JSON.stringify(data.user)
+            );
+        }
 
+        // Verify that the token was actually saved.
+        const savedToken =
+            localStorage.getItem('authToken') ||
+            sessionStorage.getItem('authToken');
+
+        if (savedToken !== data.token) {
+            throw new Error('Could not save your login session.');
+        }
+
+        // Redirect to the profile and QR ticket page.
         window.location.replace('/profile.html');
 
     } catch (error) {
-        err.textContent = error.message;
+        console.error('LOGIN ERROR:', error);
+
+        err.textContent = error.message || 'Something went wrong. Please try again.';
         err.classList.add('show');
 
         submitButton.disabled = false;
         submitButton.textContent = 'Log in';
-
-        console.error('LOGIN ERROR:', error);
     }
 });
 </script>
