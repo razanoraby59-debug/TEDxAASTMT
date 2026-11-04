@@ -575,16 +575,32 @@ app.post("/login", async (req, res) => {
             });
         }
 
-        const isMatch = await bcrypt.compare(
-            password,
-            user.password
-        );
+const storedPassword = user.password;
 
-        if (!isMatch) {
-            return res.status(401).json({
-                message: "Invalid email or password."
-            });
-        }
+const isBcryptHash =
+    /^\$2[aby]\$\d{2}\$/.test(storedPassword);
+
+let isMatch = false;
+
+if (isBcryptHash) {
+    isMatch = await bcrypt.compare(password, storedPassword);
+} else {
+    // Support accounts created by the older plain-text signup code.
+    isMatch = password === storedPassword;
+
+    if (isMatch) {
+        user.password = await bcrypt.hash(password, 12);
+        await user.save();
+
+        console.log("Legacy password securely migrated.");
+    }
+}
+
+if (!isMatch) {
+    return res.status(401).json({
+        message: "Invalid email or password."
+    });
+}
 
         return res.json({
             message: "Login successful!",
