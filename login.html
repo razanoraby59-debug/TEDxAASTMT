@@ -528,6 +528,7 @@ body::before {
 
 
 
+
 <script>
 const form = document.getElementById('loginForm');
 const email = document.getElementById('email');
@@ -596,11 +597,7 @@ form.addEventListener('submit', async (e) => {
             JSON.stringify(data.user)
         );
 
-        err.style.color = '#1E9E4A';
-        err.textContent = 'Login successful! Redirecting...';
-        err.classList.add('show');
-
-        window.location.assign('/profile.html');
+        window.location.replace('/profile.html');
 
     } catch (error) {
         err.textContent = error.message;
