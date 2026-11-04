@@ -525,80 +525,120 @@ body::before {
     <p class="legal made-by">Made by Razan AlOraby</p>
   </footer>
 
-  <script>
-    const form = document.getElementById('loginForm');
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    const err = document.getElementById('formError');
-    const toggle = document.getElementById('toggle');
 
+
+
+
+<script>
+const form = document.getElementById('loginForm');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const err = document.getElementById('formError');
+const toggle = document.getElementById('toggle');
+
+if (toggle) {
     toggle.addEventListener('click', () => {
-      const show = password.type === 'password';
-      password.type = show ? 'text' : 'password';
-      toggle.textContent = show ? 'Hide' : 'Show';
-      toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        const show = password.type === 'password';
+        password.type = show ? 'text' : 'password';
+        toggle.textContent = show ? 'Hide' : 'Show';
+        toggle.setAttribute(
+            'aria-label',
+            show ? 'Hide password' : 'Show password'
+        );
     });
+}
 
 form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  [email, password].forEach(i => i.classList.remove('invalid'));
-  err.classList.remove('show');
+    e.preventDefault();
 
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+    err.classList.remove('show');
 
-  if (!emailOk) {
-    email.classList.add('invalid');
-    err.textContent = 'Please enter a valid email address.';
-    err.classList.add('show');
-    email.focus();
-    return;
-  }
+    const emailValue = email.value.trim();
+    const passwordValue = password.value;
+    const remember = form.querySelector('[name="remember"]');
+    const submitButton = form.querySelector('button[type="submit"]');
 
-  if (!password.value) {
-    password.classList.add('invalid');
-    err.textContent = 'Please enter your password.';
-    err.classList.add('show');
-    password.focus();
-    return;
-  }
-
-  try {
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: email.value.trim(),
-        password: password.value
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Login failed.');
+    if (!emailValue || !passwordValue) {
+        err.textContent = 'Please enter your email and password.';
+        err.classList.add('show');
+        return;
     }
 
-    err.style.color = '#1E9E4A';
-    err.style.borderLeftColor = '#1E9E4A';
-    err.style.background = '#eefaf2';
-    err.textContent = data.message;
-    err.classList.add('show');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Logging in...';
 
-    console.log('Logged in user:', data.user);
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: emailValue,
+                password: passwordValue
+            })
+        });
 
-  } catch (error) {
-    err.style.color = 'var(--red-dark)';
-    err.style.borderLeftColor = 'var(--red)';
-    err.style.background = '#fff0f2';
-    err.textContent = error.message;
-    err.classList.add('show');
+        const data = await response.json();
+        console.log('LOGIN RESPONSE:', response.status, data);
 
-    console.error(error);
-  }
-    });
-  </script>
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed.');
+        }
 
-</body>
-</html>
+        if (!data.token) {
+            throw new Error('The server did not return an authentication token.');
+        }
+
+        // Clear any previous login token.
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
+
+        // Save the new authentication token.
+        if (remember && remember.checked) {
+            localStorage.setItem('authToken', data.token);
+        } else {
+            sessionStorage.setItem('authToken', data.token);
+        }
+
+        // Save the user's basic information.
+        if (data.user) {
+            localStorage.setItem(
+                'loggedInUser',
+                JSON.stringify(data.user)
+            );
+        }
+
+        // Verify that the token was actually saved.
+        const savedToken =
+            localStorage.getItem('authToken') ||
+            sessionStorage.getItem('authToken');
+
+            console.log('TOKEN SAVED:', 
+    localStorage.getItem('authToken') ||
+    sessionStorage.getItem('authToken')
+);
+        if (savedToken !== data.token) {
+            throw new Error('Could not save your login session.');
+        }
+
+        // Redirect to the profile and QR ticket page.
+
+console.log('REDIRECTING TO:', window.location.origin + '/profile.html');
+window.location.href = window.location.origin + '/profile.html';
+
+    } catch (error) {
+        console.error('LOGIN ERROR:', error);
+
+        err.textContent = error.message || 'Something went wrong. Please try again.';
+        err.classList.add('show');
+
+        submitButton.disabled = false;
+        submitButton.textContent = 'Log in';
+    }
+});
+</script>
+
+
+
+</body></html>
