@@ -526,99 +526,94 @@ body::before {
   </footer>
 
 
+
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('form');
+const form = document.getElementById('loginForm');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const err = document.getElementById('formError');
+const toggle = document.getElementById('toggle');
 
-    if (!form) {
-        console.error('Login form not found.');
-        return;
-    }
+if (toggle) {
+    toggle.addEventListener('click', () => {
+        const show = password.type === 'password';
+        password.type = show ? 'text' : 'password';
+        toggle.textContent = show ? 'Hide' : 'Show';
+        toggle.setAttribute(
+            'aria-label',
+            show ? 'Hide password' : 'Show password'
+        );
+    });
+}
 
-    const emailInput = form.querySelector('[type="email"]');
-    const passwordInput = form.querySelector('[type="password"]');
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    err.classList.remove('show');
+
+    const emailValue = email.value.trim();
+    const passwordValue = password.value;
     const remember = form.querySelector('[name="remember"]');
-    const err = document.querySelector('#errorMessage');
     const submitButton = form.querySelector('button[type="submit"]');
 
-    if (!emailInput || !passwordInput || !err || !submitButton) {
-        console.error('One or more login form elements are missing.');
-        return;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Logging in...';
+
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: emailValue,
+                password: passwordValue
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed.');
+        }
+
+        if (!data.token) {
+            throw new Error('No authentication token received.');
+        }
+
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
+
+        if (remember && remember.checked) {
+            localStorage.setItem('authToken', data.token);
+        } else {
+            sessionStorage.setItem('authToken', data.token);
+        }
+
+        localStorage.setItem(
+            'loggedInUser',
+            JSON.stringify(data.user)
+        );
+
+        err.style.color = '#1E9E4A';
+        err.textContent = 'Login successful! Redirecting...';
+        err.classList.add('show');
+
+        window.location.assign('/profile.html');
+
+    } catch (error) {
+        err.textContent = error.message;
+        err.classList.add('show');
+
+        submitButton.disabled = false;
+        submitButton.textContent = 'Log in';
+
+        console.error('LOGIN ERROR:', error);
     }
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-
-        err.textContent = '';
-        err.classList.remove('show');
-
-        if (!email || !password) {
-            err.textContent = 'Please enter your email and password.';
-            err.classList.add('show');
-            return;
-        }
-
-        submitButton.disabled = true;
-        submitButton.textContent = 'Logging in...';
-
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Login failed.');
-            }
-
-            if (!data.token) {
-                throw new Error('Login succeeded, but no authentication token was received.');
-            }
-
-            // Remove old authentication tokens.
-            localStorage.removeItem('tedx_token');
-            localStorage.removeItem('authToken');
-            sessionStorage.removeItem('authToken');
-
-            // Store the new authentication token.
-            if (remember && remember.checked) {
-                localStorage.setItem('authToken', data.token);
-            } else {
-                sessionStorage.setItem('authToken', data.token);
-            }
-
-            // Store basic account information.
-            localStorage.setItem(
-                'loggedInUser',
-                JSON.stringify(data.user)
-            );
-
-            err.style.color = '#1E9E4A';
-            err.textContent = 'Login successful! Redirecting...';
-            err.classList.add('show');
-
-            // Redirect to the profile page.
-            window.location.replace('/profile.html');
-
-        } catch (error) {
-            console.error('LOGIN ERROR:', error);
-
-            err.textContent = error.message || 'Something went wrong. Please try again.';
-            err.classList.add('show');
-
-            submitButton.disabled = false;
-            submitButton.textContent = 'Log in';
-        }
-    });
 });
 </script>
+
+
 
 </body></html>
