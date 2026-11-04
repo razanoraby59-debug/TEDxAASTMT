@@ -1,0 +1,1043 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TEDxAASTMT | Attendee Check-in</title>
+  <meta name="description" content="TEDxAASTMT event attendee check-in.">
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    :root {
+      --red: #EB0028;
+      --red-dark: #C60022;
+      --black: #000;
+      --ink: #171717;
+      --grey: #555;
+      --light-grey: #e3e3e3;
+      --soft: #f5f5f5;
+      --white: #fff;
+      --font: Arial, Helvetica, sans-serif;
+      --page-width: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      width: 100%;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1350' preserveAspectRatio='xMidYMid slice'%3E%3Cpath d='M0 230 L845 738 L1080 350 L1080 860 L775 1350 L475 1350 L695 983 L0 562 Z' fill='%23EB0028' fill-opacity='0.11'/%3E%3C/svg%3E") center / cover no-repeat,
+        var(--white);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* HEADER */
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px max(32px, calc((100% - var(--page-width)) / 2));
+      background: rgba(255, 255, 255, 0.97);
+      border-bottom: 1px solid var(--light-grey);
+      backdrop-filter: blur(8px);
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: baseline;
+      white-space: nowrap;
+      font-size: 1.4rem;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .ted, .x {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .aastmt {
+      color: var(--black);
+      font-weight: 800;
+    }
+
+    .header-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--grey);
+    }
+
+    /* BUTTONS */
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 48px;
+      padding: 12px 28px;
+      background: var(--red);
+      color: var(--white);
+      border: 2px solid var(--red);
+      border-radius: 2px;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition: background 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* MAIN */
+
+    main {
+      width: 100%;
+      max-width: var(--page-width);
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    .checkin-section {
+      min-height: 75vh;
+      padding-top: 90px;
+      padding-bottom: 100px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--red);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 36px;
+      height: 4px;
+      background: var(--red);
+    }
+
+    h1 {
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+      font-weight: 800;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+
+    h1 span {
+      color: var(--red);
+    }
+
+    .intro {
+      max-width: 650px;
+      color: var(--grey);
+      font-size: 1.05rem;
+      line-height: 1.65;
+      margin-bottom: 42px;
+    }
+
+    /* ATTENDANCE COUNTER */
+
+    .counter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px 30px;
+      background: var(--black);
+      color: var(--white);
+      border-left: 6px solid var(--red);
+      margin-bottom: 32px;
+    }
+
+    .counter-label {
+      color: #d0d0d0;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+    }
+
+    .counter-number {
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.05em;
+    }
+
+    /* SCANNER */
+
+    .scanner-section {
+      padding: 34px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--light-grey);
+      border-top: 4px solid var(--red);
+      box-shadow: 0 8px 35px rgba(0, 0, 0, 0.04);
+    }
+
+    .scanner-section h2 {
+      position: relative;
+      width: fit-content;
+      max-width: 100%;
+      padding-bottom: 14px;
+      margin-bottom: 15px;
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+    }
+
+    .scanner-section h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 48px;
+      height: 4px;
+      background: var(--red);
+    }
+
+    .scanner-description {
+      color: var(--grey);
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+      max-width: 650px;
+    }
+
+    /* CAMERA VIEW */
+
+    #reader {
+      width: 100%;
+      max-width: 540px;
+      min-height: 300px;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--soft);
+      border: 1px solid var(--light-grey);
+    }
+
+    #reader video {
+      width: 100% !important;
+      max-height: 480px;
+      object-fit: cover;
+    }
+
+    #reader img {
+      display: none;
+    }
+
+    #reader__scan_region {
+      min-height: 260px;
+    }
+
+    #reader__dashboard {
+      padding: 12px !important;
+      background: var(--white);
+    }
+
+    #reader__dashboard_section_csr button {
+      padding: 10px 16px;
+      margin: 5px;
+      border: 1px solid var(--red) !important;
+      border-radius: 2px !important;
+      background: var(--red) !important;
+      color: white !important;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #reader__status_span {
+      color: var(--grey);
+    }
+
+    .camera-placeholder {
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .camera-icon {
+      font-size: 3rem;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .camera-placeholder strong {
+      font-size: 1.05rem;
+      color: var(--black);
+    }
+
+    .camera-placeholder p {
+      max-width: 300px;
+      color: var(--grey);
+      font-size: 0.85rem;
+    }
+
+    /* SCANNER BUTTONS */
+
+    .scanner-actions {
+      display: flex;
+      gap: 12px;
+      max-width: 540px;
+      margin: 22px auto 0;
+    }
+
+    .scanner-actions button {
+      flex: 1;
+      min-height: 50px;
+      padding: 12px 20px;
+      border: 2px solid var(--red);
+      border-radius: 2px;
+      background: var(--red);
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .scanner-actions button:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+    }
+
+    .scanner-actions button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .scanner-actions .stop-button {
+      display: none;
+      background: transparent;
+      color: var(--black);
+      border-color: var(--black);
+    }
+
+    .scanner-actions .stop-button:hover {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    /* STATUS */
+
+    .status {
+      display: none;
+      max-width: 540px;
+      margin: 22px auto 0;
+      padding: 18px 20px;
+      border-left: 5px solid;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .status strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .status.success {
+      display: block;
+      color: #176b32;
+      background: #eaf7ee;
+      border-color: #238b46;
+    }
+
+    .status.error {
+      display: block;
+      color: #a31515;
+      background: #fff0f0;
+      border-color: var(--red);
+    }
+
+    .status.info {
+      display: block;
+      color: #34445a;
+      background: #f1f4f8;
+      border-color: #52677f;
+    }
+
+    .scanner-note {
+      max-width: 540px;
+      margin: 20px auto 0;
+      color: var(--grey);
+      font-size: 0.8rem;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+
+    footer {
+      width: 100%;
+      padding: 36px max(32px, calc((100% - var(--page-width)) / 2));
+      background: var(--black);
+      color: var(--white);
+      border-top: 6px solid var(--red);
+    }
+
+    .foot-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    footer .logo .aastmt {
+      color: var(--white);
+    }
+
+    .footer-info {
+      text-align: right;
+    }
+
+    .social-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 18px;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      color: var(--white);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .social-links a:hover {
+      color: var(--red);
+      transform: translateY(-2px);
+    }
+
+    .social-links svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .legal {
+      color: #aaa;
+      font-size: 0.8rem;
+    }
+
+    .made-by {
+      margin-top: 6px;
+      color: #777;
+    }
+
+    /* TABLETS */
+
+    @media (max-width: 1000px) {
+      main {
+        padding: 0 36px;
+      }
+
+      .nav {
+        padding-left: 28px;
+        padding-right: 28px;
+      }
+
+      footer {
+        padding-left: 28px;
+        padding-right: 28px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nav {
+        min-height: 68px;
+        padding: 14px 22px;
+      }
+
+      .logo {
+        font-size: 1.2rem;
+      }
+
+      .header-label {
+        font-size: 0.8rem;
+      }
+
+      main {
+        padding: 0 24px;
+      }
+
+      .checkin-section {
+        padding-top: 65px;
+        padding-bottom: 75px;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 11vw, 4.5rem);
+      }
+
+      .intro {
+        font-size: 0.97rem;
+        margin-bottom: 32px;
+      }
+
+      .scanner-section {
+        padding: 25px;
+      }
+
+      #reader {
+        min-height: 260px;
+      }
+
+      .camera-placeholder {
+        min-height: 260px;
+      }
+
+      .counter {
+        padding: 22px;
+      }
+
+      footer {
+        padding: 32px 24px;
+      }
+    }
+
+    /* PHONES */
+
+    @media (max-width: 480px) {
+      .nav {
+        padding: 14px 20px;
+      }
+
+      main {
+        padding: 0 20px;
+      }
+
+      .checkin-section {
+        padding-top: 55px;
+        padding-bottom: 60px;
+      }
+
+      h1 {
+        font-size: clamp(2.7rem, 13vw, 3.8rem);
+      }
+
+      .eyebrow {
+        font-size: 0.7rem;
+      }
+
+      .intro {
+        font-size: 0.9rem;
+      }
+
+      .counter {
+        padding: 20px;
+      }
+
+      .counter-label {
+        font-size: 0.72rem;
+      }
+
+      .counter-number {
+        font-size: 2.4rem;
+      }
+
+      .scanner-section {
+        padding: 19px;
+      }
+
+      .scanner-section h2 {
+        font-size: 1.5rem;
+      }
+
+      .scanner-description {
+        font-size: 0.87rem;
+      }
+
+      #reader {
+        min-height: 230px;
+      }
+
+      .camera-placeholder {
+        min-height: 230px;
+      }
+
+      .scanner-actions {
+        flex-direction: column;
+      }
+
+      .scanner-actions button {
+        width: 100%;
+      }
+
+      .foot-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .footer-info {
+        text-align: left;
+      }
+
+      .social-links {
+        justify-content: flex-start;
+      }
+
+      footer {
+        padding: 30px 20px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body::before {
+        background-position: 60% center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="nav">
+    <a class="logo" href="frontend.html#top" aria-label="TEDxAASTMT home">
+      <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
+    </a>
+
+    <div class="header-label">Event Check-in</div>
+  </header>
+
+  <main>
+    <section class="checkin-section">
+
+      <div class="eyebrow"></div>
+
+      <h1>
+        Attendee<br>
+        <span>Check-in.</span>
+      </h1>
+
+      <p class="intro">
+        Welcome to TEDxAASTMT event check-in. Scan each attendee's QR ticket
+        to record their attendance automatically.
+      </p>
+
+      <!-- ATTENDANCE COUNTER -->
+      <div class="counter">
+        <div>
+          <div class="counter-label">Total attendees checked in</div>
+        </div>
+
+        <div class="counter-number" id="checkedInCount">—</div>
+      </div>
+
+      <!-- QR SCANNER -->
+      <div class="scanner-section">
+
+        <h2>Scan QR Code</h2>
+
+        <p class="scanner-description">
+          Start the camera and point it at the attendee's QR code.
+          Their check-in will be recorded as soon as the code is recognized.
+        </p>
+
+        <div id="reader">
+          <div class="camera-placeholder" id="cameraPlaceholder">
+            <div class="camera-icon">▦</div>
+            <strong>Scanner ready</strong>
+            <p>
+              Start the camera to begin scanning attendee tickets.
+            </p>
+          </div>
+        </div>
+
+        <div class="scanner-actions">
+          <button id="startButton" onclick="startScanner()">
+            Start Scanner
+          </button>
+
+          <button
+            class="stop-button"
+            id="stopButton"
+            onclick="stopScanner()">
+            Stop Camera
+          </button>
+        </div>
+
+        <div class="status" id="statusMessage"></div>
+
+        <p class="scanner-note">
+          For the best experience, use your phone's rear camera.
+          Keep the QR code inside the scanning frame.
+        </p>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-top">
+      <a class="logo" href="frontend.html#top" aria-label="TEDxAASTMT home">
+        <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
+      </a>
+
+      <div class="footer-info">
+        <div class="social-links">
+
+          <a href="https://www.instagram.com/tedxaastmt/"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"
+                    stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4"
+                      stroke="currentColor" stroke-width="2"/>
+              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
+            </svg>
+          </a>
+
+          <a href="https://chat.whatsapp.com/JM1mXQBwc4v1iBPRBeJx5q"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="WhatsApp group" title="WhatsApp group">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M20.52 3.48A11.8 11.8 0 0 0 12.1 0C5.56 0 .23 5.32.23 11.87c0 2.1.55 4.15 1.6 5.96L.13 24l6.33-1.66a11.9 11.9 0 0 0 5.63 1.43h.01c6.55 0 11.87-5.32 11.87-11.87 0-3.17-1.23-6.15-3.45-8.42ZM12.1 21.75h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.76.99 1-3.67-.24-.38a9.83 9.83 0 0 1-1.51-5.23c0-5.47 4.45-9.92 9.93-9.92 2.65 0 5.14 1.03 7.01 2.91a9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.92 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
+            </svg>
+          </a>
+
+          <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor"
+                d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/>
+            </svg>
+          </a>
+
+          <a href="https://mail.google.com/mail/?view=cm&amp;to=tedxaastmt26@gmail.com"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Email" title="Email">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="2.5" y="4.5" width="19" height="15" rx="2"
+                    stroke="currentColor" stroke-width="2"/>
+              <path d="m3.5 6 8.5 7 8.5-7"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <p class="legal">
+      This independent TEDx event is operated under license from TED.
+    </p>
+
+    <p class="legal made-by">Made by Razan AlOraby</p>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin;
+
+    let scanner = null;
+    let scannerRunning = false;
+    let processingScan = false;
+    let lastScannedToken = "";
+    let lastScannedTime = 0;
+
+    const startButton = document.getElementById("startButton");
+    const stopButton = document.getElementById("stopButton");
+    const statusMessage = document.getElementById("statusMessage");
+    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+
+    function showStatus(type, title, message) {
+      statusMessage.className = "status " + type;
+      statusMessage.replaceChildren();
+
+      const heading = document.createElement("strong");
+      heading.textContent = title;
+
+      const description = document.createElement("span");
+      description.textContent = message;
+
+      statusMessage.append(heading, description);
+    }
+
+    function clearStatus() {
+      statusMessage.className = "status";
+      statusMessage.replaceChildren();
+    }
+
+    async function refreshCounter() {
+      try {
+        const response = await fetch(`${API_BASE}/event-status`, {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("Could not load attendance count.");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("checkedInCount").textContent =
+          data.checkedInCount ?? 0;
+
+      } catch (error) {
+        console.error("Counter error:", error);
+      }
+    }
+
+    async function checkInTicket(token) {
+      if (!/^[a-f0-9]{48}$/i.test(token)) {
+        showStatus(
+          "error",
+          "Invalid QR code",
+          "This does not appear to be a valid TEDxAASTMT ticket."
+        );
+        return;
+      }
+
+      try {
+        showStatus(
+          "info",
+          "Processing...",
+          "Recording attendee check-in."
+        );
+
+        const response = await fetch(`${API_BASE}/api/checkin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ token })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          showStatus(
+            "error",
+            "Check-in unsuccessful",
+            data.message || data.error || "This ticket could not be checked in."
+          );
+          return;
+        }
+
+        const attendeeName =
+          data.attendee?.name ||
+          data.user?.name ||
+          data.name ||
+          "";
+
+        showStatus(
+          "success",
+          "✓ Check-in successful",
+          attendeeName
+            ? `${attendeeName} has been checked in successfully.`
+            : data.message || "Attendee attendance has been saved."
+        );
+
+        await refreshCounter();
+
+      } catch (error) {
+        console.error("Check-in error:", error);
+
+        showStatus(
+          "error",
+          "Connection error",
+          "Could not reach the server. Check your internet connection and scan again."
+        );
+      }
+    }
+
+    async function handleScan(decodedText) {
+      const token = decodedText.trim();
+      const now = Date.now();
+
+      if (processingScan) return;
+
+      if (
+        token === lastScannedToken &&
+        now - lastScannedTime < 3000
+      ) {
+        return;
+      }
+
+      processingScan = true;
+      lastScannedToken = token;
+      lastScannedTime = now;
+
+      try {
+        await checkInTicket(token);
+      } finally {
+        setTimeout(() => {
+          processingScan = false;
+        }, 1200);
+      }
+    }
+
+    async function startScanner() {
+      if (scannerRunning) return;
+
+      clearStatus();
+
+      if (!window.isSecureContext) {
+        showStatus(
+          "error",
+          "Secure connection required",
+          "Camera access requires HTTPS. Open the deployed website using its HTTPS address."
+        );
+        return;
+      }
+
+      startButton.disabled = true;
+      startButton.textContent = "Starting camera...";
+
+      try {
+        cameraPlaceholder.style.display = "none";
+
+        scanner = new Html5Qrcode("reader");
+
+        await scanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 240, height: 240 },
+            aspectRatio: 1
+          },
+          handleScan,
+          () => {}
+        );
+
+        scannerRunning = true;
+        startButton.style.display = "none";
+        stopButton.style.display = "block";
+
+        showStatus(
+          "info",
+          "Scanner ready",
+          "Point the camera at an attendee's QR code."
+        );
+
+      } catch (error) {
+        console.error("Camera error:", error);
+
+        if (scanner) {
+          try {
+            await scanner.clear();
+          } catch (_) {}
+        }
+
+        scanner = null;
+        cameraPlaceholder.style.display = "flex";
+
+        showStatus(
+          "error",
+          "Could not start camera",
+          "Allow camera access in your browser settings and try again. Make sure no other app is using the camera."
+        );
+
+        startButton.disabled = false;
+        startButton.textContent = "Start Scanner";
+      }
+    }
+
+    async function stopScanner() {
+      if (!scanner || !scannerRunning) return;
+
+      try {
+        await scanner.stop();
+        await scanner.clear();
+      } catch (error) {
+        console.error("Error stopping scanner:", error);
+      }
+
+      scanner = null;
+      scannerRunning = false;
+      processingScan = false;
+
+      cameraPlaceholder.style.display = "flex";
+      startButton.style.display = "block";
+      startButton.disabled = false;
+      startButton.textContent = "Start Scanner";
+      stopButton.style.display = "none";
+
+      clearStatus();
+    }
+
+    refreshCounter();
+    setInterval(refreshCounter, 15000);
+  </script>
+
+</body>
+</html>
