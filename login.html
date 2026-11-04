@@ -598,8 +598,7 @@ body::before {
     throw new Error(data.message || 'Login failed.');
 }
 
-localStorage.setItem('tedx_token', data.token);
-
+localStorage.setItem('authToken', data.token);
 window.location.href = 'profile.html';
 
             if (!data.token) {
