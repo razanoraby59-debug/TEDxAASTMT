@@ -525,123 +525,74 @@ body::before {
     <p class="legal made-by">Made by Razan AlOraby</p>
   </footer>
 
-  <script>
-    const form = document.getElementById('loginForm');
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    const err = document.getElementById('formError');
-    const toggle = document.getElementById('toggle');
+<script>
+document.querySelector('form').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-    toggle.addEventListener('click', () => {
-        const show = password.type === 'password';
+    const form = this;
+    const email = form.querySelector('[type="email"]').value.trim();
+    const password = form.querySelector('[type="password"]').value;
+    const remember = form.querySelector('[name="remember"]');
 
-        password.type = show ? 'text' : 'password';
-        toggle.textContent = show ? 'Hide' : 'Show';
+    const err = document.querySelector('#errorMessage');
 
-        toggle.setAttribute(
-            'aria-label',
-            show ? 'Hide password' : 'Show password'
-        );
-    });
+    const submitButton = form.querySelector('button[type="submit"]');
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    submitButton.disabled = true;
+    submitButton.textContent = 'Logging in...';
 
-        [email, password].forEach(input => {
-            input.classList.remove('invalid');
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
         });
 
-        err.classList.remove('show');
+        const data = await response.json();
 
-        const emailValue = email.value.trim();
-        const passwordValue = password.value;
-
-        const emailOk =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
-
-        if (!emailOk) {
-            email.classList.add('invalid');
-            err.textContent = 'Please enter a valid email address.';
-            err.classList.add('show');
-            email.focus();
-            return;
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed.');
         }
 
-        if (!passwordValue) {
-            password.classList.add('invalid');
-            err.textContent = 'Please enter your password.';
-            err.classList.add('show');
-            password.focus();
-            return;
+        if (!data.token) {
+            throw new Error('No authentication token received.');
         }
 
-        const submitButton = form.querySelector(
-            'button[type="submit"]'
+        // Clear any old token.
+        localStorage.removeItem('tedx_token');
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
+
+        // Save the token.
+        if (remember && remember.checked) {
+            localStorage.setItem('authToken', data.token);
+        } else {
+            sessionStorage.setItem('authToken', data.token);
+        }
+
+        // Save basic user information.
+        localStorage.setItem(
+            'loggedInUser',
+            JSON.stringify(data.user)
         );
 
-        submitButton.disabled = true;
-        submitButton.textContent = 'Logging in...';
+        err.style.color = '#1E9E4A';
+        err.textContent = 'Login successful! Redirecting...';
+        err.classList.add('show');
 
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: emailValue,
-                    password: passwordValue
-                })
-            });
+        window.location.href = 'profile.html';
 
-            if (!response.ok) {
-    throw new Error(data.message || 'Login failed.');
-}
+    } catch (error) {
+        err.textContent = error.message;
+        err.classList.add('show');
 
-localStorage.setItem('authToken', data.token);
-window.location.href = 'profile.html';
+        submitButton.disabled = false;
+        submitButton.textContent = 'Log in';
 
-            if (!data.token) {
-                throw new Error(
-                    'Login succeeded, but no authentication token was received.'
-                );
-            }
-
-            // Store the authentication token.
-            // Remember me = persistent login.
-            // Otherwise = session-only login.
-            if (document.querySelector('[name="remember"]').checked) {
-                localStorage.setItem('authToken', data.token);
-            } else {
-                sessionStorage.setItem('authToken', data.token);
-            }
-
-            // Store basic user information.
-            localStorage.setItem(
-                'loggedInUser',
-                JSON.stringify(data.user)
-            );
-
-            err.style.color = '#1E9E4A';
-            err.style.borderLeftColor = '#1E9E4A';
-            err.style.background = '#eefaf2';
-            err.textContent = 'Login successful! Redirecting...';
-            err.classList.add('show');
-
-            // Redirect to the user's profile.
-            window.location.href = 'profile.html';
-
-        } catch (error) {
-            err.style.color = 'var(--red-dark)';
-            err.style.borderLeftColor = 'var(--red)';
-            err.style.background = '#fff0f2';
-            err.textContent = error.message;
-            err.classList.add('show');
-
-            submitButton.disabled = false;
-            submitButton.textContent = 'Log in';
-
-            console.error('LOGIN ERROR:', error);
-        }
-    });
-</script></body></html>
+        console.error('LOGIN ERROR:', error);
+    }
+});
+</script>
+</body></html>
