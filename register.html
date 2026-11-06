@@ -738,7 +738,7 @@ body::before {
         </h2>
 
         <p class="sub">
-          All three fields are required.
+          All fields are required.
         </p>
 
 
@@ -1043,6 +1043,14 @@ const STATUS_ENDPOINT =
     const registrationNumber =
       document.getElementById("regno");
 
+      const branchError = document.getElementById("branch-err");
+
+form.querySelectorAll('input[name="branch"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    branchError.textContent = "";
+  });
+});
+
 
     /* ========================================
        FORM FIELDS
@@ -1058,11 +1066,14 @@ const STATUS_ENDPOINT =
 
         check: function(value) {
 
-          if (value.length < 3) {
-            return "Please enter your full name.";
-          }
+if (value.length < 3) {
+  return "Name must contain at least 3 characters.";
+}
 
-          return "";
+if (/\d/.test(value)) {
+  return "No numbers are allowed in the name.";
+}
+return "";
 
         }
 
@@ -1098,13 +1109,10 @@ const STATUS_ENDPOINT =
 
         check: function(value) {
 
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
-
-            return "Enter a valid email address.";
-
-          }
-
-          return "";
+if (!/^[^\s@]+@gmail\.com$/i.test(value)) {
+  return "Please use a valid @gmail.com address.";
+}
+return "";
 
         }
 
@@ -1233,7 +1241,7 @@ const STATUS_ENDPOINT =
           </h2>
 
           <p>
-            All 100 seats have been reserved.
+            All 150 seats have been reserved.
           </p>
 
         </div>
@@ -1384,12 +1392,22 @@ const STATUS_ENDPOINT =
         );
 
 
+        const selectedBranch = form.querySelector(
+          'input[name="branch"]:checked'
+        );
+
+        if (!selectedBranch) {
+          branchError.textContent = "Please select your branch.";
+          valid = false;
+
+          if (!firstInvalid) {
+            firstInvalid = form.querySelector('input[name="branch"]');
+          }
+        }
+
         if (!valid) {
-
           firstInvalid.focus();
-
           return;
-
         }
 
 
@@ -1397,18 +1415,12 @@ const STATUS_ENDPOINT =
            DATA
         ------------------------------- */
 
-        const registrationData = {
-
-          name:
-            fields.name.el.value.trim(),
-
-          registration_number:
-            fields.regno.el.value.trim(),
-
-          email:
-            fields.email.el.value.trim().toLowerCase()
-
-        };
+const registrationData = {
+  name: fields.name.el.value.trim(),
+  registration_number: fields.regno.el.value.trim(),
+  email: fields.email.el.value.trim().toLowerCase(),
+  branch: selectedBranch.value
+};
 
 
         /* -------------------------------
@@ -1489,28 +1501,20 @@ const STATUS_ENDPOINT =
              SUCCESS
           ------------------------------- */
 
-          if (response.ok) {
+           if (response.ok) {
 
-            summary.innerHTML =
+summary.innerHTML =
+  "<b>Name:</b> " +
+  escapeHTML(registrationData.name) +
 
-              "<b>Name:</b> " +
-              escapeHTML(
-                registrationData.name
-              ) +
+  "<br><b>Registration no.:</b> " +
+  escapeHTML(registrationData.registration_number) +
 
-              "<br>" +
+  "<br><b>Email:</b> " +
+  escapeHTML(registrationData.email) +
 
-              "<b>Registration no.:</b> " +
-              escapeHTML(
-                registrationData.registration_number
-              ) +
-
-              "<br>" +
-
-              "<b>Email:</b> " +
-              escapeHTML(
-                registrationData.email
-              );
+  "<br><b>Branch:</b> " +
+  escapeHTML(registrationData.branch);
 
 
             formbox.classList.add(
