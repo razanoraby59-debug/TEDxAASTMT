@@ -35,7 +35,16 @@ app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
-app.use(express.static(FRONTEND_DIR));
+// Static files: never cache, so edits to the HTML show up immediately.
+app.use(
+    express.static(FRONTEND_DIR, {
+        etag: false,
+        lastModified: false,
+        setHeaders: (res) => {
+            res.setHeader("Cache-Control", "no-store");
+        }
+    })
+);
 
 // ==================== FILE UPLOADS ====================
 
@@ -213,7 +222,7 @@ const registrationSchema = new mongoose.Schema({
         maxlength: 254
     },
 
-        branch: {
+    branch: {
         type: String,
         required: true,
         enum: ["AbuQir", "Miami", "Alamein"],
@@ -816,39 +825,44 @@ app.post("/login", async (req, res) => {
 });
 
 // ==================== ENSURE EVENT EXISTS ====================
+// Always keeps seatsRemaining in sync with the real number of
+// registrations, so a stale/zero counter can never lock the event.
 
 async function ensureEvent() {
     await connectDB();
+
+    const registeredCount = await Registration.countDocuments({
+        status: { $in: ["registered", "checked_in"] }
+    });
+
+    const correctRemaining = Math.max(
+        EVENT_CAPACITY - registeredCount,
+        0
+    );
 
     let event = await Event.findOne({
         name: EVENT_NAME
     });
 
     if (!event) {
-        event = await Event.create({
+        return Event.create({
             name: EVENT_NAME,
             totalSeats: EVENT_CAPACITY,
-            seatsRemaining: EVENT_CAPACITY,
+            seatsRemaining: correctRemaining,
             registrationOpen: true
         });
-
-        return event;
     }
 
-    if (event.totalSeats !== EVENT_CAPACITY) {
-        const registeredCount = await Registration.countDocuments({
-            status: { $in: ["registered", "checked_in"] }
-        });
-
+    if (
+        event.totalSeats !== EVENT_CAPACITY ||
+        event.seatsRemaining !== correctRemaining
+    ) {
         event = await Event.findOneAndUpdate(
             { name: EVENT_NAME },
             {
                 $set: {
                     totalSeats: EVENT_CAPACITY,
-                    seatsRemaining: Math.max(
-                        EVENT_CAPACITY - registeredCount,
-                        0
-                    )
+                    seatsRemaining: correctRemaining
                 }
             },
             { returnDocument: "after" }
@@ -871,6 +885,8 @@ app.get("/event-status", async (req, res) => {
         const checkedInCount = await Registration.countDocuments({
             status: "checked_in"
         });
+
+        res.setHeader("Cache-Control", "no-store");
 
         return res.json({
             registeredCount,
@@ -909,8 +925,6 @@ app.post("/register", async (req, res) => {
             branch
         } = req.body || {};
 
-        
-
         if (
             typeof name !== "string" ||
             typeof registration_number !== "string" ||
@@ -927,7 +941,7 @@ app.post("/register", async (req, res) => {
         const cleanName = name.trim();
         const cleanEmail = email.trim().toLowerCase();
         const cleanRegNo = registration_number.trim();
-                const cleanBranch =
+        const cleanBranch =
             typeof branch === "string" ? branch.trim() : "";
 
         if (!["AbuQir", "Miami", "Alamein"].includes(cleanBranch)) {
@@ -1022,21 +1036,9 @@ app.post("/register", async (req, res) => {
                 }
             );
 
-if (!updatedEvent) {
-    const latestEvent = await Event.findOne({
-        name: EVENT_NAME
-    }).lean();
-
-            savedRegistration = {
-                name: registration.name,
-                registration_number: registration.registration_number,
-                email: registration.email,
-                branch: registration.branch,
-                ticketId: registration.ticketId
-            };
-
-    throw new Error("EVENT_FULL");
-}
+            if (!updatedEvent) {
+                throw new Error("EVENT_FULL");
+            }
 
             const registration = new Registration({
                 name: cleanName,
@@ -1362,7 +1364,7 @@ app.get(
 
             const registrations = await Registration.find(filter)
                 .select(
-                    "name registration_number email ticketId status checkedInAt"
+                    "name registration_number email branch ticketId status checkedInAt"
                 )
                 .sort({ registeredAt: 1 })
                 .lean();
@@ -1371,6 +1373,7 @@ app.get(
                 "Name",
                 "Registration Number",
                 "Email",
+                "Branch",
                 "Ticket ID",
                 "Status",
                 "Check-in Timestamp (Africa/Cairo)"
@@ -1380,6 +1383,7 @@ app.get(
                 registration.name,
                 registration.registration_number,
                 registration.email,
+                registration.branch,
                 registration.ticketId,
                 registration.status,
                 cairoTimestamp(registration.checkedInAt)
@@ -1400,7 +1404,7 @@ app.get(
                 `attachment; filename="tedxaastmt-attendance-${checkedInOnly ? "checked-in" : "all"}.csv"`
             );
 
-            return res.send("\uFEFF" + csv);
+            return res.send("﻿" + csv);
 
         } catch (error) {
             console.error("ATTENDANCE EXPORT ERROR:", error);
@@ -1411,10 +1415,6 @@ app.get(
         }
     }
 );
-
-// ==================== APPLICATIONS EXCEL EXPORT ====================
-
-
 
 // ==================== SYNC EXISTING APPLICATIONS TO GOOGLE SHEETS ====================
 
@@ -1462,8 +1462,6 @@ app.post(
         }
     }
 );
-
-// ==================== SUBMIT TEAM APPLICATION ====================
 
 // ==================== SUBMIT TEAM APPLICATION ====================
 
@@ -1606,24 +1604,24 @@ app.post(
                     : null
             });
 
-applicationSaved = true;
+            applicationSaved = true;
 
-// Sync to Google Sheets without affecting the successful application.
-try {
-    await syncApplicationToGoogleSheet(application);
+            // Sync to Google Sheets without affecting the successful application.
+            try {
+                await syncApplicationToGoogleSheet(application);
 
-    console.log(
-        "APPLICATION SYNCED TO GOOGLE SHEETS:",
-        application.studentId
-    );
-} catch (sheetError) {
-    console.error(
-        "GOOGLE SHEETS SYNC ERROR:",
-        sheetError
-    );
-}
+                console.log(
+                    "APPLICATION SYNCED TO GOOGLE SHEETS:",
+                    application.studentId
+                );
+            } catch (sheetError) {
+                console.error(
+                    "GOOGLE SHEETS SYNC ERROR:",
+                    sheetError
+                );
+            }
 
-return res.status(201).json({
+            return res.status(201).json({
                 message:
                     "Your application has been submitted successfully!",
                 applicationId: application._id
