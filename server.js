@@ -1638,9 +1638,24 @@ app.post(
                     : null
             });
 
-            applicationSaved = true;
+applicationSaved = true;
 
-            return res.status(201).json({
+// Sync to Google Sheets without affecting the successful application.
+try {
+    await syncApplicationToGoogleSheet(application);
+
+    console.log(
+        "APPLICATION SYNCED TO GOOGLE SHEETS:",
+        application.studentId
+    );
+} catch (sheetError) {
+    console.error(
+        "GOOGLE SHEETS SYNC ERROR:",
+        sheetError
+    );
+}
+
+return res.status(201).json({
                 message:
                     "Your application has been submitted successfully!",
                 applicationId: application._id
