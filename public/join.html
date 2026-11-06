@@ -807,7 +807,7 @@
   });
 
   var form = document.getElementById("join-form");
-  var status = document.getElementById("form-status");
+  var formStatus = document.getElementById("form-status");
   var sample = document.getElementById("sample");
   var fileName = document.getElementById("file-name");
   var removeBtn = document.getElementById("remove-file");
@@ -816,15 +816,15 @@
   var MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 
   function showStatus(message, isError) {
-    status.textContent = message;
-    status.classList.add("show");
-    status.style.borderLeftColor = isError ? "#EB0028" : "#238636";
+    formStatus.textContent = message;
+    formStatus.classList.add("show");
+    formStatus.style.borderLeftColor = isError ? "#EB0028" : "#238636";
   }
 
   function clearStatus() {
-    status.textContent = "";
-    status.classList.remove("show");
-    status.style.borderLeftColor = "";
+    formStatus.textContent = "";
+    formStatus.classList.remove("show");
+    formStatus.style.borderLeftColor = "";
   }
 
   function clearSample() {
@@ -954,6 +954,9 @@ if (!/^\d{9}$/.test(studentId)) {
 
       form.reset();
       clearSample();
+      setTimeout(function () {
+        window.location.href = "frontend.html";
+      }, 2000);
 
     } catch (error) {
       console.error("APPLICATION SUBMISSION ERROR:", error);
