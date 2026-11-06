@@ -261,6 +261,13 @@ const applicationSchema = new mongoose.Schema({
         maxlength: 120
     },
 
+    studentId: {
+        type: String,
+        required: true,
+        trim: true,
+        match: /^\d{9}$/
+    },
+
     email: {
         type: String,
         required: true,
@@ -329,6 +336,35 @@ const Application = mongoose.model(
     applicationSchema,
     "applications"
 );
+
+// ==================== UNIQUE APPLICATION STUDENT ID ====================
+
+// This index prevents duplicate student IDs.
+// The partial filter preserves older applications that do not
+// yet have a studentId field.
+
+let applicationStudentIdIndexPromise = null;
+
+async function ensureApplicationStudentIdIndex() {
+    if (!applicationStudentIdIndexPromise) {
+        applicationStudentIdIndexPromise =
+            Application.collection.createIndex(
+                { studentId: 1 },
+                {
+                    unique: true,
+                    partialFilterExpression: {
+                        studentId: { $type: "string" }
+                    },
+                    name: "unique_application_student_id"
+                }
+            ).catch((error) => {
+                applicationStudentIdIndexPromise = null;
+                throw error;
+            });
+    }
+
+    await applicationStudentIdIndexPromise;
+}
 
 // ==================== AUTH TOKENS ====================
 
@@ -463,6 +499,7 @@ function newTicketFields() {
         ticketId: `TDX-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
     };
 }
+
 // ==================== APPLICATION EXPORT SECURITY ====================
 
 function requireApplicationsExportKey(req, res, next) {
@@ -605,32 +642,32 @@ app.post("/login", async (req, res) => {
             });
         }
 
-const storedPassword = user.password;
+        const storedPassword = user.password;
 
-const isBcryptHash =
-    /^\$2[aby]\$\d{2}\$/.test(storedPassword);
+        const isBcryptHash =
+            /^\$2[aby]\$\d{2}\$/.test(storedPassword);
 
-let isMatch = false;
+        let isMatch = false;
 
-if (isBcryptHash) {
-    isMatch = await bcrypt.compare(password, storedPassword);
-} else {
-    // Support accounts created by the older plain-text signup code.
-    isMatch = password === storedPassword;
+        if (isBcryptHash) {
+            isMatch = await bcrypt.compare(password, storedPassword);
+        } else {
+            // Support accounts created by the older plain-text signup code.
+            isMatch = password === storedPassword;
 
-    if (isMatch) {
-        user.password = await bcrypt.hash(password, 12);
-        await user.save();
+            if (isMatch) {
+                user.password = await bcrypt.hash(password, 12);
+                await user.save();
 
-        console.log("Legacy password securely migrated.");
-    }
-}
+                console.log("Legacy password securely migrated.");
+            }
+        }
 
-if (!isMatch) {
-    return res.status(401).json({
-        message: "Invalid email or password."
-    });
-}
+        if (!isMatch) {
+            return res.status(401).json({
+                message: "Invalid email or password."
+            });
+        }
 
         return res.json({
             message: "Login successful!",
@@ -1225,18 +1262,14 @@ app.get(
 // ==================== APPLICATIONS EXCEL EXPORT ====================
 
 function safeExcelText(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    const text = String(value);
+    const text = value === null || value === undefined
+        ? ""
+        : String(value);
 
     // Prevent spreadsheet formula injection.
-    if (/^[\s]*[=+\-@]/.test(text)) {
-        return "'" + text;
-    }
-
-    return text;
+    return /^[\s]*[=+\-@]/.test(text)
+        ? "'" + text
+        : text;
 }
 
 app.get(
@@ -1248,7 +1281,7 @@ app.get(
 
             const applications = await Application.find({})
                 .select(
-                    "name email phone college team why sampleName status createdAt"
+                    "studentId name email phone college team why sampleName status createdAt"
                 )
                 .sort({ createdAt: -1 })
                 .lean();
@@ -1261,6 +1294,7 @@ app.get(
             const worksheet = workbook.addWorksheet("Applications");
 
             worksheet.columns = [
+                { header: "Student ID", key: "studentId", width: 16 },
                 { header: "Name", key: "name", width: 25 },
                 { header: "Email", key: "email", width: 32 },
                 { header: "Phone", key: "phone", width: 20 },
@@ -1289,11 +1323,12 @@ app.get(
 
             worksheet.autoFilter = {
                 from: "A1",
-                to: "I1"
+                to: "J1"
             };
 
             for (const application of applications) {
                 worksheet.addRow({
+                    studentId: safeExcelText(application.studentId),
                     name: safeExcelText(application.name),
                     email: safeExcelText(application.email),
                     phone: safeExcelText(application.phone),
@@ -1327,10 +1362,7 @@ app.get(
                 'attachment; filename="TEDxAASTMT-Applications.xlsx"'
             );
 
-            res.setHeader(
-                "Content-Length",
-                buffer.length
-            );
+            res.setHeader("Content-Length", buffer.length);
 
             return res.send(Buffer.from(buffer));
 
@@ -1372,6 +1404,7 @@ app.post(
 
             const {
                 name,
+                studentId,
                 email,
                 phone,
                 college,
@@ -1381,6 +1414,11 @@ app.post(
 
             const cleanName =
                 typeof name === "string" ? name.trim() : "";
+
+            const cleanStudentId =
+                typeof studentId === "string"
+                    ? studentId.trim()
+                    : "";
 
             const cleanEmail =
                 typeof email === "string"
@@ -1405,6 +1443,7 @@ app.post(
 
             if (
                 !cleanName ||
+                !cleanStudentId ||
                 !cleanEmail ||
                 !cleanPhone ||
                 !cleanCollege ||
@@ -1414,6 +1453,13 @@ app.post(
             ) {
                 return res.status(400).json({
                     message: "Please complete all required fields."
+                });
+            }
+
+            if (!/^\d{9}$/.test(cleanStudentId)) {
+                return res.status(400).json({
+                    message:
+                        "Your AASTMT registration number must contain exactly 9 digits."
                 });
             }
 
@@ -1438,8 +1484,24 @@ app.post(
                 });
             }
 
+            // Ensure the unique student ID index exists before saving.
+            await ensureApplicationStudentIdIndex();
+
+            // Give the applicant a friendly message if this ID was used.
+            const existingApplication = await Application.findOne({
+                studentId: cleanStudentId
+            });
+
+            if (existingApplication) {
+                return res.status(409).json({
+                    message:
+                        "This student ID has already submitted an application. Only one application is allowed per student."
+                });
+            }
+
             const application = await Application.create({
                 name: cleanName,
+                studentId: cleanStudentId,
                 email: cleanEmail,
                 phone: cleanPhone,
                 college: cleanCollege,
@@ -1468,6 +1530,18 @@ app.post(
                 "APPLICATION SUBMISSION ERROR:",
                 error
             );
+
+            // Handle duplicate IDs even if two submissions arrive together.
+            if (
+                error.code === 11000 &&
+                error.keyPattern &&
+                error.keyPattern.studentId
+            ) {
+                return res.status(409).json({
+                    message:
+                        "This student ID has already submitted an application. Only one application is allowed per student."
+                });
+            }
 
             return res.status(500).json({
                 message:
