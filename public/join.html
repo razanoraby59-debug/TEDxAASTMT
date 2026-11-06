@@ -48,20 +48,21 @@
 
     /* HEADER */
 
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      min-height: 76px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px max(32px, calc((100% - var(--page-width)) / 2));
-      background: rgba(255, 255, 255, 0.97);
-      border-bottom: 1px solid var(--light-grey);
-      backdrop-filter: blur(8px);
-    }
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem clamp(1rem, 4vw, 3rem);
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--light-grey);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(8px);
+}
 
     .logo {
       display: inline-flex;
@@ -347,38 +348,6 @@
 
     textarea { min-height: 130px; resize: vertical; }
 
-    /* REGISTRATION NUMBER */
-
-    .reg-input {
-      position: relative;
-    }
-
-    .reg-input svg {
-      position: absolute;
-      top: 50%;
-      left: 14px;
-      width: 18px;
-      height: 18px;
-      transform: translateY(-50%);
-      color: var(--grey);
-      pointer-events: none;
-      transition: color 0.2s;
-    }
-
-    .reg-input input {
-      padding-left: 42px;
-      letter-spacing: 0.04em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .reg-input:focus-within svg { color: var(--red); }
-
-    .field-hint {
-      color: var(--grey);
-      font-size: 0.76rem;
-      line-height: 1.4;
-    }
-
     .form-note {
       color: var(--grey);
       font-size: 0.82rem;
@@ -541,17 +510,6 @@
     .legal { color: #aaa; font-size: 0.8rem; }
     .made-by { margin-top: 6px; color: #777; }
 
-    body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1350' preserveAspectRatio='xMidYMid slice'%3E%3Cpath d='M0 230 L845 738 L1080 350 L1080 860 L775 1350 L475 1350 L695 983 L0 562 Z' fill='%23EB0028' fill-opacity='0.11'/%3E%3C/svg%3E") center / cover no-repeat,
-    #fff;
-}
-
     /* TABLETS AND SMALL LAPTOPS */
 
     @media (max-width: 1000px) {
@@ -564,9 +522,6 @@
       .nav { padding-left: 28px; padding-right: 28px; }
       footer { padding-left: 28px; padding-right: 28px; }
     }
-    @media (max-width: 760px) {
-  body::before { background-position: 60% center; }
-}
 
     @media (max-width: 760px) {
       .nav { min-height: 68px; padding: 14px 22px; }
@@ -705,7 +660,7 @@
       <div class="apply-inner">
         <div>
           <h2>Apply to join</h2>
-          <p>Tell us a little about yourself and which team interests you most. We'll review your application and get back to you.</p>
+          <p>Tell us a little about yourself and which team interests you most. We'll review your application and get back to you by email.</p>
         </div>
 
         <form id="join-form" novalidate>
@@ -719,6 +674,20 @@
               <input id="email" name="email" type="email" autocomplete="email" required>
             </div>
           </div>
+          <div class="field">
+  <label for="studentId">AASTMT registration number</label>
+  <input
+    id="studentId"
+    name="studentId"
+    type="text"
+    inputmode="numeric"
+    autocomplete="off"
+    maxlength="9"
+    pattern="[0-9]{9}"
+    placeholder="Your 9-digit registration number"
+    required
+  >
+</div>
 
           <div class="row">
             <div class="field">
@@ -731,31 +700,15 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="field">
-              <label for="regnum">Registration number</label>
-              <div class="reg-input">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"
-                        stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <input id="regnum" name="regnum" type="text"
-                       inputmode="numeric" autocomplete="off"
-                       placeholder="" required>
-              </div>
-              <span class="field-hint">Your student ID / registration number.</span>
-            </div>
-            <div class="field">
-              <label for="team">Preferred team</label>
-              <select id="team" name="team" required>
-                <option value="" selected disabled>Choose a team</option>
-                <option>Coaches</option>
-                <option>Operation &amp; PR</option>
-                <option>Media &amp; Marketing</option>
-                <option>HR</option>
-              </select>
-            </div>
+          <div class="field">
+            <label for="team">Preferred team</label>
+            <select id="team" name="team" required>
+              <option value="" selected disabled>Choose a team</option>
+              <option>Coaches</option>
+              <option>Operation &amp; PR</option>
+              <option>Media &amp; Marketing</option>
+              <option>HR</option>
+            </select>
           </div>
 
           <div class="field">
@@ -795,7 +748,7 @@
   <!-- FOOTER -->
   <footer>
     <div class="foot-top">
-      <a class="logo" href="index.html" aria-label="TEDxAASTMT home">
+      <a class="logo" href="frontend.html" aria-label="TEDxAASTMT home">
         <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
       </a>
 
@@ -812,23 +765,6 @@
               <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
             </svg>
           </a>
-
-          
-<a href="https://chat.whatsapp.com/JM1mXQBwc4v1iBPRBeJx5q"
-   target="_blank"
-   rel="noopener noreferrer"
-   aria-label="WhatsApp group"
-   title="WhatsApp group">
-  <svg xmlns="http://www.w3.org/2000/svg"
-       viewBox="0 0 24 24"
-       width="24"
-       height="24"
-       fill="currentColor"
-       aria-hidden="true">
-    <path d="M20.52 3.48A11.8 11.8 0 0 0 12.1 0C5.56 0 .23 5.32.23 11.87c0 2.1.55 4.15 1.6 5.96L.13 24l6.33-1.66a11.9 11.9 0 0 0 5.63 1.43h.01c6.55 0 11.87-5.32 11.87-11.87 0-3.17-1.23-6.15-3.45-8.42ZM12.1 21.75h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.76.99 1-3.67-.24-.38a9.83 9.83 0 0 1-1.51-5.23c0-5.47 4.45-9.92 9.93-9.92 2.65 0 5.14 1.03 7.01 2.91a9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.92 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
-  </svg>
-</a>
-
 
           <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/"
              target="_blank" rel="noopener noreferrer"
@@ -862,95 +798,177 @@
   </footer>
 
   <script>
-    // Pre-select the team when a team card button is clicked
-    document.querySelectorAll('[data-team]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        document.getElementById('team').value = btn.getAttribute('data-team');
-      });
+  // Pre-select the team when a team card button is clicked.
+  document.querySelectorAll("[data-team]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      document.getElementById("team").value =
+        button.getAttribute("data-team");
     });
+  });
 
-    var statusBox = document.getElementById('form-status');
+  var form = document.getElementById("join-form");
+  var status = document.getElementById("form-status");
+  var sample = document.getElementById("sample");
+  var fileName = document.getElementById("file-name");
+  var removeBtn = document.getElementById("remove-file");
+  var submitBtn = form.querySelector('button[type="submit"]');
 
-    // Work sample upload
-    var MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-    var sample = document.getElementById('sample');
-    var fileName = document.getElementById('file-name');
-    var removeBtn = document.getElementById('remove-file');
+  var MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 
-    function clearSample() {
-      sample.value = '';
-      fileName.textContent = 'Choose a file';
-      removeBtn.hidden = true;
+  function showStatus(message, isError) {
+    status.textContent = message;
+    status.classList.add("show");
+    status.style.borderLeftColor = isError ? "#EB0028" : "#238636";
+  }
+
+  function clearStatus() {
+    status.textContent = "";
+    status.classList.remove("show");
+    status.style.borderLeftColor = "";
+  }
+
+  function clearSample() {
+    sample.value = "";
+    fileName.textContent = "Choose a file";
+    removeBtn.hidden = true;
+  }
+
+  // Validate the selected work sample.
+  sample.addEventListener("change", function () {
+    var file = sample.files && sample.files[0];
+
+    if (!file) {
+      clearSample();
+      return;
     }
 
-    sample.addEventListener('change', function () {
-      var file = sample.files[0];
-      if (!file) { clearSample(); return; }
+    if (file.size > MAX_SIZE) {
+      clearSample();
+      showStatus(
+        "That file is larger than 10 MB. Please choose a smaller one.",
+        true
+      );
+      return;
+    }
 
-      if (file.size > MAX_SIZE) {
-        clearSample();
-        statusBox.classList.add('show');
-        statusBox.textContent = 'That file is larger than 10 MB. Please choose a smaller one.';
-        return;
+    clearStatus();
+    fileName.textContent = file.name;
+    removeBtn.hidden = false;
+  });
+
+  removeBtn.addEventListener("click", clearSample);
+
+  // Submit the application to the Express backend.
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    clearStatus();
+
+var requiredFields = [
+  "name",
+  "email",
+  "studentId",
+  "phone",
+  "college",
+  "team",
+  "why"
+];
+
+    var missing = false;
+
+    requiredFields.forEach(function (id) {
+      var field = document.getElementById(id);
+
+      if (!field.value.trim()) {
+        missing = true;
       }
-
-      statusBox.classList.remove('show');
-      fileName.textContent = file.name;
-      removeBtn.hidden = false;
     });
 
-    removeBtn.addEventListener('click', clearSample);
+    if (missing) {
+      showStatus(
+        "Please fill in every required field before submitting.",
+        true
+      );
+      return;
+    }
 
-    // Build an email from the form
-    var form = document.getElementById('join-form');
+    var studentId = document.getElementById("studentId").value.trim();
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+if (!/^\d{9}$/.test(studentId)) {
+  showStatus(
+    "Your AASTMT registration number must contain exactly 9 digits.",
+    true
+  );
+  return;
+}
 
-      var fields = ['name', 'email', 'phone', 'college', 'regnum', 'team', 'why'];
-      var data = {};
-      var missing = false;
+    var email = document.getElementById("email").value.trim();
 
-      fields.forEach(function (id) {
-        var el = document.getElementById(id);
-        data[id] = el.value.trim();
-        if (!data[id]) missing = true;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      showStatus("Please enter a valid email address.", true);
+      return;
+    }
+
+    var file = sample.files && sample.files[0];
+
+    if (file && file.size > MAX_SIZE) {
+      showStatus(
+        "That file is larger than 10 MB. Please choose a smaller one.",
+        true
+      );
+      return;
+    }
+
+    var originalButtonText = submitBtn.textContent;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
+    try {
+      var formData = new FormData(form);
+
+      var response = await fetch("/applications", {
+        method: "POST",
+        body: formData
       });
 
-      statusBox.classList.add('show');
+      var result;
 
-      if (missing) {
-        statusBox.textContent = 'Please fill in every field before submitting.';
-        return;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        result = {};
       }
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        statusBox.textContent = 'Please enter a valid email address.';
-        return;
+      if (!response.ok) {
+        throw new Error(
+          result.message ||
+          "We couldn't submit your application. Please try again."
+        );
       }
 
-      var subject = 'TEDxAASTMT application - ' + data.team;
-      var body =
-        'Name: ' + data.name + '\n' +
-        'Email: ' + data.email + '\n' +
-        'Phone: ' + data.phone + '\n' +
-        'College / Major: ' + data.college + '\n' +
-        'Registration number: ' + data.regnum + '\n' +
-        'Preferred team: ' + data.team + '\n\n' +
-        'Why I want to join:\n' + data.why;
+      showStatus(
+        result.message ||
+        "Your application has been submitted successfully!",
+        false
+      );
 
-      var file = sample.files[0];
-      if (file) {
-        body += '\n\nWork sample: ' + file.name + ' (attached below)';
-      }
+      form.reset();
+      clearSample();
 
-      statusBox.textContent = 'Thanks, ' + data.name.split(' ')[0] + '! Your email app should open now.' +
-        (file ? ' Please attach "' + file.name + '" to the email before you press send.' : ' Just press send.');
+    } catch (error) {
+      console.error("APPLICATION SUBMISSION ERROR:", error);
 
-      window.location.href = 'mailto:tedxaastmt26@gmail.com' +
-        '?subject=' + encodeURIComponent(subject) +
-        '&body=' + encodeURIComponent(body);
-    });
-  </script>
+      showStatus(
+        error.message ||
+        "We couldn't connect to the server. Please try again.",
+        true
+      );
+
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalButtonText;
+    }
+  });
+</script>
 </body>
 </html>
