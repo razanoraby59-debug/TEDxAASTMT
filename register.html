@@ -275,6 +275,61 @@
       margin-bottom: 1.3rem;
     }
 
+    /* =========================
+   BRANCH SELECTION
+========================= */
+
+.branch-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin-top: .6rem;
+}
+
+.branch-option {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+
+  padding: .75rem 1rem;
+  margin: 0;
+
+  background: var(--white);
+  border: 2px solid #C8C8C8;
+
+  font-size: .9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+
+.branch-option:hover {
+  border-color: var(--red);
+}
+
+.branch-option input[type="radio"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--red);
+  cursor: pointer;
+}
+
+.branch-option:has(input:checked) {
+  border-color: var(--red);
+  background: #FFF6F7;
+}
+
+.branch-option:focus-within {
+  outline: 3px solid rgba(235, 0, 40, .2);
+  outline-offset: 2px;
+}
+
+#branch-err {
+  margin-top: .4rem;
+}
+
     label {
       display: block;
 
@@ -692,7 +747,7 @@ footer .logo .aastmt {
         </h2>
 
         <p class="sub">
-          All three fields are required.
+          All fields are required.
         </p>
 
 
@@ -768,6 +823,31 @@ footer .logo .aastmt {
 
           </div>
 
+          
+          <div class="field">
+            <label>What's your branch?</label>
+
+            <div class="branch-options">
+              <label class="branch-option">
+                <input type="radio" name="branch" value="AbuQir">
+                AbuQir
+              </label>
+
+              <label class="branch-option">
+                <input type="radio" name="branch" value="Miami">
+                Miami
+              </label>
+
+              <label class="branch-option">
+                <input type="radio" name="branch" value="Alamein">
+                Alamein
+              </label>
+            </div>
+
+            <p class="error" id="branch-err"></p>
+          </div>
+
+
 
           <!-- EMAIL -->
 
@@ -786,6 +866,8 @@ footer .logo .aastmt {
               aria-describedby="email-err"
             >
 
+            
+
             <p
               class="error"
               id="email-err"
@@ -793,6 +875,8 @@ footer .logo .aastmt {
             ></p>
 
           </div>
+
+                    <!-- BRANCH -->
 
 
           <button
@@ -965,72 +1049,47 @@ const STATUS_ENDPOINT =
     /* ========================================
        FORM FIELDS
     ======================================== */
-
-    const fields = {
-
-      name: {
-
-        el: document.getElementById("name"),
-
-        err: document.getElementById("name-err"),
-
-        check: function(value) {
-
-          if (value.length < 3) {
-            return "Please enter your full name.";
-          }
-
-          return "";
-
-        }
-
-      },
-
-
-      regno: {
-
-        el: registrationNumber,
-
-        err: document.getElementById("regno-err"),
-
-        check: function(value) {
-
-          if (!/^\d{9}$/.test(value)) {
-
-            return "Registration number must be exactly 9 digits.";
-
-          }
-
-          return "";
-
-        }
-
-      },
-
-
-      email: {
-
-        el: document.getElementById("email"),
-
-        err: document.getElementById("email-err"),
-
-        check: function(value) {
-
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
-
-            return "Enter a valid email address.";
-
-          }
-
-          return "";
-
-        }
-
+const fields = {
+  name: {
+    el: document.getElementById("name"),
+    err: document.getElementById("name-err"),
+    check: function(value) {
+      if (value.length < 3) {
+        return "Please enter your full name.";
       }
 
-    };
+      if (/\d/.test(value)) {
+        return "Your name cannot contain numbers.";
+      }
 
+      return "";
+    }
+  },
 
+  regno: {
+    el: registrationNumber,
+    err: document.getElementById("regno-err"),
+    check: function(value) {
+      if (!/^\d{9}$/.test(value)) {
+        return "Registration number must contain exactly 9 digits.";
+      }
+
+      return "";
+    }
+  },
+
+  email: {
+    el: document.getElementById("email"),
+    err: document.getElementById("email-err"),
+    check: function(value) {
+      if (!/^[^\s@]+@gmail\.com$/i.test(value)) {
+        return "Please enter a valid Gmail address ending in @gmail.com.";
+      }
+
+      return "";
+    }
+  }
+};
     /* ========================================
        REGISTRATION NUMBER
        ONLY ALLOWS 9 DIGITS
