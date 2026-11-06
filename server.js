@@ -4,7 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
+const ExcelJS = require("exceljs");
 const multer = require("multer");
 const fs = require("fs");
 const crypto = require("crypto");
@@ -461,6 +462,35 @@ function newTicketFields() {
         ticketToken: crypto.randomBytes(24).toString("hex"),
         ticketId: `TDX-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
     };
+}
+// ==================== APPLICATION EXPORT SECURITY ====================
+
+function requireApplicationsExportKey(req, res, next) {
+    const expected = process.env.APPLICATIONS_EXPORT_KEY;
+
+    if (!expected) {
+        return res.status(500).json({
+            message: "APPLICATIONS_EXPORT_KEY is not configured."
+        });
+    }
+
+    const provided = String(
+        req.headers["x-applications-export-key"] || ""
+    );
+
+    const a = Buffer.from(provided);
+    const b = Buffer.from(expected);
+
+    if (
+        a.length !== b.length ||
+        !crypto.timingSafeEqual(a, b)
+    ) {
+        return res.status(403).json({
+            message: "Invalid applications export key."
+        });
+    }
+
+    next();
 }
 
 // ==================== SIGN UP ====================
@@ -1187,6 +1217,128 @@ app.get(
 
             return res.status(500).json({
                 message: "Failed to export attendance."
+            });
+        }
+    }
+);
+
+// ==================== APPLICATIONS EXCEL EXPORT ====================
+
+function safeExcelText(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    const text = String(value);
+
+    // Prevent spreadsheet formula injection.
+    if (/^[\s]*[=+\-@]/.test(text)) {
+        return "'" + text;
+    }
+
+    return text;
+}
+
+app.get(
+    "/api/applications.xlsx",
+    requireApplicationsExportKey,
+    async (req, res) => {
+        try {
+            await connectDB();
+
+            const applications = await Application.find({})
+                .select(
+                    "name email phone college team why sampleName status createdAt"
+                )
+                .sort({ createdAt: -1 })
+                .lean();
+
+            const workbook = new ExcelJS.Workbook();
+
+            workbook.creator = "TEDxAASTMT";
+            workbook.created = new Date();
+
+            const worksheet = workbook.addWorksheet("Applications");
+
+            worksheet.columns = [
+                { header: "Name", key: "name", width: 25 },
+                { header: "Email", key: "email", width: 32 },
+                { header: "Phone", key: "phone", width: 20 },
+                { header: "College / Major", key: "college", width: 28 },
+                { header: "Preferred Team", key: "team", width: 24 },
+                { header: "Why They Applied", key: "why", width: 55 },
+                { header: "Work Sample", key: "sampleName", width: 30 },
+                { header: "Application Status", key: "status", width: 20 },
+                { header: "Submitted At (Cairo)", key: "createdAt", width: 28 }
+            ];
+
+            worksheet.getRow(1).font = {
+                bold: true,
+                color: { argb: "FFFFFFFF" }
+            };
+
+            worksheet.getRow(1).fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "FFEB0028" }
+            };
+
+            worksheet.views = [
+                { state: "frozen", ySplit: 1 }
+            ];
+
+            worksheet.autoFilter = {
+                from: "A1",
+                to: "I1"
+            };
+
+            for (const application of applications) {
+                worksheet.addRow({
+                    name: safeExcelText(application.name),
+                    email: safeExcelText(application.email),
+                    phone: safeExcelText(application.phone),
+                    college: safeExcelText(application.college),
+                    team: safeExcelText(application.team),
+                    why: safeExcelText(application.why),
+                    sampleName: safeExcelText(application.sampleName),
+                    status: safeExcelText(application.status),
+                    createdAt: cairoTimestamp(application.createdAt)
+                });
+            }
+
+            worksheet.eachRow((row, rowNumber) => {
+                if (rowNumber > 1) {
+                    row.alignment = {
+                        vertical: "top",
+                        wrapText: true
+                    };
+                }
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+
+            res.setHeader(
+                "Content-Type",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            );
+
+            res.setHeader(
+                "Content-Disposition",
+                'attachment; filename="TEDxAASTMT-Applications.xlsx"'
+            );
+
+            res.setHeader(
+                "Content-Length",
+                buffer.length
+            );
+
+            return res.send(Buffer.from(buffer));
+
+        } catch (error) {
+            console.error("APPLICATIONS EXPORT ERROR:", error);
+
+            return res.status(500).json({
+                message: "Failed to export applications."
             });
         }
     }
