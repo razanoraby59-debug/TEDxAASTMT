@@ -1133,8 +1133,11 @@
   <script>
     /* ============ CONFIG ============ */
 
-    const FORM_ENDPOINT = "/register";
-    const STATUS_ENDPOINT = "/event-status";
+    // Opened as a local file (file://)? Talk to the local dev server.
+    // Served over http(s) (local or deployed)? Use same-origin paths.
+    const API_BASE = location.protocol === "file:" ? "http://localhost:5000" : "";
+    const FORM_ENDPOINT = API_BASE + "/register";
+    const STATUS_ENDPOINT = API_BASE + "/event-status";
     const TICKET_STORAGE_KEY = "tedxaastmt_ticket_v1";
 
     const QR_SOURCES = [
