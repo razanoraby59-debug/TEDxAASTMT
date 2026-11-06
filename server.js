@@ -1382,19 +1382,13 @@ app.get(
 
 // ==================== APPLICATIONS EXCEL EXPORT ====================
 
-function safeExcelText(value) {
-    const text = value === null || value === undefined
-        ? ""
-        : String(value);
+    }
+);
 
-    // Prevent spreadsheet formula injection.
-    return /^[\s]*[=+\-@]/.test(text)
-        ? "'" + text
-        : text;
-}
+// ==================== SYNC EXISTING APPLICATIONS TO GOOGLE SHEETS ====================
 
-app.get(
-    "/api/applications.xlsx",
+app.post(
+    "/api/applications/sync-google-sheets",
     requireApplicationsExportKey,
     async (req, res) => {
         try {
@@ -1404,98 +1398,41 @@ app.get(
                 .select(
                     "studentId name email phone college team why sampleName status createdAt"
                 )
-                .sort({ createdAt: -1 })
+                .sort({ createdAt: 1 })
                 .lean();
 
-            const workbook = new ExcelJS.Workbook();
-
-            workbook.creator = "TEDxAASTMT";
-            workbook.created = new Date();
-
-            const worksheet = workbook.addWorksheet("Applications");
-
-            worksheet.columns = [
-                { header: "Student ID", key: "studentId", width: 16 },
-                { header: "Name", key: "name", width: 25 },
-                { header: "Email", key: "email", width: 32 },
-                { header: "Phone", key: "phone", width: 20 },
-                { header: "College / Major", key: "college", width: 28 },
-                { header: "Preferred Team", key: "team", width: 24 },
-                { header: "Why They Applied", key: "why", width: 55 },
-                { header: "Work Sample", key: "sampleName", width: 30 },
-                { header: "Application Status", key: "status", width: 20 },
-                { header: "Submitted At (Cairo)", key: "createdAt", width: 28 }
-            ];
-
-            worksheet.getRow(1).font = {
-                bold: true,
-                color: { argb: "FFFFFFFF" }
-            };
-
-            worksheet.getRow(1).fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "FFEB0028" }
-            };
-
-            worksheet.views = [
-                { state: "frozen", ySplit: 1 }
-            ];
-
-            worksheet.autoFilter = {
-                from: "A1",
-                to: "J1"
-            };
+            let synced = 0;
+            let alreadyPresent = 0;
 
             for (const application of applications) {
-                worksheet.addRow({
-                    studentId: safeExcelText(application.studentId),
-                    name: safeExcelText(application.name),
-                    email: safeExcelText(application.email),
-                    phone: safeExcelText(application.phone),
-                    college: safeExcelText(application.college),
-                    team: safeExcelText(application.team),
-                    why: safeExcelText(application.why),
-                    sampleName: safeExcelText(application.sampleName),
-                    status: safeExcelText(application.status),
-                    createdAt: cairoTimestamp(application.createdAt)
-                });
+                const wasAdded =
+                    await syncApplicationToGoogleSheet(application);
+
+                if (wasAdded) {
+                    synced++;
+                } else {
+                    alreadyPresent++;
+                }
             }
 
-            worksheet.eachRow((row, rowNumber) => {
-                if (rowNumber > 1) {
-                    row.alignment = {
-                        vertical: "top",
-                        wrapText: true
-                    };
-                }
+            return res.json({
+                message: "Google Sheets synchronization completed.",
+                total: applications.length,
+                synced,
+                alreadyPresent
             });
 
-            const buffer = await workbook.xlsx.writeBuffer();
-
-            res.setHeader(
-                "Content-Type",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            );
-
-            res.setHeader(
-                "Content-Disposition",
-                'attachment; filename="TEDxAASTMT-Applications.xlsx"'
-            );
-
-            res.setHeader("Content-Length", buffer.length);
-
-            return res.send(Buffer.from(buffer));
-
         } catch (error) {
-            console.error("APPLICATIONS EXPORT ERROR:", error);
+            console.error("GOOGLE SHEETS BACKFILL ERROR:", error);
 
             return res.status(500).json({
-                message: "Failed to export applications."
+                message: "Failed to synchronize applications."
             });
         }
     }
 );
+
+// ==================== SUBMIT TEAM APPLICATION ====================
 
 // ==================== SUBMIT TEAM APPLICATION ====================
 
