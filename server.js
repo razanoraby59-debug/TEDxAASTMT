@@ -536,7 +536,7 @@ app.post("/signup", async (req, res) => {
     try {
         await connectDB();
 
-        const { name, email, password } = req.body;
+        const { name, email, password } = req.body || {};
 
         if (
             typeof name !== "string" ||
