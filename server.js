@@ -1024,7 +1024,9 @@ app.post("/register", async (req, res) => {
             const updatedEvent = await Event.findOneAndUpdate(
                 {
                     name: EVENT_NAME,
-                    registrationOpen: true,
+                    // $ne:false also matches events created before this
+                    // field existed (a missing field never equals true)
+                    registrationOpen: { $ne: false },
                     seatsRemaining: { $gt: 0 }
                 },
                 {
