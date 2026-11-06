@@ -9,7 +9,6 @@ const ExcelJS = require("exceljs");
 const multer = require("multer");
 const fs = require("fs");
 const crypto = require("crypto");
-const { google } = require("googleapis");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -337,126 +336,6 @@ const Application = mongoose.model(
     applicationSchema,
     "applications"
 );
-// ==================== GOOGLE SHEETS INTEGRATION ====================
-
-let googleSheetsClientPromise = null;
-
-async function getGoogleSheetsContext() {
-    if (!googleSheetsClientPromise) {
-        googleSheetsClientPromise = (async () => {
-            const encodedKey =
-                process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64;
-
-            const spreadsheetId =
-                process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-
-            if (!encodedKey || !spreadsheetId) {
-                throw new Error(
-                    "Google Sheets environment variables are missing."
-                );
-            }
-
-            const credentials = JSON.parse(
-                Buffer.from(encodedKey, "base64").toString("utf8")
-            );
-
-            const auth = new google.auth.GoogleAuth({
-                credentials,
-                scopes: [
-                    "https://www.googleapis.com/auth/spreadsheets"
-                ]
-            });
-
-            const sheets = google.sheets({
-                version: "v4",
-                auth
-            });
-
-            const metadata = await sheets.spreadsheets.get({
-                spreadsheetId,
-                fields: "sheets.properties.title"
-            });
-
-            const sheetTitle =
-                metadata.data.sheets?.[0]?.properties?.title;
-
-            if (!sheetTitle) {
-                throw new Error("Google spreadsheet tab not found.");
-            }
-
-            const quotedTitle =
-                "'" + sheetTitle.replace(/'/g, "''") + "'";
-
-            return {
-                sheets,
-                spreadsheetId,
-                quotedTitle
-            };
-        })().catch((error) => {
-            googleSheetsClientPromise = null;
-            throw error;
-        });
-    }
-
-    return googleSheetsClientPromise;
-}
-
-async function syncApplicationToGoogleSheet(application) {
-    const {
-        sheets,
-        spreadsheetId,
-        quotedTitle
-    } = await getGoogleSheetsContext();
-
-    const existingRows = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: `${quotedTitle}!A:A`
-    });
-
-    const existingStudentIds = new Set(
-        (existingRows.data.values || [])
-            .flat()
-            .map(value => String(value))
-    );
-
-    if (existingStudentIds.has(String(application.studentId))) {
-        return false;
-    }
-
-    const submittedAt = new Intl.DateTimeFormat("en-GB", {
-        timeZone: "Africa/Cairo",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false
-    }).format(new Date(application.createdAt || Date.now()));
-
-    await sheets.spreadsheets.values.append({
-        spreadsheetId,
-        range: `${quotedTitle}!A:J`,
-        valueInputOption: "USER_ENTERED",
-        insertDataOption: "INSERT_ROWS",
-        requestBody: {
-            values: [[
-                application.studentId || "",
-                application.name || "",
-                application.email || "",
-                application.phone || "",
-                application.college || "",
-                application.team || "",
-                application.why || "",
-                application.sampleName || "",
-                application.status || "pending",
-                submittedAt
-            ]]
-        }
-    });
-
-    return true;
-}
 
 // ==================== UNIQUE APPLICATION STUDENT ID ====================
 
@@ -738,7 +617,7 @@ app.post("/login", async (req, res) => {
             });
         }
 
-        const { email, password } = req.body;
+        const { email, password } = req.body || {};
 
         if (
             typeof email !== "string" ||
@@ -899,7 +778,7 @@ app.post("/register", async (req, res) => {
             name,
             registration_number,
             email
-        } = req.body;
+        } = req.body || {};
 
         if (
             typeof name !== "string" ||
@@ -1139,9 +1018,9 @@ app.get("/api/me", requireAuth, async (req, res) => {
 // ==================== PROFILE: MY TICKET ====================
 
 const STATUS_MESSAGES = {
-    registered: "Registered – Your ticket is ready!",
-    checked_in: "Checked In – You have been checked in successfully.",
-    invalid: "Invalid – This ticket is not valid."
+    registered: "Registered â€“ Your ticket is ready!",
+    checked_in: "Checked In â€“ You have been checked in successfully.",
+    invalid: "Invalid â€“ This ticket is not valid."
 };
 
 app.get("/api/ticket", requireAuth, async (req, res) => {
@@ -1213,7 +1092,7 @@ app.post("/api/checkin", async (req, res) => {
     try {
         await connectDB();
 
-        const { token } = req.body;
+        const { token } = req.body || {};
 
         if (
             typeof token !== "string" ||
@@ -1382,9 +1261,6 @@ app.get(
 
 // ==================== APPLICATIONS EXCEL EXPORT ====================
 
-    }
-);
-
 // ==================== SYNC EXISTING APPLICATIONS TO GOOGLE SHEETS ====================
 
 app.post(
@@ -1432,7 +1308,7 @@ app.post(
     }
 );
 
-// ==================== SUBMIT TEAM APPLICATION ====================
+
 
 // ==================== SUBMIT TEAM APPLICATION ====================
 
@@ -1468,7 +1344,7 @@ app.post(
                 college,
                 team,
                 why
-            } = req.body;
+            } = req.body || {};
 
             const cleanName =
                 typeof name === "string" ? name.trim() : "";
@@ -1575,24 +1451,9 @@ app.post(
                     : null
             });
 
-applicationSaved = true;
+            applicationSaved = true;
 
-// Sync to Google Sheets without affecting the successful application.
-try {
-    await syncApplicationToGoogleSheet(application);
-
-    console.log(
-        "APPLICATION SYNCED TO GOOGLE SHEETS:",
-        application.studentId
-    );
-} catch (sheetError) {
-    console.error(
-        "GOOGLE SHEETS SYNC ERROR:",
-        sheetError
-    );
-}
-
-return res.status(201).json({
+            return res.status(201).json({
                 message:
                     "Your application has been submitted successfully!",
                 applicationId: application._id
