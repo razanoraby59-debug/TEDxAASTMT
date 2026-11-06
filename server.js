@@ -129,6 +129,12 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxlength: 254
     },
+        branch: {
+        type: String,
+        required: true,
+        enum: ["AbuQir", "Miami", "Alamein"],
+        trim: true
+    },
 
     password: {
         type: String,
@@ -337,8 +343,6 @@ const Application = mongoose.model(
     applicationSchema,
     "applications"
 );
-
-
 // ==================== GOOGLE SHEETS INTEGRATION ====================
 
 let googleSheetsClientPromise = null;
@@ -740,7 +744,7 @@ app.post("/login", async (req, res) => {
             });
         }
 
-        const { email, password } = req.body || {};
+        const { email, password } = req.body;
 
         if (
             typeof email !== "string" ||
@@ -900,8 +904,11 @@ app.post("/register", async (req, res) => {
         const {
             name,
             registration_number,
-            email
+            email,
+            branch
         } = req.body || {};
+
+        
 
         if (
             typeof name !== "string" ||
@@ -919,6 +926,14 @@ app.post("/register", async (req, res) => {
         const cleanName = name.trim();
         const cleanEmail = email.trim().toLowerCase();
         const cleanRegNo = registration_number.trim();
+                const cleanBranch =
+            typeof branch === "string" ? branch.trim() : "";
+
+        if (!["AbuQir", "Miami", "Alamein"].includes(cleanBranch)) {
+            return res.status(400).json({
+                message: "Please select your branch."
+            });
+        }
 
         if (cleanName.length < 3 || cleanName.length > 120) {
             return res.status(400).json({
@@ -1006,14 +1021,28 @@ app.post("/register", async (req, res) => {
                 }
             );
 
-            if (!updatedEvent) {
-                throw new Error("EVENT_FULL");
-            }
+if (!updatedEvent) {
+    const latestEvent = await Event.findOne({
+        name: EVENT_NAME
+    }).lean();
+
+    console.error("SEAT RESERVATION MATCH FAILED:", {
+        expectedEventName: EVENT_NAME,
+        eventFound: Boolean(latestEvent),
+        actualEventName: latestEvent?.name,
+        totalSeats: latestEvent?.totalSeats,
+        seatsRemaining: latestEvent?.seatsRemaining,
+        registrationOpen: latestEvent?.registrationOpen
+    });
+
+    throw new Error("EVENT_FULL");
+}
 
             const registration = new Registration({
                 name: cleanName,
                 registration_number: cleanRegNo,
                 email: cleanEmail,
+                branch: cleanBranch,
                 user: owner ? owner._id : null,
                 ...newTicketFields()
             });
@@ -1025,6 +1054,7 @@ app.post("/register", async (req, res) => {
                 registration_number: registration.registration_number,
                 email: registration.email,
                 ticketId: registration.ticketId
+                                branch: registration.branch,
             };
         });
 
@@ -1141,9 +1171,9 @@ app.get("/api/me", requireAuth, async (req, res) => {
 // ==================== PROFILE: MY TICKET ====================
 
 const STATUS_MESSAGES = {
-    registered: "Registered â€“ Your ticket is ready!",
-    checked_in: "Checked In â€“ You have been checked in successfully.",
-    invalid: "Invalid â€“ This ticket is not valid."
+    registered: "Registered – Your ticket is ready!",
+    checked_in: "Checked In – You have been checked in successfully.",
+    invalid: "Invalid – This ticket is not valid."
 };
 
 app.get("/api/ticket", requireAuth, async (req, res) => {
@@ -1215,7 +1245,7 @@ app.post("/api/checkin", async (req, res) => {
     try {
         await connectDB();
 
-        const { token } = req.body || {};
+        const { token } = req.body;
 
         if (
             typeof token !== "string" ||
@@ -1384,126 +1414,8 @@ app.get(
 
 // ==================== APPLICATIONS EXCEL EXPORT ====================
 
-
-// ==================== APPLICATIONS EXCEL EXPORT ====================
-
-function safeExcelText(value) {
-    const text = value === null || value === undefined
-        ? ""
-        : String(value);
-
-    // Prevent spreadsheet formula injection.
-    return /^[\s]*[=+\-@]/.test(text)
-        ? "'" + text
-        : text;
-}
-
-app.get(
-    "/api/applications.xlsx",
-    requireApplicationsExportKey,
-    async (req, res) => {
-        try {
-            await connectDB();
-
-            const applications = await Application.find({})
-                .select(
-                    "studentId name email phone college team why sampleName status createdAt"
-                )
-                .sort({ createdAt: -1 })
-                .lean();
-
-            const workbook = new ExcelJS.Workbook();
-
-            workbook.creator = "TEDxAASTMT";
-            workbook.created = new Date();
-
-            const worksheet = workbook.addWorksheet("Applications");
-
-            worksheet.columns = [
-                { header: "Student ID", key: "studentId", width: 16 },
-                { header: "Name", key: "name", width: 25 },
-                { header: "Email", key: "email", width: 32 },
-                { header: "Phone", key: "phone", width: 20 },
-                { header: "College / Major", key: "college", width: 28 },
-                { header: "Preferred Team", key: "team", width: 24 },
-                { header: "Why They Applied", key: "why", width: 55 },
-                { header: "Work Sample", key: "sampleName", width: 30 },
-                { header: "Application Status", key: "status", width: 20 },
-                { header: "Submitted At (Cairo)", key: "createdAt", width: 28 }
-            ];
-
-            worksheet.getRow(1).font = {
-                bold: true,
-                color: { argb: "FFFFFFFF" }
-            };
-
-            worksheet.getRow(1).fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "FFEB0028" }
-            };
-
-            worksheet.views = [
-                { state: "frozen", ySplit: 1 }
-            ];
-
-            worksheet.autoFilter = {
-                from: "A1",
-                to: "J1"
-            };
-
-            for (const application of applications) {
-                worksheet.addRow({
-                    studentId: safeExcelText(application.studentId),
-                    name: safeExcelText(application.name),
-                    email: safeExcelText(application.email),
-                    phone: safeExcelText(application.phone),
-                    college: safeExcelText(application.college),
-                    team: safeExcelText(application.team),
-                    why: safeExcelText(application.why),
-                    sampleName: safeExcelText(application.sampleName),
-                    status: safeExcelText(application.status),
-                    createdAt: cairoTimestamp(application.createdAt)
-                });
-            }
-
-            worksheet.eachRow((row, rowNumber) => {
-                if (rowNumber > 1) {
-                    row.alignment = {
-                        vertical: "top",
-                        wrapText: true
-                    };
-                }
-            });
-
-            const buffer = await workbook.xlsx.writeBuffer();
-
-            res.setHeader(
-                "Content-Type",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            );
-
-            res.setHeader(
-                "Content-Disposition",
-                'attachment; filename="TEDxAASTMT-Applications.xlsx"'
-            );
-
-            res.setHeader("Content-Length", buffer.length);
-
-            return res.send(Buffer.from(buffer));
-
-        } catch (error) {
-            console.error("APPLICATIONS EXPORT ERROR:", error);
-
-            return res.status(500).json({
-                message: "Failed to export applications."
-            });
-        }
     }
 );
-
-// ==================== SYNC EXISTING APPLICATIONS TO GOOGLE SHEETS ====================
-
 
 // ==================== SYNC EXISTING APPLICATIONS TO GOOGLE SHEETS ====================
 
@@ -1552,7 +1464,7 @@ app.post(
     }
 );
 
-
+// ==================== SUBMIT TEAM APPLICATION ====================
 
 // ==================== SUBMIT TEAM APPLICATION ====================
 
@@ -1588,7 +1500,7 @@ app.post(
                 college,
                 team,
                 why
-            } = req.body || {};
+            } = req.body;
 
             const cleanName =
                 typeof name === "string" ? name.trim() : "";
@@ -1695,15 +1607,24 @@ app.post(
                     : null
             });
 
-            applicationSaved = true;
-                        try {
-                await syncApplicationToGoogleSheet(application);
-                console.log("APPLICATION SYNCED TO GOOGLE SHEETS:", application.studentId);
-            } catch (sheetError) {
-                console.error("GOOGLE SHEETS SYNC ERROR:", sheetError);
-            }
+applicationSaved = true;
 
-            return res.status(201).json({
+// Sync to Google Sheets without affecting the successful application.
+try {
+    await syncApplicationToGoogleSheet(application);
+
+    console.log(
+        "APPLICATION SYNCED TO GOOGLE SHEETS:",
+        application.studentId
+    );
+} catch (sheetError) {
+    console.error(
+        "GOOGLE SHEETS SYNC ERROR:",
+        sheetError
+    );
+}
+
+return res.status(201).json({
                 message:
                     "Your application has been submitted successfully!",
                 applicationId: application._id
