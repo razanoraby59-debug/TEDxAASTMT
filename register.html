@@ -129,12 +129,6 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxlength: 254
     },
-        branch: {
-        type: String,
-        required: true,
-        enum: ["AbuQir", "Miami", "Alamein"],
-        trim: true
-    },
 
     password: {
         type: String,
@@ -217,6 +211,13 @@ const registrationSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
         maxlength: 254
+    },
+
+        branch: {
+        type: String,
+        required: true,
+        enum: ["AbuQir", "Miami", "Alamein"],
+        trim: true
     },
 
     registeredAt: {
@@ -1026,14 +1027,13 @@ if (!updatedEvent) {
         name: EVENT_NAME
     }).lean();
 
-    console.error("SEAT RESERVATION MATCH FAILED:", {
-        expectedEventName: EVENT_NAME,
-        eventFound: Boolean(latestEvent),
-        actualEventName: latestEvent?.name,
-        totalSeats: latestEvent?.totalSeats,
-        seatsRemaining: latestEvent?.seatsRemaining,
-        registrationOpen: latestEvent?.registrationOpen
-    });
+            savedRegistration = {
+                name: registration.name,
+                registration_number: registration.registration_number,
+                email: registration.email,
+                branch: registration.branch,
+                ticketId: registration.ticketId
+            };
 
     throw new Error("EVENT_FULL");
 }
@@ -1053,8 +1053,8 @@ if (!updatedEvent) {
                 name: registration.name,
                 registration_number: registration.registration_number,
                 email: registration.email,
-                ticketId: registration.ticketId,
-                                branch: registration.branch,
+                branch: registration.branch,
+                ticketId: registration.ticketId
             };
         });
 
