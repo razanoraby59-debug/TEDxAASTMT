@@ -806,8 +806,15 @@
     });
   });
 
-  var form = document.getElementById("join-form");
-  var status = document.getElementById("form-status");
+var form = document.getElementById("join-form");
+var status = document.getElementById("form-status");
+
+if (!form || !status) {
+    console.error("Join form initialization failed:", {
+        formFound: !!form,
+        statusFound: !!status
+    });
+} 
   var sample = document.getElementById("sample");
   var fileName = document.getElementById("file-name");
   var removeBtn = document.getElementById("remove-file");
@@ -821,11 +828,13 @@
     status.style.borderLeftColor = isError ? "#EB0028" : "#238636";
   }
 
-  function clearStatus() {
+function clearStatus() {
+    if (!status) return;
+
     status.textContent = "";
-    status.classList.remove("show");
-    status.style.borderLeftColor = "";
-  }
+    status.classList.remove("success");
+    status.classList.remove("error");
+}
 
   function clearSample() {
     sample.value = "";
