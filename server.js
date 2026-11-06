@@ -1,4 +1,4 @@
-require("dotenv").config();
+﻿require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
@@ -617,7 +617,7 @@ app.post("/login", async (req, res) => {
             });
         }
 
-        const { email, password } = req.body;
+        const { email, password } = req.body || {};
 
         if (
             typeof email !== "string" ||
@@ -778,7 +778,7 @@ app.post("/register", async (req, res) => {
             name,
             registration_number,
             email
-        } = req.body;
+        } = req.body || {};
 
         if (
             typeof name !== "string" ||
@@ -1018,9 +1018,9 @@ app.get("/api/me", requireAuth, async (req, res) => {
 // ==================== PROFILE: MY TICKET ====================
 
 const STATUS_MESSAGES = {
-    registered: "Registered – Your ticket is ready!",
-    checked_in: "Checked In – You have been checked in successfully.",
-    invalid: "Invalid – This ticket is not valid."
+    registered: "Registered â€“ Your ticket is ready!",
+    checked_in: "Checked In â€“ You have been checked in successfully.",
+    invalid: "Invalid â€“ This ticket is not valid."
 };
 
 app.get("/api/ticket", requireAuth, async (req, res) => {
@@ -1092,7 +1092,7 @@ app.post("/api/checkin", async (req, res) => {
     try {
         await connectDB();
 
-        const { token } = req.body;
+        const { token } = req.body || {};
 
         if (
             typeof token !== "string" ||
@@ -1410,7 +1410,7 @@ app.post(
                 college,
                 team,
                 why
-            } = req.body;
+            } = req.body || {};
 
             const cleanName =
                 typeof name === "string" ? name.trim() : "";
