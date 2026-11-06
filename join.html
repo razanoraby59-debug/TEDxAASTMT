@@ -48,20 +48,21 @@
 
     /* HEADER */
 
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      min-height: 76px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px max(32px, calc((100% - var(--page-width)) / 2));
-      background: rgba(255, 255, 255, 0.97);
-      border-bottom: 1px solid var(--light-grey);
-      backdrop-filter: blur(8px);
-    }
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem clamp(1rem, 4vw, 3rem);
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--light-grey);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(8px);
+}
 
     .logo {
       display: inline-flex;
@@ -673,6 +674,20 @@
               <input id="email" name="email" type="email" autocomplete="email" required>
             </div>
           </div>
+          <div class="field">
+  <label for="studentId">AASTMT registration number</label>
+  <input
+    id="studentId"
+    name="studentId"
+    type="text"
+    inputmode="numeric"
+    autocomplete="off"
+    maxlength="9"
+    pattern="[0-9]{9}"
+    placeholder="Your 9-digit registration number"
+    required
+  >
+</div>
 
           <div class="row">
             <div class="field">
@@ -733,7 +748,7 @@
   <!-- FOOTER -->
   <footer>
     <div class="foot-top">
-      <a class="logo" href="index.html" aria-label="TEDxAASTMT home">
+      <a class="logo" href="frontend.html" aria-label="TEDxAASTMT home">
         <span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span>
       </a>
 
@@ -848,14 +863,15 @@
     event.preventDefault();
     clearStatus();
 
-    var requiredFields = [
-      "name",
-      "email",
-      "phone",
-      "college",
-      "team",
-      "why"
-    ];
+var requiredFields = [
+  "name",
+  "email",
+  "studentId",
+  "phone",
+  "college",
+  "team",
+  "why"
+];
 
     var missing = false;
 
@@ -874,6 +890,16 @@
       );
       return;
     }
+
+    var studentId = document.getElementById("studentId").value.trim();
+
+if (!/^\d{9}$/.test(studentId)) {
+  showStatus(
+    "Your AASTMT registration number must contain exactly 9 digits.",
+    true
+  );
+  return;
+}
 
     var email = document.getElementById("email").value.trim();
 
