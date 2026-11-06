@@ -319,6 +319,59 @@
       background: #FFF6F7;
     }
 
+    /* =========================
+   BRANCH SELECTION
+========================= */
+
+.branch-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+}
+
+.branch-option {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+
+  padding: .7rem .9rem;
+  margin: 0;
+
+  background: var(--white);
+  border: 2px solid #C8C8C8;
+
+  font-size: .9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.branch-option:hover {
+  border-color: var(--red);
+}
+
+.branch-option:has(input:checked) {
+  border-color: var(--red);
+  background: #FFF6F7;
+}
+
+.branch-option input[type="radio"] {
+  width: auto;
+  padding: 0;
+  margin: 0;
+
+  accent-color: var(--red);
+  cursor: pointer;
+
+  box-shadow: none;
+}
+
+.branch-option input[type="radio"]:focus {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
     .hint {
       font-size: .8rem;
       color: var(--grey);
@@ -705,7 +758,7 @@ body::before {
         </h2>
 
         <p class="sub">
-          All three fields are required.
+          All fields are required.
         </p>
 
 
@@ -780,6 +833,29 @@ body::before {
             ></p>
 
           </div>
+
+          <div class="field">
+    <label>What's your branch?</label>
+
+    <div class="branch-options">
+        <label class="branch-option">
+            <input type="radio" name="branch" value="AbuQir" required>
+            AbuQir
+        </label>
+
+        <label class="branch-option">
+            <input type="radio" name="branch" value="Miami" required>
+            Miami
+        </label>
+
+        <label class="branch-option">
+            <input type="radio" name="branch" value="Alamein" required>
+            Alamein
+        </label>
+    </div>
+
+    <p class="error" id="branch-err"></p>
+</div>
 
 
           <!-- EMAIL -->
