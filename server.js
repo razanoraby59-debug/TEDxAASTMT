@@ -1056,7 +1056,8 @@ app.post("/register", async (req, res) => {
                 registration_number: registration.registration_number,
                 email: registration.email,
                 branch: registration.branch,
-                ticketId: registration.ticketId
+                ticketId: registration.ticketId,
+                ticketToken: registration.ticketToken
             };
         });
 
