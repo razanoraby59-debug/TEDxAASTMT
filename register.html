@@ -1226,119 +1226,50 @@ return "";
     /* ========================================
        SHOW CLOSED REGISTRATION
     ======================================== */
+function showClosedMessage() {
+  seatsElement.textContent = "0 seats";
+  formbox.innerHTML = `
+    <div class="closed">
+      <h2>Registration closed</h2>
+      <p>All 150 seats have been reserved.</p>
+    </div>`;
+}
 
-    function showClosedMessage() {
+async function updateSeats() {
+  try {
+    const response = await fetch(STATUS_ENDPOINT, { method: "GET", cache: "no-store" });
+    if (!response.ok) throw new Error("Server returned " + response.status);
 
-      seatsElement.textContent =
-        "0 seats";
+    const data = await response.json();
+    console.log("Event status:", data);
+    connectionError.style.display = "none";
 
-      formbox.innerHTML = `
+    // accept common key names
+    const raw = data.seatsRemaining ?? data.seats_remaining ?? data.remaining;
+    const seats = Number(raw);
 
-        <div class="closed">
-
-          <h2>
-            Registration closed
-          </h2>
-
-          <p>
-            All 150 seats have been reserved.
-          </p>
-
-        </div>
-
-      `;
-
+    if (raw === undefined || raw === null || Number.isNaN(seats)) {
+      throw new Error("Unexpected /event-status response");
     }
 
-
-    /* ========================================
-       UPDATE SEAT COUNT
-    ======================================== */
-
-    async function updateSeats() {
-
-      try {
-
-        const response =
-          await fetch(
-            STATUS_ENDPOINT,
-            {
-              method: "GET",
-              cache: "no-store"
-            }
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Server returned " +
-            response.status
-          );
-
-        }
-
-
-        const data =
-          await response.json();
-
-
-        console.log(
-          "Event status:",
-          data
-        );
-
-
-        connectionError.style.display =
-          "none";
-
-
-        /* SEATS AVAILABLE */
-
-        if (Number(data.seatsRemaining) > 0) {
-
-          seatsElement.textContent =
-            data.seatsRemaining +
-            (
-              data.seatsRemaining === 1
-                ? " seat"
-                : " seats"
-            );
-
-          return;
-
-        }
-
-
-        /* NO SEATS */
-
-        showClosedMessage();
-
-      }
-
-
-      catch (error) {
-
-        console.error(
-          "Could not load seat count:",
-          error
-        );
-
-
-        seatsElement.textContent =
-          "Unable to load";
-
-
-        connectionError.style.display =
-          "block";
-
-
-        connectionError.textContent =
-          "We couldn't load the registration status. Please refresh the page and try again.";
-
-      }
-
+    if (seats > 0) {
+      seatsElement.textContent = seats + (seats === 1 ? " seat" : " seats");
+      return;
     }
+
+    // only close when the server explicitly says 0
+    seatsElement.textContent = "0 seats";
+    form.style.display = "none";
+    document.getElementById("form-title").textContent = "Registration closed";
+    document.querySelector(".card .sub").textContent = "All 150 seats have been reserved.";
+  } catch (error) {
+    console.error("Could not load seat count:", error);
+    seatsElement.textContent = "Unable to load";
+    connectionError.style.display = "block";
+    connectionError.textContent =
+      "We couldn't load the registration status. Please refresh the page and try again.";
+  }
+}
 
 
     /* ========================================
