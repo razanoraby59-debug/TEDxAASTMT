@@ -9,6 +9,7 @@ const ExcelJS = require("exceljs");
 const multer = require("multer");
 const fs = require("fs");
 const crypto = require("crypto");
+const { google } = require("googleapis");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -336,6 +337,128 @@ const Application = mongoose.model(
     applicationSchema,
     "applications"
 );
+
+
+// ==================== GOOGLE SHEETS INTEGRATION ====================
+
+let googleSheetsClientPromise = null;
+
+async function getGoogleSheetsContext() {
+    if (!googleSheetsClientPromise) {
+        googleSheetsClientPromise = (async () => {
+            const encodedKey =
+                process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64;
+
+            const spreadsheetId =
+                process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+
+            if (!encodedKey || !spreadsheetId) {
+                throw new Error(
+                    "Google Sheets environment variables are missing."
+                );
+            }
+
+            const credentials = JSON.parse(
+                Buffer.from(encodedKey, "base64").toString("utf8")
+            );
+
+            const auth = new google.auth.GoogleAuth({
+                credentials,
+                scopes: [
+                    "https://www.googleapis.com/auth/spreadsheets"
+                ]
+            });
+
+            const sheets = google.sheets({
+                version: "v4",
+                auth
+            });
+
+            const metadata = await sheets.spreadsheets.get({
+                spreadsheetId,
+                fields: "sheets.properties.title"
+            });
+
+            const sheetTitle =
+                metadata.data.sheets?.[0]?.properties?.title;
+
+            if (!sheetTitle) {
+                throw new Error("Google spreadsheet tab not found.");
+            }
+
+            const quotedTitle =
+                "'" + sheetTitle.replace(/'/g, "''") + "'";
+
+            return {
+                sheets,
+                spreadsheetId,
+                quotedTitle
+            };
+        })().catch((error) => {
+            googleSheetsClientPromise = null;
+            throw error;
+        });
+    }
+
+    return googleSheetsClientPromise;
+}
+
+async function syncApplicationToGoogleSheet(application) {
+    const {
+        sheets,
+        spreadsheetId,
+        quotedTitle
+    } = await getGoogleSheetsContext();
+
+    const existingRows = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `${quotedTitle}!A:A`
+    });
+
+    const existingStudentIds = new Set(
+        (existingRows.data.values || [])
+            .flat()
+            .map(value => String(value))
+    );
+
+    if (existingStudentIds.has(String(application.studentId))) {
+        return false;
+    }
+
+    const submittedAt = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Africa/Cairo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    }).format(new Date(application.createdAt || Date.now()));
+
+    await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: `${quotedTitle}!A:J`,
+        valueInputOption: "USER_ENTERED",
+        insertDataOption: "INSERT_ROWS",
+        requestBody: {
+            values: [[
+                application.studentId || "",
+                application.name || "",
+                application.email || "",
+                application.phone || "",
+                application.college || "",
+                application.team || "",
+                application.why || "",
+                application.sampleName || "",
+                application.status || "pending",
+                submittedAt
+            ]]
+        }
+    });
+
+    return true;
+}
 
 // ==================== UNIQUE APPLICATION STUDENT ID ====================
 
@@ -1261,6 +1384,127 @@ app.get(
 
 // ==================== APPLICATIONS EXCEL EXPORT ====================
 
+
+// ==================== APPLICATIONS EXCEL EXPORT ====================
+
+function safeExcelText(value) {
+    const text = value === null || value === undefined
+        ? ""
+        : String(value);
+
+    // Prevent spreadsheet formula injection.
+    return /^[\s]*[=+\-@]/.test(text)
+        ? "'" + text
+        : text;
+}
+
+app.get(
+    "/api/applications.xlsx",
+    requireApplicationsExportKey,
+    async (req, res) => {
+        try {
+            await connectDB();
+
+            const applications = await Application.find({})
+                .select(
+                    "studentId name email phone college team why sampleName status createdAt"
+                )
+                .sort({ createdAt: -1 })
+                .lean();
+
+            const workbook = new ExcelJS.Workbook();
+
+            workbook.creator = "TEDxAASTMT";
+            workbook.created = new Date();
+
+            const worksheet = workbook.addWorksheet("Applications");
+
+            worksheet.columns = [
+                { header: "Student ID", key: "studentId", width: 16 },
+                { header: "Name", key: "name", width: 25 },
+                { header: "Email", key: "email", width: 32 },
+                { header: "Phone", key: "phone", width: 20 },
+                { header: "College / Major", key: "college", width: 28 },
+                { header: "Preferred Team", key: "team", width: 24 },
+                { header: "Why They Applied", key: "why", width: 55 },
+                { header: "Work Sample", key: "sampleName", width: 30 },
+                { header: "Application Status", key: "status", width: 20 },
+                { header: "Submitted At (Cairo)", key: "createdAt", width: 28 }
+            ];
+
+            worksheet.getRow(1).font = {
+                bold: true,
+                color: { argb: "FFFFFFFF" }
+            };
+
+            worksheet.getRow(1).fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "FFEB0028" }
+            };
+
+            worksheet.views = [
+                { state: "frozen", ySplit: 1 }
+            ];
+
+            worksheet.autoFilter = {
+                from: "A1",
+                to: "J1"
+            };
+
+            for (const application of applications) {
+                worksheet.addRow({
+                    studentId: safeExcelText(application.studentId),
+                    name: safeExcelText(application.name),
+                    email: safeExcelText(application.email),
+                    phone: safeExcelText(application.phone),
+                    college: safeExcelText(application.college),
+                    team: safeExcelText(application.team),
+                    why: safeExcelText(application.why),
+                    sampleName: safeExcelText(application.sampleName),
+                    status: safeExcelText(application.status),
+                    createdAt: cairoTimestamp(application.createdAt)
+                });
+            }
+
+            worksheet.eachRow((row, rowNumber) => {
+                if (rowNumber > 1) {
+                    row.alignment = {
+                        vertical: "top",
+                        wrapText: true
+                    };
+                }
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+
+            res.setHeader(
+                "Content-Type",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            );
+
+            res.setHeader(
+                "Content-Disposition",
+                'attachment; filename="TEDxAASTMT-Applications.xlsx"'
+            );
+
+            res.setHeader("Content-Length", buffer.length);
+
+            return res.send(Buffer.from(buffer));
+
+        } catch (error) {
+            console.error("APPLICATIONS EXPORT ERROR:", error);
+
+            return res.status(500).json({
+                message: "Failed to export applications."
+            });
+        }
+    }
+);
+
+// ==================== SYNC EXISTING APPLICATIONS TO GOOGLE SHEETS ====================
+
+
 // ==================== SYNC EXISTING APPLICATIONS TO GOOGLE SHEETS ====================
 
 app.post(
@@ -1452,6 +1696,12 @@ app.post(
             });
 
             applicationSaved = true;
+                        try {
+                await syncApplicationToGoogleSheet(application);
+                console.log("APPLICATION SYNCED TO GOOGLE SHEETS:", application.studentId);
+            } catch (sheetError) {
+                console.error("GOOGLE SHEETS SYNC ERROR:", sheetError);
+            }
 
             return res.status(201).json({
                 message:
