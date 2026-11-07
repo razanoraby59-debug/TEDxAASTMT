@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- register.html  |  build: 2026-11-06-v4 (ticket + QR + branch chips) -->
 <html lang="en">
 
 <head>
@@ -132,6 +133,7 @@
 
     .btn {
       display: inline-block;
+      text-align: center;
 
       background: var(--red);
       color: var(--white);
@@ -254,6 +256,12 @@
       padding: clamp(1.5rem, 4vw, 2.5rem);
     }
 
+    .card.ticket-mode {
+      background: transparent;
+      border-top: 0;
+      padding: 0;
+    }
+
     .card h2 {
       font-size: 1.6rem;
       letter-spacing: -.02em;
@@ -271,39 +279,6 @@
       margin-bottom: 1.8rem;
     }
 
-    .branch-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .65rem;
-      margin-top: .6rem;
-    }
-
-    .branch-option {
-      display: flex;
-      align-items: center;
-      gap: .55rem;
-      padding: .75rem 1rem;
-      margin: 0;
-      background: var(--white);
-      border: 2px solid #C8C8C8;
-      font-size: .9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: border-color .2s, background .2s;
-    }
-
-    .branch-option input[type="radio"] {
-      width: auto;
-      margin: 0;
-      padding: 0;
-      accent-color: var(--red);
-      cursor: pointer;
-    }
-
-    .branch-option:has(input:checked) {
-      border-color: var(--red);
-      background: #FFF6F7;
-    }
     .field {
       margin-bottom: 1.3rem;
     }
@@ -317,7 +292,8 @@
       margin-bottom: .4rem;
     }
 
-    input {
+    input[type="text"],
+    input[type="email"] {
       width: 100%;
 
       font: inherit;
@@ -335,11 +311,13 @@
         box-shadow .2s ease;
     }
 
-    input:hover {
+    input[type="text"]:hover,
+    input[type="email"]:hover {
       border-color: var(--grey);
     }
 
-    input:focus {
+    input[type="text"]:focus,
+    input[type="email"]:focus {
       border-color: var(--red);
       outline: none;
 
@@ -369,7 +347,58 @@
       min-height: 1.2em;
     }
 
-    .card .btn {
+    /* ---------- BRANCH CHIPS ---------- */
+
+    .branch-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      margin-top: .2rem;
+    }
+
+    .chip {
+      position: relative;
+      display: block;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .chip input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .chip span {
+      display: block;
+      padding: .75rem 1.3rem;
+      background: var(--white);
+      border: 2px solid #C8C8C8;
+      font-size: .95rem;
+      font-weight: 700;
+      transition: border-color .2s, background .2s, color .2s;
+    }
+
+    .chip:hover span {
+      border-color: var(--grey);
+    }
+
+    .chip input:checked + span {
+      border-color: var(--red);
+      background: var(--red);
+      color: var(--white);
+    }
+
+    .chip input:focus-visible + span {
+      outline: 3px solid var(--red);
+      outline-offset: 3px;
+    }
+
+    .card .btn.block {
       width: 100%;
 
       font-size: 1.05rem;
@@ -384,66 +413,6 @@
       margin-top: 1rem;
 
       text-align: center;
-    }
-
-    /* =========================
-       SUCCESS
-    ========================= */
-
-    .success {
-      display: none;
-      text-align: left;
-    }
-
-    .success.show {
-      display: block;
-    }
-
-    .tick {
-      width: 56px;
-      height: 56px;
-
-      border-radius: 50%;
-
-      background: var(--red);
-      color: var(--white);
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 1.8rem;
-      font-weight: 800;
-
-      margin-bottom: 1.2rem;
-    }
-
-    .success h2 {
-      margin-bottom: .6rem;
-      font-weight: 800;
-    }
-
-    .success p {
-      margin-bottom: 1.5rem;
-    }
-
-    .summary {
-      background: var(--white);
-
-      padding: 1rem 1.2rem;
-
-      margin-bottom: 1.5rem;
-
-      font-size: .95rem;
-
-      border-left: 4px solid var(--red);
-
-      word-break: break-word;
-    }
-
-    .summary b {
-      display: inline-block;
-      min-width: 8.5rem;
     }
 
     .formbox.hide {
@@ -487,10 +456,217 @@
     }
 
     /* =========================
+       SUCCESS + TICKET
+    ========================= */
+
+    .success {
+      display: none;
+    }
+
+    .success.show {
+      display: block;
+    }
+
+    .success:focus {
+      outline: none;
+    }
+
+    .success-title,
+    .success-sub {
+      text-align: center;
+    }
+
+    .success-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+      margin-bottom: .3rem;
+    }
+
+    .success-sub {
+      color: var(--grey);
+      font-size: .95rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .ticket {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-top: 0;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .12);
+      max-width: 420px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .t-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.4rem;
+      background: var(--black);
+      border-bottom: 5px solid var(--red);
+      color: var(--white);
+    }
+
+    .t-head .logo {
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+
+    .t-head .logo .aastmt {
+      color: var(--white);
+      font-weight: 900;
+    }
+
+    .t-badge {
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #ddd;
+      border: 1px solid #555;
+      padding: .25rem .6rem;
+      white-space: nowrap;
+    }
+
+    .t-qr {
+      text-align: center;
+      padding: 1.8rem 1.4rem 1.4rem;
+    }
+
+    .qr-frame {
+      display: inline-block;
+      padding: 12px;
+      background: var(--white);
+      border: 2px solid var(--black);
+      line-height: 0;
+    }
+
+    #qrcode {
+      width: 208px;
+      height: 208px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+      display: block;
+      width: 208px !important;
+      height: 208px !important;
+    }
+
+    .qr-fail {
+      font-size: .8rem;
+      line-height: 1.4;
+      color: var(--grey);
+      padding: .5rem;
+    }
+
+    .t-scan {
+      margin-top: .9rem;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+
+    .t-perf {
+      position: relative;
+      margin: 0 1.4rem;
+      border-top: 2px dashed #D0D0D0;
+    }
+
+    .t-body {
+      padding: 1.4rem;
+    }
+
+    .t-idrow {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .t-label {
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--brand-grey);
+    }
+
+    .t-id {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      color: var(--red);
+    }
+
+    .t-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 1.2rem;
+    }
+
+    .t-grid div {
+      min-width: 0;
+    }
+
+    .t-grid .wide {
+      grid-column: 1 / -1;
+    }
+
+    .t-grid dd {
+      font-size: .98rem;
+      font-weight: 700;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .t-foot {
+      background: var(--soft);
+      border-top: 1px solid var(--line);
+      padding: .8rem 1.4rem;
+      font-size: .76rem;
+      color: var(--grey);
+      text-align: center;
+    }
+
+    .t-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .7rem;
+      justify-content: center;
+      max-width: 420px;
+      margin: 1.4rem auto 0;
+    }
+
+    .t-actions .btn {
+      flex: 1 1 150px;
+      font-size: .95rem;
+      padding: .75rem 1rem;
+    }
+
+    .t-note {
+      max-width: 420px;
+      margin: 1rem auto 0;
+      font-size: .85rem;
+      color: var(--grey);
+      text-align: center;
+    }
+
+    /* =========================
        FOOTER
     ========================= */
 
-    
 /* FOOTER — matches frontend.html */
 
 footer {
@@ -570,6 +746,7 @@ footer .logo .aastmt {
   margin-top: 6px;
   color: #777;
 }
+
 body::before {
   content: "";
   position: fixed;
@@ -631,9 +808,10 @@ body::before {
         text-align: left;
       }
     }
+
     @media (max-width: 760px) {
-  body::before { background-position: 60% center; }
-}
+      body::before { background-position: 60% center; }
+    }
 
     @media (prefers-reduced-motion: reduce) {
 
@@ -642,8 +820,39 @@ body::before {
       }
 
       .btn,
+      .chip span,
       input {
         transition: none;
+      }
+    }
+
+    /* =========================
+       PRINT: ticket only
+    ========================= */
+
+    @media print {
+      .nav,
+      footer,
+      .intro,
+      .t-actions,
+      .t-note,
+      body::before {
+        display: none !important;
+      }
+
+      main {
+        display: block;
+        padding: 0;
+      }
+
+      .ticket {
+        box-shadow: none;
+        border: 1px solid #999;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
     }
   </style>
@@ -684,13 +893,14 @@ body::before {
 
     <section
       class="intro"
+      id="intro"
       aria-labelledby="page-title"
     >
 
       <h1 id="page-title">
-  <span class="ted">Save</span><br>
-  your seat
-</h1>
+        <span class="ted">Save</span><br>
+        your seat
+      </h1>
 
       <p>
         Entry is completely free. Tell us who you are and we'll hold a seat for you.
@@ -710,8 +920,8 @@ body::before {
         </li>
 
         <li>
-          <strong>Saturday 00 Month 2026</strong>
-          Main Hall, AASTMT
+          <strong id="event-date">Saturday 00 Month 2026</strong>
+          <span id="event-place">Main Hall, AASTMT</span>
         </li>
 
       </ul>
@@ -725,6 +935,7 @@ body::before {
 
     <section
       class="card"
+      id="card"
       aria-labelledby="form-title"
     >
 
@@ -737,7 +948,7 @@ body::before {
           Register for free
         </h2>
 
-        <p class="sub">
+        <p class="sub" id="form-sub">
           All fields are required.
         </p>
 
@@ -842,26 +1053,34 @@ body::before {
 
 
           <!-- BRANCH -->
-          <div class="field">
-            <label>What's your branch?</label>
-            <div class="branch-options">
-              <label class="branch-option">
+          <div class="field" id="branch-field">
+            <label id="branch-label">What's your branch?</label>
+
+            <div class="branch-options" role="radiogroup" aria-labelledby="branch-label">
+
+              <label class="chip">
                 <input type="radio" name="branch" value="AbuQir">
-                AbuQir
+                <span>AbuQir</span>
               </label>
-              <label class="branch-option">
+
+              <label class="chip">
                 <input type="radio" name="branch" value="Miami">
-                Miami
+                <span>Miami</span>
               </label>
-              <label class="branch-option">
+
+              <label class="chip">
                 <input type="radio" name="branch" value="Alamein">
-                Alamein
+                <span>Alamein</span>
               </label>
+
             </div>
-            <p class="error" id="branch-err"></p>
+
+            <p class="error" id="branch-err" role="alert"></p>
           </div>
+
+
           <button
-            class="btn"
+            class="btn block"
             type="submit"
             id="submit"
           >
@@ -879,7 +1098,7 @@ body::before {
 
 
       <!-- =========================
-           SUCCESS SCREEN
+           SUCCESS: YOUR TICKET
       ========================= -->
 
       <div
@@ -889,34 +1108,76 @@ body::before {
         aria-live="polite"
       >
 
-        <div
-          class="tick"
-          aria-hidden="true"
-        >
-          &#10003;
-        </div>
+        <h2 class="success-title">You're registered!</h2>
+        <p class="success-sub">Your seat is reserved. This is your ticket.</p>
 
-        <h2>
-          You're registered!
-        </h2>
+        <article class="ticket" id="ticket" aria-label="Your TEDxAASTMT ticket">
 
-        <p>
-          Your seat is reserved. Keep an eye on your inbox for event details.
+          <header class="t-head">
+            <span class="logo"><span class="ted">TED</span><span class="x">x</span><span class="aastmt">AASTMT</span></span>
+            <span class="t-badge">Admit one</span>
+          </header>
+
+          <div class="t-qr">
+            <div class="qr-frame"><div id="qrcode"></div></div>
+            <p class="t-scan">Scan at the entrance</p>
+          </div>
+
+          <div class="t-perf"></div>
+
+          <div class="t-body">
+
+            <div class="t-idrow">
+              <span class="t-label">Ticket ID</span>
+              <span class="t-id" id="t-id">&mdash;</span>
+            </div>
+
+            <dl class="t-grid">
+              <div class="wide">
+                <dt class="t-label">Name</dt>
+                <dd id="t-name"></dd>
+              </div>
+
+              <div>
+                <dt class="t-label">Registration no.</dt>
+                <dd id="t-regno"></dd>
+              </div>
+
+              <div>
+                <dt class="t-label">Branch</dt>
+                <dd id="t-branch"></dd>
+              </div>
+
+              <div class="wide">
+                <dt class="t-label">Email</dt>
+                <dd id="t-email"></dd>
+              </div>
+
+              <div>
+                <dt class="t-label">Date</dt>
+                <dd id="t-date"></dd>
+              </div>
+
+              <div>
+                <dt class="t-label">Venue</dt>
+                <dd id="t-place"></dd>
+              </div>
+            </dl>
+
+          </div>
+
+          <div class="t-foot">One scan per ticket &middot; Free entry</div>
+
+        </article>
+
+        <p class="t-note">
+          Screenshot or save this ticket &mdash; you'll need the QR code at the door.
         </p>
 
-
-        <div
-          class="summary"
-          id="summary"
-        ></div>
-
-
-        <a
-          class="btn ghost"
-          href="frontend.html"
-        >
-          Back to home
-        </a>
+        <div class="t-actions">
+          <button class="btn" type="button" id="print-ticket">Save / print ticket</button>
+          <button class="btn ghost" type="button" id="another">Register another person</button>
+        </div>
 
       </div>
 
@@ -949,7 +1210,6 @@ body::before {
             </svg>
           </a>
 
-          
 <a href="https://chat.whatsapp.com/JM1mXQBwc4v1iBPRBeJx5q"
    target="_blank"
    rel="noopener noreferrer"
@@ -964,7 +1224,6 @@ body::before {
     <path d="M20.52 3.48A11.8 11.8 0 0 0 12.1 0C5.56 0 .23 5.32.23 11.87c0 2.1.55 4.15 1.6 5.96L.13 24l6.33-1.66a11.9 11.9 0 0 0 5.63 1.43h.01c6.55 0 11.87-5.32 11.87-11.87 0-3.17-1.23-6.15-3.45-8.42ZM12.1 21.75h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.76.99 1-3.67-.24-.38a9.83 9.83 0 0 1-1.51-5.23c0-5.47 4.45-9.92 9.93-9.92 2.65 0 5.14 1.03 7.01 2.91a9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.92 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.67-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
   </svg>
 </a>
-
 
           <a href="https://www.facebook.com/YOUR_FACEBOOK_PAGE/"
              target="_blank" rel="noopener noreferrer"
@@ -994,7 +1253,7 @@ body::before {
       This independent TEDx event is operated under license from TED.
     </p>
 
-    <p class="legal made-by">Made by Razan AlOraby</p>
+    <p class="legal made-by">Made by Razan AlOraby &middot; build v4</p>
   </footer>
 
 
@@ -1005,51 +1264,39 @@ body::before {
   <script>
 
     /* ========================================
-       BACKEND
+       CONFIG
     ======================================== */
 
-    const FORM_ENDPOINT =
-  "/register";
+    const FORM_ENDPOINT = "/register";
+    const STATUS_ENDPOINT = "/event-status";
+    const TICKET_STORAGE_KEY = "tedxaastmt_ticket_v1";
 
-const STATUS_ENDPOINT =
-  "/event-status";
+    // QR library: tries these in order (first one that loads wins)
+    const QR_SOURCES = [
+      "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js",
+      "https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
+    ];
 
 
     /* ========================================
        ELEMENTS
     ======================================== */
 
-    const form =
-      document.getElementById("reg");
+    const form = document.getElementById("reg");
+    const card = document.getElementById("card");
+    const submitButton = document.getElementById("submit");
+    const seatsElement = document.getElementById("seats");
+    const formbox = document.getElementById("formbox");
+    const success = document.getElementById("success");
+    const connectionError = document.getElementById("connectionError");
+    const registrationNumber = document.getElementById("regno");
+    const branchError = document.getElementById("branch-err");
 
-    const submitButton =
-      document.getElementById("submit");
-
-    const seatsElement =
-      document.getElementById("seats");
-
-    const formbox =
-      document.getElementById("formbox");
-
-    const success =
-      document.getElementById("success");
-
-    const summary =
-      document.getElementById("summary");
-
-    const connectionError =
-      document.getElementById("connectionError");
-
-    const registrationNumber =
-      document.getElementById("regno");
-
-      const branchError = document.getElementById("branch-err");
-
-form.querySelectorAll('input[name="branch"]').forEach(radio => {
-  radio.addEventListener("change", () => {
-    branchError.textContent = "";
-  });
-});
+    form.querySelectorAll('input[name="branch"]').forEach(function(radio) {
+      radio.addEventListener("change", function() {
+        branchError.textContent = "";
+      });
+    });
 
 
     /* ========================================
@@ -1059,83 +1306,51 @@ form.querySelectorAll('input[name="branch"]').forEach(radio => {
     const fields = {
 
       name: {
-
         el: document.getElementById("name"),
-
         err: document.getElementById("name-err"),
-
         check: function(value) {
-
-if (value.length < 3) {
-  return "Name must contain at least 3 characters.";
-}
-
-if (/\d/.test(value)) {
-  return "No numbers are allowed in the name.";
-}
-return "";
-
+          if (value.length < 3) {
+            return "Name must contain at least 3 characters.";
+          }
+          if (/\d/.test(value)) {
+            return "No numbers are allowed in the name.";
+          }
+          return "";
         }
-
       },
-
 
       regno: {
-
         el: registrationNumber,
-
         err: document.getElementById("regno-err"),
-
         check: function(value) {
-
           if (!/^\d{9}$/.test(value)) {
-
             return "Registration number must be exactly 9 digits.";
-
           }
-
           return "";
-
         }
-
       },
 
-
       email: {
-
         el: document.getElementById("email"),
-
         err: document.getElementById("email-err"),
-
         check: function(value) {
-
-if (!/^[^\s@]+@gmail\.com$/i.test(value)) {
-  return "Please use a valid @gmail.com address.";
-}
-return "";
-
+          if (!/^[^\s@]+@gmail\.com$/i.test(value)) {
+            return "Please use a valid @gmail.com address.";
+          }
+          return "";
         }
-
       }
 
     };
 
 
     /* ========================================
-       REGISTRATION NUMBER
-       ONLY ALLOWS 9 DIGITS
+       REGISTRATION NUMBER - ONLY 9 DIGITS
     ======================================== */
 
-    registrationNumber.addEventListener(
-      "input",
-      function() {
-
-        this.value = this.value
-          .replace(/\D/g, "")
-          .slice(0, 9);
-
-      }
-    );
+    registrationNumber.addEventListener("input", function() {
+      this.value = this.value.replace(/\D/g, "").slice(0, 9);
+    });
 
 
     /* ========================================
@@ -1143,395 +1358,373 @@ return "";
     ======================================== */
 
     function validate(field) {
+      const value = field.el.value.trim();
+      const message = field.check(value);
 
-      const value =
-        field.el.value.trim();
-
-      const message =
-        field.check(value);
-
-      field.err.textContent =
-        message;
-
-      field.el.setAttribute(
-        "aria-invalid",
-        message ? "true" : "false"
-      );
+      field.err.textContent = message;
+      field.el.setAttribute("aria-invalid", message ? "true" : "false");
 
       return !message;
+    }
 
+    Object.keys(fields).forEach(function(key) {
+
+      fields[key].el.addEventListener("blur", function() {
+        validate(fields[key]);
+      });
+
+      fields[key].el.addEventListener("input", function() {
+        if (fields[key].el.getAttribute("aria-invalid") === "true") {
+          validate(fields[key]);
+        }
+      });
+
+    });
+
+
+    /* ========================================
+       CLOSED REGISTRATION
+       (hides the form but never deletes it)
+    ======================================== */
+
+    function showClosedMessage() {
+      seatsElement.textContent = "0 seats";
+      form.style.display = "none";
+      document.getElementById("form-title").textContent = "Registration closed";
+      document.getElementById("form-sub").textContent =
+        "All 150 seats have been reserved.";
     }
 
 
-    Object.keys(fields).forEach(
-      function(key) {
+    /* ========================================
+       UPDATE SEAT COUNT
+    ======================================== */
 
-        fields[key].el.addEventListener(
-          "blur",
-          function() {
+    async function updateSeats() {
 
-            validate(fields[key]);
+      try {
 
-          }
-        );
+        const response = await fetch(STATUS_ENDPOINT, {
+          method: "GET",
+          cache: "no-store"
+        });
 
+        if (!response.ok) {
+          throw new Error("Server returned " + response.status);
+        }
 
-        fields[key].el.addEventListener(
-          "input",
-          function() {
+        const data = await response.json();
 
-            if (
-              fields[key].el.getAttribute(
-                "aria-invalid"
-              ) === "true"
-            ) {
+        console.log("Event status:", data);
 
-              validate(fields[key]);
+        connectionError.style.display = "none";
 
-            }
+        const raw =
+          data.seatsRemaining ??
+          data.seats_remaining ??
+          data.remaining;
 
-          }
-        );
+        const seats = Number(raw);
+
+        if (raw === undefined || raw === null || Number.isNaN(seats)) {
+          throw new Error("Unexpected /event-status response");
+        }
+
+        if (seats > 0 && data.registrationOpen !== false) {
+          seatsElement.textContent =
+            seats + (seats === 1 ? " seat" : " seats");
+          return;
+        }
+
+        showClosedMessage();
+
+      } catch (error) {
+
+        console.error("Could not load seat count:", error);
+
+        seatsElement.textContent = "Unable to load";
+
+        connectionError.style.display = "block";
+
+        connectionError.textContent =
+          "We couldn't load the registration status. Please refresh the page and try again.";
 
       }
-    );
+
+    }
 
 
     /* ========================================
-       ESCAPE HTML
+       QR CODE
     ======================================== */
 
-    function escapeHTML(value) {
+    function loadScript(src) {
+      return new Promise(function(resolve, reject) {
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.onload = resolve;
+        s.onerror = function() { reject(new Error("Failed: " + src)); };
+        document.head.appendChild(s);
+      });
+    }
 
-      return value.replace(
-        /[&<>"']/g,
-        function(character) {
+    async function renderQR(value, fallbackText) {
 
-          return {
+      const box = document.getElementById("qrcode");
+      box.innerHTML = "";
 
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
+      try {
 
-          }[character];
-
+        if (typeof QRCode === "undefined") {
+          for (const src of QR_SOURCES) {
+            try {
+              await loadScript(src);
+              if (typeof QRCode !== "undefined") break;
+            } catch (e) { /* try next source */ }
+          }
         }
+
+        if (typeof QRCode === "undefined") {
+          throw new Error("QR library could not be loaded");
+        }
+
+        new QRCode(box, {
+          text: value,
+          width: 208,
+          height: 208,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+      } catch (error) {
+
+        console.error("QR error:", error);
+
+        const p = document.createElement("p");
+        p.className = "qr-fail";
+        p.textContent =
+          "QR code could not load. Show this ticket ID at the door: " + fallbackText;
+        box.appendChild(p);
+
+      }
+
+    }
+
+
+    /* ========================================
+       TICKET
+    ======================================== */
+
+    function showTicket(ticket) {
+
+      document.getElementById("t-id").textContent = ticket.ticketId || "—";
+      document.getElementById("t-name").textContent = ticket.name;
+      document.getElementById("t-regno").textContent = ticket.registration_number;
+      document.getElementById("t-branch").textContent = ticket.branch;
+      document.getElementById("t-email").textContent = ticket.email;
+
+      document.getElementById("t-date").textContent =
+        document.getElementById("event-date").textContent;
+
+      document.getElementById("t-place").textContent =
+        document.getElementById("event-place").textContent;
+
+      formbox.classList.add("hide");
+      card.classList.add("ticket-mode");
+      success.classList.add("show");
+
+      // QR holds the secure ticket token (used by /api/checkin);
+      // falls back to the ticket ID if the server did not send one.
+      renderQR(
+        ticket.ticketToken || ticket.ticketId || ticket.registration_number,
+        ticket.ticketId || ""
       );
 
+      success.focus({ preventScroll: true });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
     }
+
+    function saveTicket(ticket) {
+      try {
+        localStorage.setItem(TICKET_STORAGE_KEY, JSON.stringify(ticket));
+      } catch (e) { /* storage unavailable, ticket still shown */ }
+    }
+
+    function loadSavedTicket() {
+      try {
+        const raw = localStorage.getItem(TICKET_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearSavedTicket() {
+      try {
+        localStorage.removeItem(TICKET_STORAGE_KEY);
+      } catch (e) { /* ignore */ }
+    }
+
+    document.getElementById("print-ticket").addEventListener("click", function() {
+      window.print();
+    });
+
+    document.getElementById("another").addEventListener("click", function() {
+      clearSavedTicket();
+      window.location.reload();
+    });
 
 
     /* ========================================
-       SHOW CLOSED REGISTRATION
-    ======================================== */
-function showClosedMessage() {
-  seatsElement.textContent = "0 seats";
-  formbox.innerHTML = `
-    <div class="closed">
-      <h2>Registration closed</h2>
-      <p>All 150 seats have been reserved.</p>
-    </div>`;
-}
-
-async function updateSeats() {
-  try {
-    const response = await fetch(STATUS_ENDPOINT, { method: "GET", cache: "no-store" });
-    if (!response.ok) throw new Error("Server returned " + response.status);
-
-    const data = await response.json();
-    console.log("Event status:", data);
-    connectionError.style.display = "none";
-
-    // accept common key names
-    const raw = data.seatsRemaining ?? data.seats_remaining ?? data.remaining;
-    const seats = Number(raw);
-
-    if (raw === undefined || raw === null || Number.isNaN(seats)) {
-      throw new Error("Unexpected /event-status response");
-    }
-
-    if (seats > 0) {
-      seatsElement.textContent = seats + (seats === 1 ? " seat" : " seats");
-      return;
-    }
-
-    // only close when the server explicitly says 0
-    seatsElement.textContent = "0 seats";
-    form.style.display = "none";
-    document.getElementById("form-title").textContent = "Registration closed";
-    document.querySelector(".card .sub").textContent = "All 150 seats have been reserved.";
-  } catch (error) {
-    console.error("Could not load seat count:", error);
-    seatsElement.textContent = "Unable to load";
-    connectionError.style.display = "block";
-    connectionError.textContent =
-      "We couldn't load the registration status. Please refresh the page and try again.";
-  }
-}
-
-
-    /* ========================================
-       LOAD SEATS WHEN PAGE OPENS
+       ON PAGE LOAD
     ======================================== */
 
     updateSeats();
+
+    const savedTicket = loadSavedTicket();
+
+    if (savedTicket && savedTicket.name && savedTicket.ticketId) {
+      showTicket(savedTicket);
+    }
 
 
     /* ========================================
        SUBMIT REGISTRATION
     ======================================== */
 
-    form.addEventListener(
-      "submit",
-      async function(event) {
+    form.addEventListener("submit", async function(event) {
 
-        event.preventDefault();
+      event.preventDefault();
 
+      /* ---------- VALIDATE ---------- */
 
-        /* -------------------------------
-           VALIDATE
-        ------------------------------- */
+      let valid = true;
+      let firstInvalid = null;
 
-        let valid = true;
+      Object.keys(fields).forEach(function(key) {
 
-        let firstInvalid = null;
+        const isValid = validate(fields[key]);
 
-
-        Object.keys(fields).forEach(
-          function(key) {
-
-            const isValid =
-              validate(fields[key]);
-
-
-            if (!isValid) {
-
-              valid = false;
-
-              if (!firstInvalid) {
-
-                firstInvalid =
-                  fields[key].el;
-
-              }
-
-            }
-
-          }
-        );
-
-
-        const selectedBranch = form.querySelector(
-          'input[name="branch"]:checked'
-        );
-
-        if (!selectedBranch) {
-          branchError.textContent = "Please select your branch.";
+        if (!isValid) {
           valid = false;
-
           if (!firstInvalid) {
-            firstInvalid = form.querySelector('input[name="branch"]');
+            firstInvalid = fields[key].el;
           }
         }
 
-        if (!valid) {
-          firstInvalid.focus();
-          return;
+      });
+
+      const selectedBranch = form.querySelector(
+        'input[name="branch"]:checked'
+      );
+
+      if (!selectedBranch) {
+        branchError.textContent = "Please select your branch.";
+        valid = false;
+
+        if (!firstInvalid) {
+          firstInvalid = form.querySelector('input[name="branch"]');
         }
+      }
+
+      if (!valid) {
+        firstInvalid.focus();
+        return;
+      }
 
 
-        /* -------------------------------
-           DATA
-        ------------------------------- */
+      /* ---------- DATA ---------- */
 
-const registrationData = {
-  name: fields.name.el.value.trim(),
-  registration_number: fields.regno.el.value.trim(),
-  email: fields.email.el.value.trim().toLowerCase(),
-  branch: selectedBranch.value
-};
+      const registrationData = {
+        name: fields.name.el.value.trim(),
+        registration_number: fields.regno.el.value.trim(),
+        email: fields.email.el.value.trim().toLowerCase(),
+        branch: selectedBranch.value
+      };
 
 
-        /* -------------------------------
-           BUTTON
-        ------------------------------- */
+      /* ---------- BUTTON ---------- */
 
-        submitButton.disabled =
-          true;
-
-        submitButton.textContent =
-          "Reserving…";
+      submitButton.disabled = true;
+      submitButton.textContent = "Reserving…";
+      connectionError.style.display = "none";
 
 
-        connectionError.style.display =
-          "none";
+      try {
 
+        const response = await fetch(FORM_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(registrationData)
+        });
+
+        let result = {};
 
         try {
+          result = await response.json();
+        } catch (e) {
+          result = {};
+        }
 
-          console.log(
-            "Sending registration:",
-            registrationData
-          );
-
-
-          /* -------------------------------
-             SEND TO BACKEND
-          ------------------------------- */
-
-          const response =
-            await fetch(
-              FORM_ENDPOINT,
-              {
-
-                method: "POST",
-
-                headers: {
-                  "Content-Type": "application/json"
-                },
-
-                body:
-                  JSON.stringify(
-                    registrationData
-                  )
-
-              }
-            );
+        console.log("Registration response:", response.status, result);
 
 
-          /* -------------------------------
-             SERVER RESPONSE
-          ------------------------------- */
+        /* ---------- SUCCESS: SHOW TICKET ---------- */
 
-          let result = {};
+        if (response.ok) {
 
-          try {
+          const saved = result.registration || {};
 
-            result =
-              await response.json();
+          const ticket = {
+            name: saved.name || registrationData.name,
+            registration_number:
+              saved.registration_number || registrationData.registration_number,
+            email: saved.email || registrationData.email,
+            branch: saved.branch || registrationData.branch,
+            ticketId: saved.ticketId || "",
+            ticketToken: saved.ticketToken || ""
+          };
 
-          }
-
-          catch {
-
-            result = {};
-
-          }
-
-
-          console.log(
-            "Registration response:",
-            response.status,
-            result
-          );
-
-
-          /* -------------------------------
-             SUCCESS
-          ------------------------------- */
-
-           if (response.ok) {
-
-summary.innerHTML =
-  "<b>Name:</b> " +
-  escapeHTML(registrationData.name) +
-
-  "<br><b>Registration no.:</b> " +
-  escapeHTML(registrationData.registration_number) +
-
-  "<br><b>Email:</b> " +
-  escapeHTML(registrationData.email) +
-
-  "<br><b>Branch:</b> " +
-  escapeHTML(registrationData.branch);
-
-
-            formbox.classList.add(
-              "hide"
-            );
-
-
-            success.classList.add(
-              "show"
-            );
-
-
-            success.focus();
-
-
-            /*
-              Update the number immediately.
-
-              Example:
-              100 → 99
-              99 → 98
-              etc.
-            */
-
-            await updateSeats();
-
-            return;
-
-          }
-
-
-          /* -------------------------------
-             REGISTRATION FAILED
-          ------------------------------- */
-
-          submitButton.disabled =
-            false;
-
-          submitButton.textContent =
-            "Reserve my seat";
-
-
-          alert(
-            result.message ||
-            "Registration failed. Please try again."
-          );
-
-
-          /* Check seat count again */
+          saveTicket(ticket);
+          showTicket(ticket);
 
           await updateSeats();
 
-        }
-
-
-        catch (error) {
-
-          console.error(
-            "Registration request failed:",
-            error
-          );
-
-
-          submitButton.disabled =
-            false;
-
-          submitButton.textContent =
-            "Reserve my seat";
-
-
-          connectionError.style.display =
-            "block";
-
-
-          connectionError.textContent =
-            "The registration server could not be reached. Please refresh the page and try again.";
-
-
-          alert(
-            "Could not connect to the registration server. Please try again."
-          );
+          return;
 
         }
+
+
+        /* ---------- FAILED ---------- */
+
+        submitButton.disabled = false;
+        submitButton.textContent = "Reserve my seat";
+
+        alert(result.message || "Registration failed. Please try again.");
+
+        await updateSeats();
+
+      } catch (error) {
+
+        console.error("Registration request failed:", error);
+
+        submitButton.disabled = false;
+        submitButton.textContent = "Reserve my seat";
+
+        connectionError.style.display = "block";
+        connectionError.textContent =
+          "The registration server could not be reached. Please refresh the page and try again.";
+
+        alert("Could not connect to the registration server. Please try again.");
 
       }
-    );
+
+    });
 
   </script>
 
